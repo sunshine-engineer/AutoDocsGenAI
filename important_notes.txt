@@ -1,0 +1,563 @@
+
+
+Objective - An automated documentation knowledge pipeline that discovers, indexes, retrieves, validates, and generates structured learning material from authoritative sources.
+
+
+# Technology Stack
+
+| Layer               | Recommendation                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Orchestration       | LangGraph                                                                                                          |
+| LLM                 | Qwen 3, Llama 3.1, or Gemma (via Ollama) for local inference; optionally a free-tier hosted API during development |
+| Embeddings          | Nomic Embed or BAAI BGE-small                                                                                      |
+| Vector Store        | ChromaDB                                                                                                           |
+| Crawling            | Crawl4AI or Firecrawl (free tier), with BeautifulSoup as a fallback                                                |
+| Markdown Processing | `markdownify`, `pymdown`, `mistune` as needed                                                                      |
+| Validation          | Pydantic structured outputs                                                                                        |
+| Export              | Markdown files with a predictable directory structure                                                              |
+
+
+
+# Hallucination Prevention Strategy
+
+Since correctness is one of your primary goals, I would design the system around these principles:
+
+Use retrieval-augmented generation (RAG) so the model answers only from retrieved documentation.
+Restrict sources to official documentation and trusted repositories.
+Store source metadata with every chunk and include citations in the generated Markdown.
+Use structured output schemas so the model fills specific fields rather than writing unconstrained prose.
+If evidence is missing, instruct the model to explicitly say "Not documented" instead of guessing.
+Optionally run a second validation pass that checks every generated section against the retrieved context.
+
+High-Level Project Phases
+
+I would structure the project into the following phases:
+
+Documentation Discovery – Find official documentation, versioned docs, API references, and release notes.
+Document Ingestion – Crawl, clean, and normalize documentation into structured text.
+Knowledge Base – Chunk documents, generate embeddings, and index them in a vector store with rich metadata (source URL, version, section).
+Retrieval Layer – Retrieve only the most relevant chunks for each documentation section to generate.
+Structured Generation – Produce Markdown with predefined schemas (definitions, parameters, examples, notes, etc.) instead of free-form text.
+Validation & Quality Checks – Verify that generated content is grounded in retrieved context, include citations, and flag missing information instead of inventing answers.
+Export Layer – Write organized Markdown files and optionally build a searchable documentation site later.
+
+
+
+# The Core Principles
+
+Rule 1 — Official Documentation is the Source of Truth
+Never scrape blogs, Reddit, Medium, StackOverflow, or tutorials.
+
+The pipeline should only consume:
+
+Official documentation
+Official API Reference
+Official Release Notes
+Official Examples
+Official GitHub repository (optional, only if owned by the project)
+
+Everything generated must be traceable back to those sources.
+
+
+
+# Rule 2 — The LLM Never Invents Information
+
+The prompt should explicitly enforce:
+
+If the information is not present in the retrieved documentation, write:
+
+Not documented in the official documentation.
+
+instead of guessing.
+
+This is one of the biggest differences between a demo and a production system.
+
+
+# Rule 3 — Everything Must Be Traceable
+
+Every generated Markdown section should include its evidence.
+
+For example:
+
+## PromptTemplate
+
+Definition
+
+...
+
+Source
+
+https://python.langchain.com/docs/...
+
+Retrieved from
+
+Prompt Templates page
+
+This enables users to verify and review the generated content.
+
+
+# Rule 4 — Build Small
+
+I strongly agree with your suggestion.
+
+Instead of:
+
+Entire LangChain Docs
+
+the system should work like this:
+
+Prompt Templates
+
+↓
+
+Retrieve pages
+
+↓
+
+Generate PromptTemplate.md
+
+↓
+
+Human Review
+
+↓
+
+Approve
+
+↓
+
+Next Topic
+
+or
+
+Runnable
+
+↓
+
+Generate Runnable.md
+
+This improves quality, reduces context size, and makes retries inexpensive.
+
+
+Rule 5 — Human Approval
+
+Nothing is considered complete until the reviewer approves it.
+
+The workflow becomes:
+
+Generate
+
+↓
+
+Validate
+
+↓
+
+Quality Check
+
+↓
+
+Human Review
+
+↓
+
+Regenerate if needed
+
+↓
+
+Approve
+
+↓
+
+Save
+
+
+
+## Architecture
+              User
+
+                │
+
+                ▼
+
+       Project Configuration
+
+                │
+
+                ▼
+
+      Documentation Discovery
+
+                │
+
+                ▼
+
+      User verifies official URL
+
+                │
+
+                ▼
+
+      Documentation Downloader
+
+                │
+
+                ▼
+
+      HTML Cleaning Pipeline
+
+                │
+
+                ▼
+
+      Structured Documents
+
+                │
+
+                ▼
+
+      Intelligent Chunking
+
+                │
+
+                ▼
+
+      Embedding Pipeline
+
+                │
+
+                ▼
+
+        Vector Database
+
+                │
+
+                ▼
+
+      Retrieval Engine
+
+                │
+
+                ▼
+
+     Documentation Generator
+
+                │
+
+                ▼
+
+      Documentation Validator
+
+                │
+
+                ▼
+
+     Documentation Reviewer
+
+                │
+
+                ▼
+
+     Markdown File Generator
+
+                │
+
+                ▼
+
+      Final Documentation
+
+
+
+
+# Splitting responsibilities 
+1. Discovery Agent
+
+Input:
+
+Package
+
+Version
+
+Output:
+
+Official Documentation URL
+
+API URL
+
+Release Notes
+
+Examples
+
+The user confirms or overrides the URLs before proceeding.
+
+
+
+2. Ingestion Agent
+
+Responsible for:
+
+downloading pages
+extracting text
+preserving headings
+preserving code blocks
+removing navigation, ads, footers, and unrelated content
+
+No LLM should be involved here.
+
+3. Indexing Agent
+
+Responsible for:
+
+chunking
+metadata
+embeddings
+vector database
+
+Metadata should include:
+
+{
+  "package": "LangChain",
+  "version": "0.3",
+  "page": "Prompt Templates",
+  "heading": "MessagesPlaceholder",
+  "url": "...",
+  "chunk_id": 42
+}
+
+This metadata is essential for traceability and retrieval.
+
+
+4. Retrieval Agent
+
+Instead of asking:
+
+Summarize LangChain
+
+it should retrieve only the chunks relevant to the section being generated.
+
+Example:
+
+Generate PromptTemplate.md
+
+↓
+
+Retrieve only PromptTemplate chunks
+
+↓
+
+Pass to LLM
+
+This keeps context focused and improves factual accuracy.
+
+
+
+5. Documentation Writer Agent
+
+This is where the LLM is used.
+
+It should generate a consistent structure, such as:
+
+Definition
+
+Purpose
+
+When to Use
+
+Syntax
+
+Parameters
+
+Examples
+
+Common Mistakes
+
+Best Practices
+
+Related Components
+
+The model fills only sections supported by the retrieved evidence.
+
+
+6. Documentation Validator Agent
+
+This agent reviews the draft and checks:
+
+unsupported claims
+missing citations
+empty sections
+duplicated information
+formatting issues
+adherence to the template
+
+This acts as a quality gate before human review.
+
+7. Reviewer
+
+The user can:
+
+edit text
+request regeneration
+add instructions
+approve the final version
+
+
+Repository Structure
+documentation-pipeline/
+
+│
+
+├── config/
+│      config.yaml
+│
+├── discovery/
+│
+├── ingestion/
+│
+├── chunking/
+│
+├── embeddings/
+│
+├── vectorstore/
+│
+├── retrieval/
+│
+├── agents/
+│      writer.py
+│      validator.py
+│
+├── prompts/
+│
+├── markdown/
+│      templates/
+│
+├── generated_docs/
+│
+├── notebooks/
+│
+├── tests/
+│
+└── main.py
+
+This separation makes the project easier to extend and demonstrates good software design.
+
+
+
+Technology Choices (Free & Practical)
+
+For your requirements, I'd use:
+
+Component	Recommendation	Why
+Orchestration	LangGraph	Models the pipeline as a stateful graph and makes agent interactions explicit.
+LLM	Qwen 3 via Ollama	Strong instruction-following, free to run locally, and suitable for documentation tasks.
+Embeddings	Nomic Embed or BGE-small	Fast, open source, and accurate enough for retrieval.
+Vector Store	ChromaDB	Lightweight, local, and easy to integrate.
+Crawling	Crawl4AI	Handles modern documentation sites better than basic HTML parsing.
+Parsing	BeautifulSoup + Markdown conversion	Reliable cleanup of HTML while preserving structure.
+Validation	Pydantic	Enforces structured outputs and catches malformed responses early.
+
+
+
+Major Feature I'd Add
+
+I think this project can stand out even more by making every generated statement explainable.
+
+Imagine each Markdown section includes a hidden metadata block like:
+
+generated_by: Qwen 3
+package: LangChain
+version: 0.3
+
+sources:
+  - https://python.langchain.com/docs/...
+  - https://python.langchain.com/docs/...
+
+chunks:
+  - 17
+  - 22
+  - 31
+
+The visible documentation stays clean, but you retain complete provenance for auditing or regeneration. This is a production-oriented feature that many enterprise GenAI systems require.
+
+
+
+My Suggested Development Plan
+
+Rather than implementing features as a long checklist, I'd build the project incrementally with a working pipeline at every stage:
+
+Project foundation – repository structure, configuration, logging, and basic workflow.
+Documentation discovery – locate official docs, confirm URLs with the user, and support manual overrides.
+Ingestion – download and clean documentation while preserving headings and code blocks.
+Knowledge base – chunk, embed, and index the cleaned content with rich metadata.
+Retrieval – retrieve relevant chunks for a requested topic or section.
+Documentation generation – generate structured Markdown from retrieved evidence only.
+Validation – verify citations, detect unsupported claims, and enforce formatting.
+Human review – allow edits, regeneration with additional instructions, and approval.
+Export – save approved Markdown files with metadata and a consistent folder structure.
+
+
+
+## Options to discover online web information 
+### Google Search API
+Problems
+Requires API
+Costs money
+Unstable
+Rate limits
+
+### DuckDuckGo
+Free
+Still scraping search results
+Not deterministic
+
+GitHub Search
+Works for open-source projects
+
+
+### Use the package registry as the source of truth.
+PyPI
+
+↓
+
+Project URLs
+
+↓
+
+Homepage
+
+↓
+
+Documentation
+
+↓
+
+Repository
+
+## Discovery Flow
+Verified Documentation URL
+            │
+            ▼
+Discover Documentation Pages
+            │
+            ▼
+Build Crawl Plan
+            │
+            ▼
+User Review (optional)
+            │
+            ▼
+Download Pages
+            │
+            ▼
+Extract Main Content
+            │
+            ▼
+Normalize & Clean
+
+
+
+manifests/ → save discovery results for reuse.
+cache/ → avoid downloading the same documentation repeatedly.
+
+services/ → shared business logic (future LLM client, embedding service, tokenizer, etc.)
+storage/ → filesystem, ChromaDB, cache, manifests
+exporters/ → Markdown, HTML, PDF in future

@@ -1,0 +1,35 @@
+project:
+  name: "Documentation Knowledge Pipeline"
+  version: "0.1.0"
+
+package:
+  name: ""
+  version: ""
+
+llm:
+  provider: "ollama"
+  model: "qwen3"
+
+embedding:
+  provider: "ollama"
+  model: "nomic-embed-text"
+
+vectorstore:
+  provider: "chroma"
+  persist_directory: "./data/vectorstore"
+
+output:
+  directory: "./data/generated_docs"
+
+logging:
+  config_file: "./config/logging.yaml"
+
+data:
+  raw_directory: "./data/raw"
+  cleaned_directory: "./data/cleaned"
+  chunks_directory: "./data/chunks"
+  embeddings_directory: "./data/embeddings"
+
+pipeline:
+  stop_on_error: true
+  save_intermediate_files: true
