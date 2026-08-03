@@ -29,6 +29,14 @@ def main():
         print(page.url)
 
         print()
+    
+    for doc in state.raw_documents:
+        
+        print(doc.title)
+        print(doc.url)
+        print(doc.status_code)
+        print(doc.framework)
+        print()
 
     # print(state.model_dump())
 

@@ -566,4 +566,14 @@ exporters/ → Markdown, HTML, PDF in future
  + beautifulsoup4==4.15.0
  + soupsieve==2.9.1
 
- 
+ Phase 5 Goals
+
+By the end of the next phase, you'll have:
+
+✅ Framework-aware extraction (MkDocs, Docusaurus, Sphinx, Mintlify, etc.)
+✅ Removal of navigation, sidebars, headers, and footers
+✅ Preservation of headings, tables, code blocks, and lists
+✅ Clean, structured Markdown suitable for chunking
+✅ Much higher quality input for embeddings and LLM generation
+
+This phase is critical because everything downstream—chunking, retrieval, generation, and validation—depends on the quality of the extracted content. Investing in robust extraction now will significantly improve the quality of the final documentation.
