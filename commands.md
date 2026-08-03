@@ -43,3 +43,10 @@ python -m tests.test_config
  + httpcore==1.0.9
  + httpx==0.28.1
  + idna==3.18
+
+
+ + greenlet==3.5.4
+ + playwright==1.62.0
+ + pyee==13.0.1
+ + 
+playwright install chromium

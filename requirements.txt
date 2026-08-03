@@ -20,3 +20,4 @@ beautifulsoup4  ## used for parsing HTML and XML documents.
 
 markdownify>=1.2.0  ## used for converting HTML to Markdown.
 
+playwright>=1.55 ## used for automating web browsers to scrape dynamic content.
