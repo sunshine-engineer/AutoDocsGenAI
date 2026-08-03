@@ -11,6 +11,11 @@ from models.document import (
 
 from models.manifest import DocumentationManifest
 
+from models.crawl import CrawlPlan
+
+from models.raw_document import RawDocument
+from models.clean_document import CleanDocument
+
 class PipelineState(BaseModel):
     """
     Shared state passed through the pipeline.
@@ -35,3 +40,5 @@ class PipelineState(BaseModel):
     validation_reports: list[ValidationReport] = Field(default_factory=list)
 
     errors: list[str] = Field(default_factory=list)
+    
+    crawl_plan: CrawlPlan | None = None

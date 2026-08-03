@@ -15,3 +15,8 @@ pytest>=8.4.1  # Testing framework for unit and integration tests.
 
 
 httpx>=0.28  ## used for making HTTP requests to external APIs.
+
+beautifulsoup4  ## used for parsing HTML and XML documents.
+
+markdownify>=1.2.0  ## used for converting HTML to Markdown.
+

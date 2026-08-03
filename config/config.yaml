@@ -33,3 +33,6 @@ data:
 pipeline:
   stop_on_error: true
   save_intermediate_files: true
+
+crawl:
+  max_pages: 10

@@ -561,3 +561,9 @@ cache/ → avoid downloading the same documentation repeatedly.
 services/ → shared business logic (future LLM client, embedding service, tokenizer, etc.)
 storage/ → filesystem, ChromaDB, cache, manifests
 exporters/ → Markdown, HTML, PDF in future
+
+
+ + beautifulsoup4==4.15.0
+ + soupsieve==2.9.1
+
+ 

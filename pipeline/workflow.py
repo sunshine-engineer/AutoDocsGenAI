@@ -18,6 +18,10 @@ from agents.writer import generate_documentation
 from agents.validator import validate_documentation
 from agents.reviewer import review_documentation
 
+from planner.planner import build_crawl_plan
+
+from ingestion.ingest import ingest_documents
+
 
 logger = setup_logger()
 
@@ -33,6 +37,19 @@ def run_pipeline(state: PipelineState) -> PipelineState:
     len(state.manifest.sources),
     )
     
+    logger.info("Building Crawl Plan")
+    state = build_crawl_plan(state)
+    logger.info(
+    "Discovered %d pages.",
+    len(state.crawl_plan.pages),
+    )
+    
+    logger.info("Starting Document Ingestion")
+    state = ingest_documents(state)
+    logger.info(
+        "Downloaded %d documents.",
+        len(state.cleaned_documents),
+    )
     
     state = download_documents(state)
     state = parse_documents(state)
