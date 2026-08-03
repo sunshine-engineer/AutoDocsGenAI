@@ -1,209 +1,203 @@
+# Documentation Knowledge Pipeline
 
+A production-inspired Generative AI system that discovers official package documentation, ingests and cleans source content, retrieves relevant evidence, validates generated material, and produces structured Markdown documentation.
 
-# Repository Structure
-
-
-    documentation-knowledge-pipeline/
-                            │
-                            ├── config/
-                            │   ├── config.yaml   -- Only configuration
-                            │   └── logging.yaml  -- Only configuration
-                            │
-                            ├── data/
-                            │   ├── raw/
-                            │   ├── cleaned/
-                            │   ├── chunks/
-                            │   ├── embeddings/
-                            │   └── generated_docs/
-                            │
-                            ├── discovery/          -- only responsible for Package Official documentation URLs 
-                            │   ├── discover.py
-                            │   └── validator.py
-                            │
-                            ├── ingestion/          -- Only responsible for HTML to clean document generation
-                            │   ├── downloader.py
-                            │   ├── parser.py
-                            │   └── cleaner.py
-                            │
-                            ├── indexing/          -- responsible for Document > chunks > Enbeddings > Vector DB
-                            │   ├── chunker.py
-                            │   ├── embedder.py
-                            │   └── vectorstore.py
-                            │
-                            ├── retrieval/        -- responsible for Query > relevant chunks
-                            │   └── retriever.py
-                            │
-                            ├── agents/            -- LLM's live here
-                            │   ├── writer.py
-                            │   ├── validator.py
-                            │   └── reviewer.py
-                            │
-                            ├── prompts/
-                            │
-                            ├── models/             -- only pydantic models
-                            │   ├── state.py
-                            │   ├── config.py
-                            │   ├── metadata.py
-                            │   └── document.py
-                            │
-                            ├── pipeline/
-                            │   └── workflow.py
-                            │
-                            ├── utils/             Reusable helper functions
-                            │   ├── logger.py
-                            │   ├── file_utils.py
-                            │   └── helpers.py
-                            │
-                            ├── notebooks/
-                            │
-                            ├── tests/
-                            │
-                            ├── main.py
-                            │
-                            ├── requirements.txt
-                            │
-                            └── README.md
+> This project is a work in progress, but it is designed as a reliable documentation knowledge pipeline rather than a general-purpose chatbot.
 
+---
 
+## Overview
 
-# Pipeline Architecture
+This repository explores how to build an end-to-end GenAI system for technical documentation. The goal is to create a workflow that can move from raw documentation pages to polished, evidence-backed learning material.
 
-                                            State
+The project focuses on reliability, traceability, and grounded generation rather than casual conversational AI.
 
-                                            ↓
+---
 
-                                            Discovery
+## Why This Project Exists
 
-                                            ↓
+Many AI systems generate content confidently without sufficient grounding. This project addresses that by combining:
 
-                                            State
+- retrieval-augmented generation,
+- source-backed writing,
+- modular agent workflows,
+- and validation checkpoints.
 
-                                            ↓
+The emphasis is on building a trustworthy documentation pipeline for real-world use cases.
 
-                                            Downloader
+---
 
-                                            ↓
+## Core Objectives
 
-                                            State
+- Use only official documentation as the source of truth.
+- Reduce hallucinations by grounding generation in retrieved evidence.
+- Preserve traceability with metadata, citations, and source references.
+- Generate structured content in a reusable Markdown format.
+- Keep the workflow modular, extensible, and suitable for experimentation.
+- Build a strong portfolio project that demonstrates GenAI engineering practices.
 
-                                            ↓
+---
 
-                                            Cleaner
+## Core Principles
 
-                                            ↓
+1. Official sources only
+   - Allowed sources include official docs, API references, release notes, official examples, and official repositories.
 
-                                            State
+2. Zero invention
+   - If the information is not present in the source material, the system should clearly indicate that it is not documented.
 
-                                            ↓
+3. Evidence-based output
+   - Generated sections should be connected to retrieved chunks and source metadata.
 
-                                            Chunker
+4. Topic-scoped generation
+   - Content is generated for specific topics or pages rather than large unstructured document sets.
 
-                                            ↓
+5. Human review
+   - Final output should be validated and reviewed before export.
 
-                                            State
+---
 
-                                            ↓
+## System Architecture
 
-                                            Retriever
+The project is organized as a pipeline that moves from source discovery to final documentation generation.
 
-                                            ↓
+```text
+User Input
+   ↓
+Package Discovery
+   ↓
+Documentation URL Validation
+   ↓
+Downloader / Ingestion
+   ↓
+HTML Cleaning and Normalization
+   ↓
+Chunking and Indexing
+   ↓
+Embedding and Vector Storage
+   ↓
+Retrieval
+   ↓
+Documentation Generation
+   ↓
+Validation
+   ↓
+Review / Approval
+   ↓
+Markdown Export
+```
 
-                                            State
+## Current Workflow
 
-                                            ↓
+The current workflow follows these stages:
 
-                                            Writer
-
-                                            ↓
-
-                                            State
-
-                                            ↓
-
-                                            Validator
-
-                                            ↓
-
-                                            Export
-
-
-
-
-# Coding Standards
-
-| Standard      | Rule                              |
-| ------------- | --------------------------------- |
-| Language      | Python 3.12+                      |
-| Formatting    | `black`                           |
-| Linting       | `ruff`                            |
-| Type Checking | `mypy` (where practical)          |
-| Data Models   | Pydantic                          |
-| Docstrings    | Google style                      |
-| Imports       | Absolute imports                  |
-| Configuration | YAML only                         |
-| Logging       | `logging` module                  |
-| Testing       | `pytest`                          |
-| Secrets       | `.env` (never commit credentials) |
-
-
-
-
-
-
-# Packages
-
-| Component             | Library                                      | Why                                                                        |
-| --------------------- | -------------------------------------------- | -------------------------------------------------------------------------- |
-| Workflow / Agents     | **LangGraph**                                | Current standard for stateful agent workflows.                             |
-| LLM abstraction       | **LangChain**                                | Mature ecosystem with strong integration support.                          |
-| Local LLM             | **Ollama**                                   | Best local inference experience.                                           |
-| Embeddings            | **Nomic Embed** (via Ollama)                 | Excellent open-source embedding model.                                     |
-| Vector DB             | **ChromaDB**                                 | Simple, local-first, ideal for this project.                               |
-| Crawling              | **Crawl4AI**                                 | Better suited to modern documentation sites than basic scraping.           |
-| HTML parsing          | **BeautifulSoup4**                           | Still the de facto standard for HTML cleanup.                              |
-| Structured output     | **Pydantic v2**                              | Fast, type-safe, and integrates well with LangChain.                       |
-| Configuration         | **PyYAML**                                   | Stable and widely used.                                                    |
-| Environment variables | **python-dotenv**                            | Standard approach.                                                         |
-| Logging               | **Standard `logging`** + optional `colorlog` | Built into Python and production proven.                                   |
-| HTTP client           | **httpx**                                    | Modern async/sync HTTP client, preferred over `requests` for new projects. |
-| Testing               | **pytest**                                   | Industry standard.                                                         |
-| Linting               | **ruff**                                     | Fast, comprehensive, replacing multiple older tools.                       |
-| Formatting            | **black**                                    | Still widely adopted.                                                      |
-| Type checking         | **mypy**                                     | Good complement to Pydantic and type hints.                                |
-
-
-
-## Discovery Flow
-
-                Package Name
-
-                ↓
-
-                PyPI JSON API
-
-                ↓
-
-                Project URLs
-
-                ↓
-
-                Documentation URL
-
-                ↓
-
-                Homepage
-
-                ↓
-
-                GitHub
-
-                ↓
-
-                Release Notes
-
-                ↓
-
-                Build Manifest
-
-
+1. Accept a package name and version.
+2. Discover official documentation sources.
+3. Build a crawl plan for relevant pages.
+4. Download and ingest the documentation.
+5. Clean and normalize the HTML content.
+6. Create chunks and generate embeddings.
+7. Store the content in a vector index.
+8. Retrieve relevant evidence for a topic.
+9. Generate structured Markdown content.
+10. Validate the output and prepare it for review.
+
+---
+
+## Main Components
+
+### Discovery
+Responsible for identifying official documentation URLs and validating them.
+
+### Ingestion
+Handles downloading, parsing, and cleaning source content from documentation sites.
+
+### Indexing
+Processes cleaned documents into chunks, embeddings, and searchable indexes.
+
+### Retrieval
+Finds the most relevant chunks for a given topic or question.
+
+### Agents
+The project includes dedicated agent modules for:
+
+- writing documentation,
+- validating content,
+- and reviewing output.
+
+### Pipeline
+The workflow orchestration layer ties all the stages together into a single end-to-end process.
+
+---
+
+## Current Status
+
+This repository is in active development. The project structure and pipeline flow are in place, and several core modules have been scaffolded or partially implemented. Some of the agent stages are still placeholders, which makes this a strong WIP foundation for continued development.
+
+### What is already present
+- Pipeline state model
+- Documentation discovery flow
+- Ingestion and cleaning modules
+- Chunking and indexing structure
+- Retrieval module skeleton
+- Writer, validator, and reviewer agent modules
+- Main entry point
+
+### What is still being built
+- Full generation logic
+- Strong validation rules
+- Production-quality review flow
+- More robust retrieval and grounding behavior
+
+---
+
+## Tech Stack
+
+### Core Language
+- Python
+
+### Data and Validation
+- Pydantic
+- PyYAML
+- python-dotenv
+
+### HTTP and Parsing
+- httpx
+- BeautifulSoup4
+- markdownify
+- Playwright
+
+### Development and Quality
+- pytest
+- black
+- ruff
+- colorlog
+
+---
+
+## Repository Structure
+
+```text
+auto_doc_pipeline/
+├── agents/
+├── cleaning/
+├── config/
+├── data/
+├── discovery/
+├── ingestion/
+├── indexing/
+├── models/
+├── pipeline/
+├── planner/
+├── prompts/
+├── retrieval/
+├── services/
+├── storage/
+├── tests/
+├── utils/
+├── main.py
+├── requirements.txt
+└── README_1.md
+
+```
 
