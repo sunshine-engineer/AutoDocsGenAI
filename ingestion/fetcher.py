@@ -2,7 +2,7 @@ from models.raw_document import RawDocument
 
 from utils.http_client import http_client
 
-from ingestion.detectors.framework import detect_framework
+from services.framework_detector import detect_framework
 
 def fetch_document(
     title: str,
