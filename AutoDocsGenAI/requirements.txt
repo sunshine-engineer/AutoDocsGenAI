@@ -1,0 +1,23 @@
+# Configuration
+PyYAML>=6.0.2  # Parses .yaml configuration files.
+python-dotenv>=1.1.1 # Parses .env configuration files.
+
+# Data Models
+pydantic>=2.11.7 # andles data validation and type definitions using Python type annotations.
+
+# Logging
+colorlog>=6.9.0 # Adds color output to Python’s terminal logging
+
+# Development
+black>=25.1.0 # Code formatter to enforce standard style.
+ruff>=0.12.9  # High-speed linter and code style checker.
+pytest>=8.4.1  # Testing framework for unit and integration tests.
+
+
+httpx>=0.28  ## used for making HTTP requests to external APIs.
+
+beautifulsoup4  ## used for parsing HTML and XML documents.
+
+markdownify>=1.2.0  ## used for converting HTML to Markdown.
+
+playwright>=1.55 ## used for automating web browsers to scrape dynamic content.
