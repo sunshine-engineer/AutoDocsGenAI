@@ -40,3 +40,8 @@ data/generated_docs/*
 
 # Black
 .cache/
+.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
