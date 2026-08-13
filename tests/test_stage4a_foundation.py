@@ -18,6 +18,8 @@ def test_compose_uses_pinned_healthy_pgvector_service():
     assert postgres["volumes"] == ["postgres_data:/var/lib/postgresql/data"]
     assert "pg_isready" in " ".join(postgres["healthcheck"]["test"])
     assert services["app"]["depends_on"]["postgres"]["condition"] == ("service_healthy")
+    assert "model_cache:/models" in services["app"]["volumes"]
+    assert "model_cache" in compose["volumes"]
 
 
 def test_devcontainer_uses_compose_app_service():
@@ -50,4 +52,5 @@ def test_example_environment_documents_database_contract():
         "POSTGRES_USER",
         "POSTGRES_PASSWORD",
         "DATABASE_URL",
+        "FASTEMBED_CACHE_PATH",
     } <= keys

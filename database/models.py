@@ -1,6 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
+from pgvector.sqlalchemy import VECTOR
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
@@ -215,6 +216,59 @@ class ChunkRecord(Base):
     content: Mapped[str] = mapped_column(Text)
     content_hash: Mapped[str] = mapped_column(Text)
     character_count: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )
+
+
+class EmbeddingVersionRecord(TimestampMixin, Base):
+    __tablename__ = "embedding_versions"
+    __table_args__ = (
+        UniqueConstraint(
+            "provider",
+            "model_name",
+            "dimension",
+            name="uq_embedding_versions_identity",
+        ),
+        CheckConstraint("dimension > 0", name="positive_dimension"),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    provider: Mapped[str] = mapped_column(Text)
+    model_name: Mapped[str] = mapped_column(Text)
+    dimension: Mapped[int] = mapped_column(Integer)
+
+
+class ChunkEmbeddingRecord(Base):
+    __tablename__ = "chunk_embeddings"
+    __table_args__ = (
+        UniqueConstraint(
+            "chunk_id",
+            "embedding_version_id",
+            name="uq_chunk_embeddings_chunk_version",
+        ),
+        Index(
+            "ix_chunk_embeddings_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    chunk_id: Mapped[str] = mapped_column(ForeignKey("chunks.id", ondelete="RESTRICT"))
+    embedding_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("embedding_versions.id", ondelete="RESTRICT")
+    )
+    embedding: Mapped[list[float]] = mapped_column(VECTOR(384))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
     )

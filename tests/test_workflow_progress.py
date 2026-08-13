@@ -79,7 +79,8 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
             data=SimpleNamespace(
                 cleaned_directory=str(tmp_path / "data/cleaned"),
                 chunks_directory=str(tmp_path / "data/chunks"),
-            )
+            ),
+            embedding=SimpleNamespace(),
         ),
     )
     monkeypatch.setattr("pipeline.workflow.discover_documentation", discover)
@@ -96,8 +97,17 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
             }
         ),
     )
-    monkeypatch.setattr("pipeline.workflow.generate_embeddings", passthrough)
-    monkeypatch.setattr("pipeline.workflow.index_documents", passthrough)
+    monkeypatch.setattr(
+        "pipeline.workflow.index_persisted_chunks",
+        lambda **kwargs: SimpleNamespace(
+            to_dict=lambda: {
+                "model": "BAAI/bge-small-en-v1.5",
+                "dimension": 384,
+                "chunks_indexed": 1,
+                "chunks_reused": 0,
+            }
+        ),
+    )
     monkeypatch.setattr("pipeline.workflow.retrieve_relevant_chunks", passthrough)
     monkeypatch.setattr("pipeline.workflow.generate_documentation", passthrough)
     monkeypatch.setattr("pipeline.workflow.validate_documentation", passthrough)
@@ -119,5 +129,6 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
     )
     assert "[COMPLETED] PostgreSQL lineage persistence" in rendered
     assert "Chunks inserted: 1" in rendered
-    assert "[NEXT] Embedding generation and vector indexing" in rendered
-    assert "[COMPLETED] Embeddings" not in rendered
+    assert "[COMPLETED] CPU embeddings and pgvector indexing" in rendered
+    assert "Chunks indexed: 1" in rendered
+    assert "[NEXT] Metadata-filtered retrieval evaluation" in rendered

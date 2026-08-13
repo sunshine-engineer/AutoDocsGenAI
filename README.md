@@ -21,7 +21,7 @@ The project currently runs through ingestion:
 | Markdown normalization | Working MVP | Cleaned files under `data/cleaned/` |
 | Structure-aware chunking | Working MVP | Deterministic chunks and JSONL persistence |
 | PostgreSQL/pgvector foundation | Review stop B | Schema prepared, not applied |
-| Embeddings and vector index | Placeholder | Not implemented |
+| Embeddings and vector index | Prototype | Small CPU ONNX model and pgvector |
 | Retrieval | Placeholder | Not implemented |
 | Generation, validation, review | Placeholder | Not implemented |
 
@@ -115,12 +115,29 @@ The implemented pipeline now persists package, version, run, source, document,
 and chunk lineage after chunking. To import an existing chunk artifact directly:
 
 ```bash
-python scripts/import_chunks.py PACKAGE VERSION \
+python -m scripts.import_chunks PACKAGE VERSION \
   --input data/chunks/PACKAGE/VERSION/chunks.jsonl
 ```
 
 The command prints the run ID and inserted/reused counts. Repeating an unchanged
 import reuses the existing lineage instead of duplicating rows.
+
+The embedding prototype uses `BAAI/bge-small-en-v1.5` through FastEmbed's
+CPU-only ONNX runtime. The approximately 67 MB model is cached in the Docker
+`model_cache` volume at `/models/fastembed`, so rebuilding the app container
+does not redownload it. Embeddings are 384-dimensional and stored in pgvector.
+
+Index chunks already persisted in PostgreSQL:
+
+```bash
+python -m scripts.index_chunks PACKAGE VERSION
+```
+
+Search one indexed package version:
+
+```bash
+python -m scripts.search_chunks PACKAGE VERSION "your retrieval question"
+```
 
 Cleaned documentation is written to:
 

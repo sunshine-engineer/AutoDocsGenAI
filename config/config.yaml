@@ -11,12 +11,15 @@ llm:
   model: "qwen3"
 
 embedding:
-  provider: "ollama"
-  model: "nomic-embed-text"
+  provider: "fastembed"
+  model: "BAAI/bge-small-en-v1.5"
+  dimension: 384
+  batch_size: 16
+  cache_directory: "/models/fastembed"
 
 vectorstore:
-  provider: "chroma"
-  persist_directory: "./data/vectorstore"
+  provider: "pgvector"
+  persist_directory: "postgresql"
 
 database:
   host: "postgres"
