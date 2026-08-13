@@ -20,7 +20,7 @@ The project currently runs through ingestion:
 | Fetching and extraction | Working MVP | HTTP/Playwright fetch and main-content extraction |
 | Markdown normalization | Working MVP | Cleaned files under `data/cleaned/` |
 | Structure-aware chunking | Working MVP | Deterministic chunks and JSONL persistence |
-| PostgreSQL/pgvector foundation | Review stop A | Configuration and Compose |
+| PostgreSQL/pgvector foundation | Review stop B | Schema prepared, not applied |
 | Embeddings and vector index | Placeholder | Not implemented |
 | Retrieval | Placeholder | Not implemented |
 | Generation, validation, review | Placeholder | Not implemented |
@@ -152,6 +152,8 @@ roadmap and approved architecture decisions are in
 behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md). The
 approved next phase is detailed in
 [`docs/stage-4-postgres-pgvector-plan.md`](docs/stage-4-postgres-pgvector-plan.md).
+The proposed lineage schema for the current review stop is in
+[`docs/stage-4-schema-review.md`](docs/stage-4-schema-review.md).
 
 ## Roadmap
 
