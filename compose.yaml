@@ -1,0 +1,43 @@
+name: autodocs
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    command: sleep infinity
+    volumes:
+      - .:/workspaces/AutoDocsGenAI:cached
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-autodocs}
+      POSTGRES_USER: ${POSTGRES_USER:-autodocs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autodocs-local-change-me}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-autodocs}:${POSTGRES_PASSWORD:-autodocs-local-change-me}@postgres:5432/${POSTGRES_DB:-autodocs}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: pgvector/pgvector:0.8.6-pg17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-autodocs}
+      POSTGRES_USER: ${POSTGRES_USER:-autodocs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autodocs-local-change-me}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-autodocs} -d ${POSTGRES_DB:-autodocs}
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  postgres_data:
