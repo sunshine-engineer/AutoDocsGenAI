@@ -387,6 +387,9 @@ and coverage calculations. Produce an in-memory proposal and artifacts.
 Implement transactional idempotent persistence and explicit review transitions.
 Validate against disposable PostgreSQL.
 
+Detailed implementation plan:
+[`stage-6-stop-b3-persistence-plan.md`](stage-6-stop-b3-persistence-plan.md).
+
 ### B4: real catalog review stop
 
 Apply migration `0003` to the reusable database only after PR #12 is merged and
