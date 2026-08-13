@@ -224,6 +224,7 @@ def search_similar_chunks(
     engine: Engine | None = None,
     hybrid_rerank: bool = True,
     candidate_multiplier: int = 8,
+    embedder: LocalEmbedder | None = None,
 ) -> list[SearchHit]:
     """Return current chunks using cosine retrieval and metadata reranking."""
 
@@ -233,8 +234,8 @@ def search_similar_chunks(
         raise ValueError("candidate_multiplier must be positive")
     owned_engine = engine is None
     database_engine = engine or create_database_engine()
-    embedder = LocalEmbedder(config.model, config.cache_directory)
-    query_vector = embedder.embed_query(query)
+    query_embedder = embedder or LocalEmbedder(config.model, config.cache_directory)
+    query_vector = query_embedder.embed_query(query)
     distance = ChunkEmbeddingRecord.embedding.cosine_distance(query_vector)
 
     try:
@@ -269,7 +270,7 @@ def search_similar_chunks(
                     EmbeddingVersionRecord.model_name == config.model,
                     EmbeddingVersionRecord.dimension == config.dimension,
                 )
-                .order_by(distance)
+                .order_by(distance, ChunkRecord.id)
                 .limit(limit * candidate_multiplier if hybrid_rerank else limit)
             ).all()
         hits = [
