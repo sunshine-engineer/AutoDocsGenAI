@@ -18,6 +18,13 @@ vectorstore:
   provider: "chroma"
   persist_directory: "./data/vectorstore"
 
+database:
+  host: "postgres"
+  port: 5432
+  name: "autodocs"
+  user: "autodocs"
+  connect_timeout_seconds: 10
+
 output:
   directory: "./data/generated_docs"
 
