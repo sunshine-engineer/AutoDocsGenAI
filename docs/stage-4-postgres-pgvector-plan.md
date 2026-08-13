@@ -1,6 +1,7 @@
 # Stage 4 implementation plan: PostgreSQL and pgvector foundation
 
-Status: review stop A approved; review stop B schema prepared but not applied.
+Status: migration applied; MVP lineage persistence and idempotent chunk import
+implemented. Repository hardening is deferred to optimization.
 
 ## Objective
 

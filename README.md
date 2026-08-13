@@ -64,6 +64,7 @@ the following operations automatically:
 4. Installs Playwright Chromium and required Linux packages.
 5. Creates ignored runtime directories.
 6. Confirms that the PostgreSQL service is ready without printing credentials.
+7. Applies pending Alembic migrations idempotently.
 
 Re-run setup inside the container when needed:
 
@@ -109,6 +110,17 @@ The package and version are currently defined in `main.py`.
 ```bash
 python main.py
 ```
+
+The implemented pipeline now persists package, version, run, source, document,
+and chunk lineage after chunking. To import an existing chunk artifact directly:
+
+```bash
+python scripts/import_chunks.py PACKAGE VERSION \
+  --input data/chunks/PACKAGE/VERSION/chunks.jsonl
+```
+
+The command prints the run ID and inserted/reused counts. Repeating an unchanged
+import reuses the existing lineage instead of duplicating rows.
 
 Cleaned documentation is written to:
 

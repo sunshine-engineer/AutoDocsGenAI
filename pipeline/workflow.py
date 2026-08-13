@@ -11,6 +11,7 @@ from ingestion.ingest import ingest_documents
 from models.state import PipelineState
 from planner.planner import build_crawl_plan
 from retrieval.retriever import retrieve_relevant_chunks
+from services.chunk_importer import persist_pipeline_state
 from utils.config_loader import load_config
 from utils.logger import setup_logger
 from utils.progress import ProgressReporter
@@ -96,7 +97,13 @@ def run_pipeline(
         artifact=chunks_path,
     )
 
-    progress.next_stage("PostgreSQL/pgvector foundation")
+    import_result = persist_pipeline_state(state)
+    progress.completed(
+        "PostgreSQL lineage persistence",
+        import_result.to_dict(),
+    )
+
+    progress.next_stage("Embedding generation and vector indexing")
 
     # The stages below are placeholders. Do not report them as completed until
     # they produce real artifacts and meet their acceptance criteria.
