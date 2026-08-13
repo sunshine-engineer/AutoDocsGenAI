@@ -1,0 +1,122 @@
+[
+  {
+    "id": "create-agent-overview",
+    "content": "### create\\_agent  Creates an agent graph that calls tools in a loop.](/python/langchain/agents/factory/create_agent)[Function",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain",
+    "page_title": "Overview",
+    "header_path": ["LangChain", "Functions", "create\\_agent"],
+    "chunk_index": 0,
+    "content_hash": "hash-create-overview",
+    "character_count": 142
+  },
+  {
+    "id": "create-agent-focused",
+    "content": "### create\\_agent  Creates an agent graph that calls tools in a loop.](/python/langchain/agents/factory/create_agent)[Function",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain/agents",
+    "page_title": "Agents",
+    "header_path": ["Agents", "Functions", "create\\_agent"],
+    "chunk_index": 0,
+    "content_hash": "hash-create-focused",
+    "character_count": 142
+  },
+  {
+    "id": "agent-middleware",
+    "content": "### AgentMiddleware  Base middleware class for an agent.](/python/langchain/agents/middleware/types/AgentMiddleware)[Class",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain/middleware",
+    "page_title": "Middleware",
+    "header_path": ["Middleware", "Classes", "AgentMiddleware"],
+    "chunk_index": 0,
+    "content_hash": "hash-agent-middleware",
+    "character_count": 124
+  },
+  {
+    "id": "agent-state-type",
+    "content": "### AgentState  State schema for the agent.](/python/langchain/agents/middleware/types/AgentState)[Type",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain/middleware",
+    "page_title": "Middleware",
+    "header_path": ["Middleware", "Types", "AgentState"],
+    "chunk_index": 1,
+    "content_hash": "hash-agent-state",
+    "character_count": 104
+  },
+  {
+    "id": "cross-namespace",
+    "content": "### Client  LangSmith API client.](/python/langsmith/client/Client)[Class",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langsmith",
+    "page_title": "LangSmith",
+    "header_path": ["LangSmith", "Classes", "Client"],
+    "chunk_index": 0,
+    "content_hash": "hash-cross-namespace",
+    "character_count": 74
+  },
+  {
+    "id": "package-overview",
+    "content": "# LangChain\n\nLangChain is a framework for building agents and LLM applications.",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain",
+    "page_title": "Overview",
+    "header_path": ["LangChain"],
+    "chunk_index": 2,
+    "content_hash": "hash-overview",
+    "character_count": 77
+  },
+  {
+    "id": "quick-install",
+    "content": "## Quick Install\n\nInstall LangChain with pip.",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain",
+    "page_title": "Overview",
+    "header_path": ["LangChain", "Quick Install"],
+    "chunk_index": 3,
+    "content_hash": "hash-quick-install",
+    "character_count": 47
+  },
+  {
+    "id": "middleware-concept",
+    "content": "# Middleware\n\nReference documentation for middleware.",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain/middleware",
+    "page_title": "Middleware",
+    "header_path": ["Middleware"],
+    "chunk_index": 2,
+    "content_hash": "hash-middleware-concept",
+    "character_count": 55
+  },
+  {
+    "id": "malformed-marker",
+    "content": "### Broken  Broken target.](/python/langchain/broken path)[Function",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain",
+    "page_title": "Overview",
+    "header_path": ["LangChain", "Functions", "Broken"],
+    "chunk_index": 4,
+    "content_hash": "hash-malformed",
+    "character_count": 68
+  },
+  {
+    "id": "adjacent-package-overview",
+    "content": "# LangChain Community\n\nCommunity integrations.",
+    "package": "langchain",
+    "version": "0.3",
+    "source_url": "https://reference.langchain.com/python/langchain-community",
+    "page_title": "LangChain Community",
+    "header_path": ["LangChain Community"],
+    "chunk_index": 0,
+    "content_hash": "hash-adjacent-package",
+    "character_count": 48
+  }
+]
