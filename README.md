@@ -134,7 +134,9 @@ For system boundaries and design decisions, read
 [`docs/architecture.md`](docs/architecture.md). The authoritative delivery
 roadmap and approved architecture decisions are in
 [`docs/project-completion-plan.md`](docs/project-completion-plan.md). Chunking
-behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md).
+behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md). The
+approved next phase is detailed in
+[`docs/stage-4-postgres-pgvector-plan.md`](docs/stage-4-postgres-pgvector-plan.md).
 
 ## Roadmap
 
