@@ -5,8 +5,7 @@ from agents.validator import validate_documentation
 from agents.writer import generate_documentation
 from discovery.discover import discover_documentation
 from indexing.chunker import create_chunks
-from indexing.embedder import generate_embeddings
-from indexing.vectorstore import index_documents
+from indexing.vectorstore import index_persisted_chunks
 from ingestion.ingest import ingest_documents
 from models.state import PipelineState
 from planner.planner import build_crawl_plan
@@ -103,12 +102,20 @@ def run_pipeline(
         import_result.to_dict(),
     )
 
-    progress.next_stage("Embedding generation and vector indexing")
+    index_result = index_persisted_chunks(
+        package=state.package,
+        version=state.version,
+        config=config.embedding,
+    )
+    progress.completed(
+        "CPU embeddings and pgvector indexing",
+        index_result.to_dict(),
+    )
+
+    progress.next_stage("Metadata-filtered retrieval evaluation")
 
     # The stages below are placeholders. Do not report them as completed until
     # they produce real artifacts and meet their acceptance criteria.
-    state = generate_embeddings(state)
-    state = index_documents(state)
     state = retrieve_relevant_chunks(state)
     state = generate_documentation(state)
     state = validate_documentation(state)

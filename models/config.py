@@ -21,6 +21,9 @@ class LLMConfig(BaseModel):
 class EmbeddingConfig(BaseModel):
     provider: str
     model: str
+    dimension: int = Field(gt=0)
+    batch_size: int = Field(default=16, gt=0)
+    cache_directory: str = Field(min_length=1)
 
 
 class VectorStoreConfig(BaseModel):

@@ -75,4 +75,7 @@ log "Applying database migrations"
 python -m alembic upgrade head
 printf 'Database migration: %s\n' "$(python -m alembic current)"
 
+log "Preparing the CPU embedding model"
+python -m scripts.prepare_embedding_model
+
 printf '\nDevelopment environment ready at %s\n' "${PROJECT_ROOT}"

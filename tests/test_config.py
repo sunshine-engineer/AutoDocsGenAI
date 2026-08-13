@@ -13,3 +13,7 @@ def test_load_config():
     assert config.database.name == "autodocs"
     assert config.database.user == "autodocs"
     assert config.database.connect_timeout_seconds == 10
+    assert config.embedding.provider == "fastembed"
+    assert config.embedding.model == "BAAI/bge-small-en-v1.5"
+    assert config.embedding.dimension == 384
+    assert config.embedding.batch_size == 16
