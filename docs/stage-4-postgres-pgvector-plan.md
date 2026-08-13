@@ -1,6 +1,6 @@
 # Stage 4 implementation plan: PostgreSQL and pgvector foundation
 
-Status: review stop A implemented on `agent/stage4a-foundation`; awaiting review.
+Status: review stop A approved; review stop B schema prepared but not applied.
 
 ## Objective
 
