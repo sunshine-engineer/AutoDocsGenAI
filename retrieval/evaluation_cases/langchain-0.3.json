@@ -1,0 +1,26 @@
+[
+  {
+    "query": "create_agent function",
+    "expected_any": ["create_agent"]
+  },
+  {
+    "query": "init_chat_model function",
+    "expected_any": ["init_chat_model"]
+  },
+  {
+    "query": "SummarizationMiddleware",
+    "expected_any": ["SummarizationMiddleware"]
+  },
+  {
+    "query": "human in the loop middleware",
+    "expected_any": ["HumanInTheLoopMiddleware", "human_in_the_loop"]
+  },
+  {
+    "query": "before_model middleware decorator",
+    "expected_any": ["before_model"]
+  },
+  {
+    "query": "AgentMiddleware base class",
+    "expected_any": ["AgentMiddleware"]
+  }
+]
