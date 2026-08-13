@@ -61,5 +61,6 @@ def test_initial_migration_defers_embedding_schema_and_retains_extension():
 
     assert 'revision: str = "0001_stage4_lineage"' in migration
     assert "CREATE EXTENSION IF NOT EXISTS vector" in migration
+    assert "NEW.updated_at = clock_timestamp()" in migration
     assert "embedding" not in migration
     assert "DROP EXTENSION" not in migration
