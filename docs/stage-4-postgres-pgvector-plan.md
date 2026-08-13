@@ -1,6 +1,6 @@
 # Stage 4 implementation plan: PostgreSQL and pgvector foundation
 
-Status: approved next stage; implementation has not started.
+Status: review stop A approved; review stop B schema prepared but not applied.
 
 ## Objective
 
@@ -257,6 +257,11 @@ run-status timestamps.
 - extend typed configuration and `.env.example`;
 - regenerate `uv.lock`;
 - add configuration tests.
+
+Implementation note: review stop A also includes the Compose foundation listed
+under 4B so the configuration can be reviewed against its real container
+contract. Schema migrations and application database access remain deferred to
+review stop B.
 
 ### 4B — Dockerized PostgreSQL
 
