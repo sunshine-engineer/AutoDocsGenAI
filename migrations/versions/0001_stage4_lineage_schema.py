@@ -328,7 +328,7 @@ def upgrade() -> None:
         LANGUAGE plpgsql
         AS $$
         BEGIN
-            NEW.updated_at = CURRENT_TIMESTAMP;
+            NEW.updated_at = clock_timestamp();
             RETURN NEW;
         END;
         $$

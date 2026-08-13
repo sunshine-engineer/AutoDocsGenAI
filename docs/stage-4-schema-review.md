@@ -1,6 +1,7 @@
 # Stage 4 review stop B: lineage schema
 
-Status: schema and migration prepared; migration has not been applied.
+Status: validated against a disposable PostgreSQL/pgvector database; not applied
+to the persistent development database.
 
 ## Schema
 
@@ -104,3 +105,21 @@ first application target.
 
 Downgrade removes the six Stage 4 tables and the project trigger function. It
 does not drop the `vector` extension because that extension may be shared.
+
+## Disposable database validation
+
+Review stop B was validated against a temporary database and the database was
+removed afterward. The persistent `autodocs` database was not targeted.
+
+Validated behavior:
+
+- upgrade from an empty database to `0001_stage4_lineage`;
+- six expected lineage tables and pgvector `0.8.6` present;
+- constraints, partial current-revision index, and update triggers present;
+- no embedding columns created;
+- complete package-to-chunk insert succeeds inside a rolled-back transaction;
+- normalized package-name constraint rejects invalid input;
+- `updated_at` advances for multiple writes in one transaction;
+- a second upgrade is a no-op;
+- downgrade removes project tables and triggers while retaining pgvector;
+- re-upgrade recreates the expected schema.
