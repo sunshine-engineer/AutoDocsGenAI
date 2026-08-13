@@ -1,47 +1,26 @@
-# Python
+# Python environments and caches
+.venv/
+.venv-*/
+venv/
 __pycache__/
 *.py[cod]
-*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
 
-# Virtual Environment
-.venv/
-venv/
-
-# Environment
+# Local configuration and editor state
 .env
-
-# IDE
 .vscode/
 .idea/
 
-# Logs
+# Runtime output
 logs/
 *.log
-
-# Data
-data/raw/*
-data/cleaned/*
-data/chunks/*
-data/embeddings/*
-data/generated_docs/*
-
-# Keep folders
-!data/raw/.gitkeep
-!data/cleaned/.gitkeep
-!data/chunks/.gitkeep
-!data/embeddings/.gitkeep
-!data/generated_docs/.gitkeep
-
-# Pytest
-.pytest_cache/
-
-# Ruff
-.ruff_cache/
-
-# Black
-.cache/
-.env
-__pycache__/
-.pytest_cache/
-.ruff_cache/
-.venv/
+tmp/
+data/raw/
+data/cleaned/
+data/chunks/
+data/embeddings/
+data/vectorstore/
+data/generated_docs/
