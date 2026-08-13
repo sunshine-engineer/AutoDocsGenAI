@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass
 
 from sqlalchemy import Engine, select
@@ -36,6 +37,92 @@ class SearchHit:
     page_title: str
     header_path: list[str]
     score: float
+
+
+_QUERY_STOP_WORDS = {
+    "a",
+    "an",
+    "and",
+    "class",
+    "does",
+    "for",
+    "function",
+    "how",
+    "in",
+    "is",
+    "of",
+    "the",
+    "to",
+    "use",
+    "what",
+    "with",
+    "work",
+}
+
+
+def _search_text(value: str) -> str:
+    """Normalize Markdown/API identifiers for lexical comparison."""
+
+    value = value.replace("\\_", "_")
+    value = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value)
+    return " ".join(re.findall(r"[a-z0-9]+", value.lower()))
+
+
+def _lexical_relevance(query: str, hit: SearchHit) -> float:
+    """Score exact API-name and metadata agreement in the range 0..1."""
+
+    normalized_query = _search_text(query)
+    terms = [
+        term
+        for term in normalized_query.split()
+        if len(term) > 1 and term not in _QUERY_STOP_WORDS
+    ]
+    if not terms:
+        return 0.0
+
+    heading_text = _search_text(" ".join(hit.header_path))
+    title_text = _search_text(hit.page_title)
+    content_text = _search_text(hit.content)
+    url_text = _search_text(hit.source_url)
+
+    matched_weight = 0.0
+    for term in terms:
+        matched_weight += max(
+            1.0 if term in heading_text.split() else 0.0,
+            0.8 if term in title_text.split() else 0.0,
+            0.55 if term in content_text.split() else 0.0,
+            0.35 if term in url_text.split() else 0.0,
+        )
+    coverage = matched_weight / len(terms)
+
+    # Exact normalized phrases are especially valuable for API reference queries.
+    phrase_bonus = 0.0
+    if len(terms) > 1:
+        phrase = " ".join(terms)
+        if phrase in heading_text:
+            phrase_bonus = 0.25
+        elif phrase in content_text:
+            phrase_bonus = 0.15
+    return min(1.0, coverage + phrase_bonus)
+
+
+def rerank_search_hits(query: str, hits: list[SearchHit]) -> list[SearchHit]:
+    """Blend semantic similarity with bounded lexical/metadata relevance."""
+
+    reranked = []
+    for hit in hits:
+        lexical_score = _lexical_relevance(query, hit)
+        reranked.append(
+            SearchHit(
+                chunk_id=hit.chunk_id,
+                content=hit.content,
+                source_url=hit.source_url,
+                page_title=hit.page_title,
+                header_path=hit.header_path,
+                score=(0.85 * hit.score) + (0.15 * lexical_score),
+            )
+        )
+    return sorted(reranked, key=lambda hit: hit.score, reverse=True)
 
 
 def index_persisted_chunks(
@@ -135,11 +222,15 @@ def search_similar_chunks(
     config: EmbeddingConfig,
     limit: int = 5,
     engine: Engine | None = None,
+    hybrid_rerank: bool = True,
+    candidate_multiplier: int = 8,
 ) -> list[SearchHit]:
-    """Return cosine-ranked current chunks for one package version."""
+    """Return current chunks using cosine retrieval and metadata reranking."""
 
     if limit <= 0:
         raise ValueError("limit must be positive")
+    if candidate_multiplier <= 0:
+        raise ValueError("candidate_multiplier must be positive")
     owned_engine = engine is None
     database_engine = engine or create_database_engine()
     embedder = LocalEmbedder(config.model, config.cache_directory)
@@ -179,9 +270,9 @@ def search_similar_chunks(
                     EmbeddingVersionRecord.dimension == config.dimension,
                 )
                 .order_by(distance)
-                .limit(limit)
+                .limit(limit * candidate_multiplier if hybrid_rerank else limit)
             ).all()
-        return [
+        hits = [
             SearchHit(
                 chunk_id=row.id,
                 content=row.content,
@@ -192,6 +283,9 @@ def search_similar_chunks(
             )
             for row in rows
         ]
+        if hybrid_rerank:
+            hits = rerank_search_hits(query, hits)
+        return hits[:limit]
     finally:
         if owned_engine:
             database_engine.dispose()

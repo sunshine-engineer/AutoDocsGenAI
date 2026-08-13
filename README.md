@@ -139,6 +139,17 @@ Search one indexed package version:
 python -m scripts.search_chunks PACKAGE VERSION "your retrieval question"
 ```
 
+Search uses a broad cosine candidate set followed by a lightweight API-aware
+reranker. It rewards exact identifiers in headings, titles, content, and URLs
+while retaining semantic similarity as 85% of the final score.
+
+Compare the semantic baseline and tuned retrieval against the checked-in
+LangChain evaluation set:
+
+```bash
+python -m scripts.evaluate_retrieval langchain 0.3 --limit 5
+```
+
 Cleaned documentation is written to:
 
 ```text
@@ -186,12 +197,10 @@ The proposed lineage schema for the current review stop is in
 
 ## Roadmap
 
-1. Evaluate chunk quality with representative retrieval questions.
-2. Generate embeddings and persist them in a local vector store.
-3. Add metadata-filtered retrieval and a small retrieval evaluation set.
-4. Generate topic-scoped Markdown from retrieved evidence.
-5. Validate citations and unsupported claims.
-6. Add explicit human approval before export.
+1. Expand retrieval evaluation beyond the initial six prototype queries.
+2. Generate topic-scoped Markdown from retrieved evidence.
+3. Validate citations and unsupported claims.
+4. Add explicit human approval before export.
 
 ## License
 

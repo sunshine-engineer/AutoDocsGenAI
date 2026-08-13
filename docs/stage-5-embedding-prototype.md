@@ -1,6 +1,7 @@
 # Stage 5 embedding and vector-indexing prototype
 
-Status: prototype implemented and validated against disposable PostgreSQL.
+Status: prototype implemented, indexed, and retrieval-tuned against reusable
+PostgreSQL.
 
 ## Frozen prototype model
 
@@ -25,6 +26,23 @@ model can coexist during re-indexing instead of silently mixing vectors.
 5. An HNSW cosine index supports filtered similarity search.
 6. Retrieval filters package, version, current revision, provider, model, and
    dimension before returning source metadata and scores.
+7. A broad semantic candidate pool is reranked with bounded API identifier and
+   heading/title signals; stored embeddings do not change.
+
+## Retrieval evaluation
+
+The checked-in `retrieval/evaluation_cases/langchain-0.3.json` suite contains
+six representative API and natural-language queries. Run it with:
+
+```bash
+python -m scripts.evaluate_retrieval langchain 0.3 --limit 5
+```
+
+The evaluator reports Hit Rate@5, mean reciprocal rank (MRR), and each query's
+first relevant rank for both cosine-only and hybrid retrieval. On the reusable
+1,533-chunk LangChain 0.3 index, both modes achieved 100% Hit Rate@5; hybrid
+reranking improved MRR from 0.917 to 1.000 by moving the exact
+`SummarizationMiddleware` class from rank 2 to rank 1.
 
 ## Deferred optimization
 
@@ -32,7 +50,8 @@ model can coexist during re-indexing instead of silently mixing vectors.
 - dynamic vector dimensions through separate tables or schema versions;
 - adaptive batch sizing and parallel embedding workers;
 - model pre-baking into a custom image instead of first-run volume download;
-- index tuning, recall measurement, hybrid search, and reranking.
+- larger human-reviewed evaluation sets and learned reranking;
+- PostgreSQL full-text search for richer lexical recall.
 
 ## Validation evidence
 
@@ -44,4 +63,8 @@ model can coexist during re-indexing instead of silently mixing vectors.
 - an installation query ranked the installation chunk first;
 - stored vector dimension and cosine HNSW index verified;
 - disposable database removed after validation;
-- persistent development database intentionally remains at Stage 4 until review.
+- reusable database migrated to `0002_stage5_embeddings`;
+- all 1,533 current LangChain 0.3 chunks indexed with zero duplicate
+  chunk/model pairs;
+- repeat indexing reused all 1,533 embeddings;
+- six-query retrieval evaluation achieved 100% Hit Rate@5 and 1.000 tuned MRR.
