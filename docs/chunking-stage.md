@@ -1,5 +1,7 @@
 # Chunking Stage
 
+Status: planned next stage; implementation has not started.
+
 ## Goal
 
 Transform each cleaned Markdown document into deterministic, traceable chunks
@@ -42,3 +44,6 @@ Embedding generation and vector storage are explicitly outside this stage.
 - Chunk output is available in state and JSONL.
 - The stage runs without Ollama or ChromaDB.
 - Unit and integration tests pass.
+
+Embedding generation, vector storage, retrieval, and LLM generation must remain
+outside this change so chunk quality can be evaluated independently.

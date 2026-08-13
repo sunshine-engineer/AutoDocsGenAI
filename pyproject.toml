@@ -1,20 +1,41 @@
 [project]
-name = "auto_doc_generator"
+name = "auto-doc-generator"
 version = "0.1.0"
-description = "Generative AI application to generate markdown content automatically"
+description = "Source-grounded pipeline for generating technical documentation from official package docs"
+readme = "README.md"
 requires-python = ">=3.12"
-
 dependencies = [
-    "langchain",
-    "langgraph",
-    "pydantic",
-    "pydantic-settings",
-    "langchain-google-genai"
+    "beautifulsoup4>=4.13",
+    "colorlog>=6.9",
+    "httpx>=0.28",
+    "langchain>=0.3",
+    "langchain-google-genai>=2.1",
+    "langgraph>=0.4",
+    "markdownify>=1.2",
+    "playwright>=1.55",
+    "pydantic>=2.11",
+    "pydantic-settings>=2.10",
+    "python-dotenv>=1.1",
+    "pyyaml>=6.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest",
-    "pytest-asyncio",
-    "mypy",
+    "black>=25.1",
+    "mypy>=1.17",
+    "pytest>=8.4",
+    "pytest-asyncio>=1.1",
+    "ruff>=0.12",
+    "types-pyyaml>=6.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.black]
+target-version = ["py312"]
+line-length = 88

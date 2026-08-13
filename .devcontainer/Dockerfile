@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv
-RUN pip install uv
+# Keep the environment bootstrap reproducible.
+RUN pip install "uv==0.12.3"
 
 # Default shell
 CMD ["bash"]

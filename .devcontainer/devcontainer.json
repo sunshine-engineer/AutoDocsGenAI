@@ -1,11 +1,9 @@
 {
-    "name": "auto_doc_generator",
+    "name": "auto-doc-generator",
     "build": {
         "dockerfile": "Dockerfile",
         "context": ".."
     },
-
-
     "customizations": {
         "vscode": {
             "extensions": [
@@ -14,6 +12,8 @@
             ],
             "settings": {
                 "python.analysis.typeCheckingMode": "basic",
+                "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+                "python.terminal.activateEnvironment": true,
                 "editor.formatOnSave": true,
                 "editor.codeActionsOnSave": {
                     "source.fixAll": "explicit"
@@ -21,8 +21,6 @@
             }
         }
     },
-
     "remoteUser": "root",
-
-    "postCreateCommand": ".devcontainer/setup.sh"
+    "postCreateCommand": "bash .devcontainer/setup.sh"
 }
