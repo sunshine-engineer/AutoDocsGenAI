@@ -1,9 +1,9 @@
 {
     "name": "auto-doc-generator",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": ".."
-    },
+    "dockerComposeFile": "../compose.yaml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/AutoDocsGenAI",
+    "shutdownAction": "stopCompose",
     "customizations": {
         "vscode": {
             "extensions": [

@@ -20,6 +20,7 @@ The project currently runs through ingestion:
 | Fetching and extraction | Working MVP | HTTP/Playwright fetch and main-content extraction |
 | Markdown normalization | Working MVP | Cleaned files under `data/cleaned/` |
 | Structure-aware chunking | Working MVP | Deterministic chunks and JSONL persistence |
+| PostgreSQL/pgvector foundation | Review stop A | Configuration and Compose |
 | Embeddings and vector index | Placeholder | Not implemented |
 | Retrieval | Placeholder | Not implemented |
 | Generation, validation, review | Placeholder | Not implemented |
@@ -52,14 +53,17 @@ Prerequisites:
 - VS Code
 - Dev Containers extension
 
-Open the repository in VS Code and choose **Reopen in Container**. The container
-setup performs the following operations automatically:
+Copy `.env.example` to `.env`, replace the local database password, then open
+the repository in VS Code and choose **Reopen in Container**. Docker Compose
+starts the app and PostgreSQL/pgvector services. The container setup performs
+the following operations automatically:
 
 1. Creates `.env` from `.env.example` when needed.
 2. Runs `uv sync --all-groups --frozen`.
 3. Activates `.venv` for setup validation and configures VS Code to use it.
 4. Installs Playwright Chromium and required Linux packages.
 5. Creates ignored runtime directories.
+6. Confirms that the PostgreSQL service is ready without printing credentials.
 
 Re-run setup inside the container when needed:
 
@@ -70,6 +74,17 @@ bash .devcontainer/setup.sh
 The script is idempotent. `python -m playwright install --with-deps chromium`
 replaces the two overlapping Playwright commands: it installs both Chromium and
 its operating-system dependencies.
+
+Inspect the local database service from the repository root:
+
+```bash
+docker compose ps
+docker compose logs postgres
+```
+
+The named `postgres_data` volume survives ordinary container rebuilds and
+`docker compose down`. Do not run `docker compose down --volumes` unless you
+intend to erase the local database.
 
 ### Local setup
 
