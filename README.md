@@ -19,7 +19,7 @@ The project currently runs through ingestion:
 | Crawl planning | Working MVP | Relevant documentation page plan |
 | Fetching and extraction | Working MVP | HTTP/Playwright fetch and main-content extraction |
 | Markdown normalization | Working MVP | Cleaned files under `data/cleaned/` |
-| Structure-aware chunking | Next stage | Contract and implementation plan exist |
+| Structure-aware chunking | Working MVP | Deterministic chunks and JSONL persistence |
 | Embeddings and vector index | Placeholder | Not implemented |
 | Retrieval | Placeholder | Not implemented |
 | Generation, validation, review | Placeholder | Not implemented |
@@ -136,7 +136,7 @@ specified in [`docs/chunking-stage.md`](docs/chunking-stage.md).
 
 ## Roadmap
 
-1. Implement and evaluate deterministic Markdown chunking.
+1. Evaluate chunk quality with representative retrieval questions.
 2. Generate embeddings and persist them in a local vector store.
 3. Add metadata-filtered retrieval and a small retrieval evaluation set.
 4. Generate topic-scoped Markdown from retrieved evidence.

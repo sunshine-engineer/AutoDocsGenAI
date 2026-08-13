@@ -22,7 +22,7 @@ over conversational behavior or broad web search.
 | `discovery/` | Find and validate official sources | MVP implemented |
 | `planner/` | Select documentation URLs to ingest | MVP implemented |
 | `ingestion/` | Fetch HTML, extract content, normalize and save Markdown | MVP implemented |
-| `indexing/` | Chunk, embed, and persist searchable content | Chunking is next |
+| `indexing/` | Chunk, embed, and persist searchable content | Chunking MVP implemented |
 | `retrieval/` | Return relevant evidence with metadata | Placeholder |
 | `agents/` | Write, validate, and review grounded output | Placeholder |
 | `pipeline/` | Coordinate state transitions | Scaffolded |
@@ -57,13 +57,13 @@ content and configuration should produce the same chunk identities.
 - Playwright is always selected by the current ingestion orchestrator.
 - Framework-specific extractors are mostly placeholders; generic extraction is
   the working fallback.
-- Chunking, embeddings, indexing, retrieval, generation, and validation are not
+- Embeddings, vector indexing, retrieval, generation, and validation are not
   implemented yet.
 - There is no command-line interface or human-approval interface yet.
 
 ## Near-term technical decisions
 
-- Implement Markdown heading-aware chunking before adding embeddings.
+- Evaluate heading-aware chunks before adding embeddings.
 - Persist chunks as inspectable JSONL before storing vectors.
 - Keep local-first infrastructure and free-tier tooling where practical.
 - Add evaluation fixtures before tuning chunk sizes or retrieval parameters.

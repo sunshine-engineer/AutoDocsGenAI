@@ -55,14 +55,18 @@ class CrawlConfig(BaseModel):
 class ChunkingConfig(BaseModel):
     max_characters: int = Field(default=4000, gt=0)
     overlap_characters: int = Field(default=400, ge=0)
-    headers: list[str] = Field(
-        default_factory=lambda: ["#", "##", "###", "####"]
-    )
+    headers: list[str] = Field(default_factory=lambda: ["#", "##", "###", "####"])
 
     @model_validator(mode="after")
     def validate_overlap(self) -> Self:
         if self.overlap_characters >= self.max_characters:
             raise ValueError("overlap_characters must be smaller than max_characters")
+        if not self.headers:
+            raise ValueError("headers must contain at least one heading marker")
+        if len(self.headers) != len(set(self.headers)):
+            raise ValueError("headers must not contain duplicates")
+        if any(not marker or set(marker) != {"#"} for marker in self.headers):
+            raise ValueError("headers must contain only ATX heading markers")
         return self
 
 
