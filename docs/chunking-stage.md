@@ -1,6 +1,6 @@
 # Chunking Stage
 
-Status: planned next stage; implementation has not started.
+Status: MVP implemented.
 
 ## Goal
 
@@ -26,6 +26,18 @@ Embedding generation and vector storage are explicitly outside this stage.
 6. Generate deterministic content hashes and chunk IDs.
 7. Save chunks as JSONL and populate `PipelineState.chunks`.
 
+## Current behavior
+
+- Configured ATX headings split documents into semantic sections.
+- Heading-like text inside backtick or tilde code fences is ignored.
+- Oversized prose splits at paragraph, line, or word boundaries.
+- Oversized code blocks are divided into independently balanced fences.
+- Overlap is applied to prose but not across code fences.
+- SHA-256 content hashes and identity hashes make output deterministic.
+- Repeated input documents and repeated pipeline runs do not duplicate chunks.
+- JSONL output is atomically replaced at
+  `data/chunks/{package}/{version}/chunks.jsonl`.
+
 ## Required tests
 
 - Nested headings preserve their hierarchy.
@@ -44,6 +56,8 @@ Embedding generation and vector storage are explicitly outside this stage.
 - Chunk output is available in state and JSONL.
 - The stage runs without Ollama or ChromaDB.
 - Unit and integration tests pass.
+
+All definition-of-done requirements above are covered by the current tests.
 
 Embedding generation, vector storage, retrieval, and LLM generation must remain
 outside this change so chunk quality can be evaluated independently.

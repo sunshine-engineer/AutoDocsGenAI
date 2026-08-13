@@ -31,6 +31,12 @@ def test_chunking_defaults_have_valid_overlap():
     assert 0 <= config.overlap_characters < config.max_characters
 
 
+@pytest.mark.parametrize("headers", [[], ["#", "#"], ["#", "heading"]])
+def test_chunking_config_rejects_invalid_headers(headers):
+    with pytest.raises(ValidationError):
+        ChunkingConfig(headers=headers)
+
+
 def test_chunk_contract_rejects_incorrect_character_count():
     with pytest.raises(ValidationError):
         Chunk(
