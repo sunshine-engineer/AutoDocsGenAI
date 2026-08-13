@@ -272,3 +272,126 @@ class ChunkEmbeddingRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
     )
+
+
+class TopicCatalogRecord(TimestampMixin, Base):
+    __tablename__ = "topic_catalogs"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('draft', 'awaiting_approval', 'approved', "
+            "'rejected', 'superseded')",
+            name="valid_status",
+        ),
+        CheckConstraint(
+            "(status = 'approved' AND approved_by IS NOT NULL AND "
+            "approved_at IS NOT NULL) OR "
+            "(status <> 'approved' AND approved_by IS NULL AND "
+            "approved_at IS NULL)",
+            name="valid_approval",
+        ),
+        UniqueConstraint(
+            "documentation_version_id",
+            "config_hash",
+            name="uq_topic_catalogs_documentation_version_config_hash",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    documentation_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("documentation_versions.id", ondelete="RESTRICT")
+    )
+    source_pipeline_run_id: Mapped[UUID] = mapped_column(
+        ForeignKey("pipeline_runs.id", ondelete="RESTRICT")
+    )
+    config_hash: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text, server_default=text("'draft'"))
+    approved_by: Mapped[str | None] = mapped_column(Text)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class TopicRecord(TimestampMixin, Base):
+    __tablename__ = "topics"
+    __table_args__ = (
+        CheckConstraint(
+            "kind IN ('module', 'class', 'function', 'concept', 'guide')",
+            name="valid_kind",
+        ),
+        CheckConstraint(
+            "status IN ('proposed', 'approved', 'rejected')",
+            name="valid_status",
+        ),
+        CheckConstraint("sort_order >= 0", name="nonnegative_sort_order"),
+        CheckConstraint("parent_id IS NULL OR parent_id <> id", name="not_own_parent"),
+        CheckConstraint("slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'", name="valid_slug"),
+        CheckConstraint(
+            "output_path !~ '(^/|(^|/)\\.\\.(/|$))' AND " "output_path ~ '\\.md$'",
+            name="safe_markdown_output_path",
+        ),
+        Index(
+            "uq_topics_catalog_qualified_name_ci",
+            "catalog_id",
+            text("lower(qualified_name)"),
+            unique=True,
+        ),
+        Index(
+            "uq_topics_catalog_output_path_ci",
+            "catalog_id",
+            text("lower(output_path)"),
+            unique=True,
+        ),
+        Index("ix_topics_catalog_parent", "catalog_id", "parent_id"),
+        Index("ix_topics_catalog_kind_status", "catalog_id", "kind", "status"),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    catalog_id: Mapped[UUID] = mapped_column(
+        ForeignKey("topic_catalogs.id", ondelete="RESTRICT")
+    )
+    parent_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("topics.id", ondelete="RESTRICT")
+    )
+    kind: Mapped[str] = mapped_column(Text)
+    qualified_name: Mapped[str] = mapped_column(Text)
+    display_name: Mapped[str] = mapped_column(Text)
+    slug: Mapped[str] = mapped_column(Text)
+    output_path: Mapped[str] = mapped_column(Text)
+    aliases: Mapped[list[str]] = mapped_column(
+        JSONB, server_default=text("'[]'::jsonb")
+    )
+    summary: Mapped[str | None] = mapped_column(Text)
+    sort_order: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    status: Mapped[str] = mapped_column(Text, server_default=text("'proposed'"))
+
+
+class TopicEvidenceRecord(Base):
+    __tablename__ = "topic_evidence"
+    __table_args__ = (
+        CheckConstraint("role IN ('primary', 'supporting')", name="valid_role"),
+        CheckConstraint("rank >= 1", name="positive_rank"),
+        CheckConstraint("score IS NULL OR score BETWEEN -1 AND 1", name="valid_score"),
+        UniqueConstraint("topic_id", "chunk_id", name="uq_topic_evidence_topic_chunk"),
+        UniqueConstraint("topic_id", "rank", name="uq_topic_evidence_topic_rank"),
+        Index("ix_topic_evidence_chunk_id", "chunk_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    topic_id: Mapped[UUID] = mapped_column(ForeignKey("topics.id", ondelete="RESTRICT"))
+    chunk_id: Mapped[str] = mapped_column(ForeignKey("chunks.id", ondelete="RESTRICT"))
+    role: Mapped[str] = mapped_column(Text, server_default=text("'supporting'"))
+    rank: Mapped[int] = mapped_column(Integer)
+    score: Mapped[float | None] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )
