@@ -59,4 +59,16 @@ python --version
 uv --version
 python -c "from playwright.sync_api import sync_playwright; print('Playwright import: OK')"
 
+log "Validating the PostgreSQL service"
+pg_isready \
+    --host="${POSTGRES_HOST:-postgres}" \
+    --port="${POSTGRES_PORT:-5432}" \
+    --username="${POSTGRES_USER:-autodocs}" \
+    --dbname="${POSTGRES_DB:-autodocs}"
+printf 'PostgreSQL ready: host=%s port=%s database=%s user=%s\n' \
+    "${POSTGRES_HOST:-postgres}" \
+    "${POSTGRES_PORT:-5432}" \
+    "${POSTGRES_DB:-autodocs}" \
+    "${POSTGRES_USER:-autodocs}"
+
 printf '\nDevelopment environment ready at %s\n' "${PROJECT_ROOT}"

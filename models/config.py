@@ -28,6 +28,14 @@ class VectorStoreConfig(BaseModel):
     persist_directory: str
 
 
+class DatabaseConfig(BaseModel):
+    host: str = Field(min_length=1)
+    port: int = Field(default=5432, ge=1, le=65535)
+    name: str = Field(min_length=1)
+    user: str = Field(min_length=1)
+    connect_timeout_seconds: int = Field(default=10, gt=0)
+
+
 class OutputConfig(BaseModel):
     directory: str
 
@@ -76,6 +84,7 @@ class Config(BaseModel):
     llm: LLMConfig
     embedding: EmbeddingConfig
     vectorstore: VectorStoreConfig
+    database: DatabaseConfig
     output: OutputConfig
     logging: LoggingConfig
     data: DataConfig
