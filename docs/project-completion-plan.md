@@ -296,6 +296,9 @@ model, and covered by evaluation fixtures.
 
 Status: next infrastructure stage.
 
+Detailed implementation design:
+[`stage-4-postgres-pgvector-plan.md`](stage-4-postgres-pgvector-plan.md).
+
 Work:
 
 - add Docker Compose with a pinned pgvector image and persistent volume;
