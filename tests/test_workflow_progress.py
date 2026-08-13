@@ -86,6 +86,16 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
     monkeypatch.setattr("pipeline.workflow.build_crawl_plan", plan)
     monkeypatch.setattr("pipeline.workflow.ingest_documents", ingest)
     monkeypatch.setattr("pipeline.workflow.create_chunks", chunk)
+    monkeypatch.setattr(
+        "pipeline.workflow.persist_pipeline_state",
+        lambda current: SimpleNamespace(
+            to_dict=lambda: {
+                "run_id": "run-id",
+                "chunks_inserted": 1,
+                "chunks_reused": 0,
+            }
+        ),
+    )
     monkeypatch.setattr("pipeline.workflow.generate_embeddings", passthrough)
     monkeypatch.setattr("pipeline.workflow.index_documents", passthrough)
     monkeypatch.setattr("pipeline.workflow.retrieve_relevant_chunks", passthrough)
@@ -107,5 +117,7 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
     assert (
         str((tmp_path / "data/chunks/example/1.0/chunks.jsonl").resolve()) in rendered
     )
-    assert "[NEXT] PostgreSQL/pgvector foundation" in rendered
+    assert "[COMPLETED] PostgreSQL lineage persistence" in rendered
+    assert "Chunks inserted: 1" in rendered
+    assert "[NEXT] Embedding generation and vector indexing" in rendered
     assert "[COMPLETED] Embeddings" not in rendered

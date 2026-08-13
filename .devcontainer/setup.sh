@@ -71,4 +71,8 @@ printf 'PostgreSQL ready: host=%s port=%s database=%s user=%s\n' \
     "${POSTGRES_DB:-autodocs}" \
     "${POSTGRES_USER:-autodocs}"
 
+log "Applying database migrations"
+python -m alembic upgrade head
+printf 'Database migration: %s\n' "$(python -m alembic current)"
+
 printf '\nDevelopment environment ready at %s\n' "${PROJECT_ROOT}"
