@@ -246,6 +246,9 @@ totals, and artifact locations. The build command never approves.
 - validate current document/chunk ownership and embedding availability;
 - add deterministic hash and invalid-snapshot unit tests.
 
+Implementation review:
+[`stage-6-stop-b3-1-snapshot-identity-review.md`](stage-6-stop-b3-1-snapshot-identity-review.md).
+
 Review checkpoint: hashes and snapshot counts are explainable and stable.
 
 ### B3.2: transactional repository
