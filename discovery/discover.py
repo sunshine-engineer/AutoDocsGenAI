@@ -9,10 +9,11 @@ from discovery.manifest_builder import build_manifest
 
 from discovery.validator import validate_source
 
+
 def discover_documentation(
     state: PipelineState,
 ) -> PipelineState:
-    
+
     manager = DiscoveryManager()
     metadata = manager.discover(
         state.package,
@@ -24,7 +25,7 @@ def discover_documentation(
         state.version,
         metadata,
     )
-    
+
     for source in state.manifest.sources:
         validate_source(source)
 

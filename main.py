@@ -19,9 +19,9 @@ def main():
         print(source.http_status)
         print(source.redirect_url)
         print()
-    
+
     print("Crawl Plan")
-        
+
     for page in state.crawl_plan.pages[:20]:
 
         print(page.title)
@@ -29,9 +29,9 @@ def main():
         print(page.url)
 
         print()
-    
+
     for doc in state.raw_documents:
-        
+
         print(doc.title)
         print(doc.url)
         print(doc.status_code)

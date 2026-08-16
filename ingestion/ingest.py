@@ -3,6 +3,7 @@ from models.state import PipelineState
 
 from ingestion.cleaner import clean_markdown
 from ingestion.extractor import extract_main_content
+
 # from ingestion.fetcher import fetch_document
 from ingestion.normalizer import html_to_markdown
 from ingestion.storage import save_document
@@ -24,7 +25,7 @@ def ingest_documents(
         fetcher = get_fetcher(
             use_browser=True,
         )
-        
+
         raw = fetcher.fetch(
             page.title,
             page.url,
@@ -49,12 +50,8 @@ def ingest_documents(
 
         state.cleaned_documents.append(clean_doc)
 
-        output_dir = (
-            f"data/cleaned/"
-            f"{state.package}/"
-            f"{state.version}"
-        )
-        
+        output_dir = f"data/cleaned/" f"{state.package}/" f"{state.version}"
+
         save_document(
             clean_doc,
             output_dir,

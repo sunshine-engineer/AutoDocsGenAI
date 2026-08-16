@@ -38,7 +38,5 @@ class PlaywrightFetcher:
             html=html,
             status_code=200,
             framework=framework,
-            metadata={
-                "fetch_method": "playwright"
-            },
+            metadata={"fetch_method": "playwright"},
         )

@@ -13,11 +13,7 @@ def save_document(
         exist_ok=True,
     )
 
-    filename = (
-        document.title
-        .replace("/", "_")
-        .replace("\\", "_")
-    )
+    filename = document.title.replace("/", "_").replace("\\", "_")
 
     path = Path(output_dir) / f"{filename}.md"
 

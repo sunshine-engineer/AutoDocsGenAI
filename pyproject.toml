@@ -37,10 +37,36 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+[tool.black]
+target-version = ["py312"]
+line-length = 88
+
 [tool.ruff]
 target-version = "py312"
 line-length = 88
 
-[tool.black]
-target-version = ["py312"]
-line-length = 88
+[tool.ruff.lint]
+# EXE002 is a Windows bind-mount portability false positive:
+# source files may appear executable inside the container.
+# Do not add broader rule exclusions.
+ignore = ["EXE002"]
+
+[tool.mypy]
+python_version = "3.12"
+files = [
+    "config",
+    "database",
+    "discovery",
+    "indexing",
+    "ingestion",
+    "planner",
+    "scripts",
+    "tests",
+]
+check_untyped_defs = true
+disallow_untyped_defs = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+

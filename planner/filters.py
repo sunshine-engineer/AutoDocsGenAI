@@ -1,6 +1,5 @@
 from urllib.parse import urlparse
 
-
 IGNORE_PATTERNS = (
     "#",
     "mailto:",

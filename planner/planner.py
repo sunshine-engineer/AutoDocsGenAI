@@ -24,7 +24,7 @@ def build_crawl_plan(
         return state
 
     links = discover_links(documentation.url)
-    
+
     seen = set()
     pages = []
 
@@ -33,10 +33,10 @@ def build_crawl_plan(
         full_url = urljoin(documentation.url, href)
         if not should_include(full_url, documentation.url):
             continue
-        
+
         if full_url in seen:
             continue
-        
+
         seen.add(full_url)
 
         pages.append(

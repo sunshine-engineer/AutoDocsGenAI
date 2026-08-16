@@ -1,7 +1,6 @@
 from ingestion.fetchers.http_fetcher import HTTPFetcher
 from ingestion.fetchers.playwright_fetcher import PlaywrightFetcher
 
-
 http_fetcher = HTTPFetcher()
 
 playwright_fetcher = PlaywrightFetcher()
