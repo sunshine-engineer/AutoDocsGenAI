@@ -6,7 +6,12 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from database import models as database_models  # noqa: F401
 from database.base import Base
-from models.topic import EvidenceRole, TopicCandidate, TopicCatalogProposal, TopicEvidence
+from models.topic import (
+    EvidenceRole,
+    TopicCandidate,
+    TopicCatalogProposal,
+    TopicEvidence,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
