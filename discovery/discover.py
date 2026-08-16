@@ -1,13 +1,7 @@
-from models.manifest import (
-    DocumentationManifest,
-    DocumentationSource,
-)
-from models.state import PipelineState
-
 from discovery.manager import DiscoveryManager
 from discovery.manifest_builder import build_manifest
-
 from discovery.validator import validate_source
+from models.state import PipelineState
 
 
 def discover_documentation(

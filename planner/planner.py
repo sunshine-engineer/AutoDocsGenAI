@@ -2,7 +2,6 @@ from urllib.parse import urljoin
 
 from models.crawl import CrawlPage, CrawlPlan
 from models.state import PipelineState
-
 from planner.filters import should_include
 from planner.sitemap import discover_links
 

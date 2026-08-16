@@ -1,7 +1,6 @@
 from playwright.sync_api import sync_playwright
 
 from models.raw_document import RawDocument
-
 from services.framework_detector import detect_framework
 
 

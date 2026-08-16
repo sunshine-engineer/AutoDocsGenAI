@@ -1,6 +1,5 @@
-from pipeline.workflow import run_pipeline
-
 from models.state import PipelineState
+from pipeline.workflow import run_pipeline
 
 
 def main():

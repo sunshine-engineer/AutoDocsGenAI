@@ -1,8 +1,7 @@
-from utils.http_client import http_client
+from ingestion.fetchers.base import BaseFetcher
 from models.raw_document import RawDocument
 from services.framework_detector import detect_framework
-
-from ingestion.fetchers.base import BaseFetcher
+from utils.http_client import http_client
 
 
 class HTTPFetcher(BaseFetcher):

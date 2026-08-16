@@ -177,6 +177,7 @@ def run_setup(project, fake_bin, log_file, **extra_env):
         env=env,
         text=True,
         capture_output=True,
+        check=False,
     )
 
 
