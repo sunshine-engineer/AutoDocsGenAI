@@ -178,6 +178,54 @@ data/cleaned/{package}/{version}/
 
 Runtime data, environments, logs, and secrets are ignored by Git.
 
+## CI Environment Setup 
+
+Create and use this environment to run tests in disposable containers
+
+```powershell
+# For powershell 
+## Create a disposable environment
+$env:POSTGRES_DB = "autodocs_ci"
+$env:POSTGRES_USER = "autodocs_ci"
+$env:POSTGRES_PASSWORD = "autodocs_ci_password"
+$env:POSTGRES_HOST_PORT = "55432"
+$env:DATABASE_URL = "postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:55432/autodocs_ci"
+$env:AUTODOCS_INTEGRATION_DATABASE_URL = $env:DATABASE_URL
+$env:POSTGRES_HOST_PORT = "55432"
+docker compose -p autodocs-ci up -d postgres app --force-recreate postgres app
+
+## Check Readiness 
+docker compose -p autodocs-ci exec -T postgres `
+  pg_isready -U autodocs -d autodocs
+
+## Run quality checks inside the app container
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run black --check ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run ruff check ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run mypy ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run pytest -m 'not db_integration and not real_model' -q"
+
+## Run migrations against the isolated database
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run alembic upgrade head"
+
+## Run PostgreSQL integration tests 
+docker compose -p autodocs-ci exec -T `
+  -e AUTODOCS_INTEGRATION_DATABASE_URL="postgresql+psycopg://autodocs:autodocs_ci_password@postgres:5432/autodocs" `
+  app bash -lc "cd /workspaces/AutoDocsGenAI && uv run pytest -m 'db_integration and not real_model' -q"
+
+## Remove only the disposable environment
+docker compose -p autodocs-ci down -v
+Remove-Item Env:POSTGRES_HOST_PORT
+
+```
+
 ## Quality checks
 
 Run the repository-wide quality baseline from the development container:
