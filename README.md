@@ -196,7 +196,7 @@ docker compose -p autodocs-ci up -d postgres app --force-recreate postgres app
 
 ## Check Readiness 
 docker compose -p autodocs-ci exec -T postgres `
-  pg_isready -U autodocs -d autodocs
+  pg_isready -U autodocs_ci -d autodocs_ci
 
 ## Run quality checks inside the app container
 docker compose -p autodocs-ci exec -T app `
@@ -217,7 +217,7 @@ docker compose -p autodocs-ci exec -T app `
 
 ## Run PostgreSQL integration tests 
 docker compose -p autodocs-ci exec -T `
-  -e AUTODOCS_INTEGRATION_DATABASE_URL="postgresql+psycopg://autodocs:autodocs_ci_password@postgres:5432/autodocs" `
+  -e AUTODOCS_INTEGRATION_DATABASE_URL="postgresql+psycopg://autodocs_ci:autodocs_ci_password@postgres:5432/autodocs_ci" `
   app bash -lc "cd /workspaces/AutoDocsGenAI && uv run pytest -m 'db_integration and not real_model' -q"
 
 ## Remove only the disposable environment
