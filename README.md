@@ -183,12 +183,39 @@ Runtime data, environments, logs, and secrets are ignored by Git.
 Run the repository-wide quality baseline from the development container:
 
 ```bash
+uv run pytest --strict-markers --collect-only -q
 uv run mypy .  ## To ensure correct datatypes are passed across pipeline
 uv run ruff check .  ## To catch basic code quality issues
 uv run ruff --fix .  ## To fix all basic code quality issue
 uv run black --check .  ## To keep the code consistently formatted
 uv run black .  ## Fix all formatting related issues
 uv run pytest -q  ## Run all the test cases
+```
+
+### PostgreSQL integration tests
+
+The PostgreSQL integration tests use a disposable PostgreSQL/pgvector database.
+They are not run against the reusable development database.
+
+```powershell
+# For powershell 
+$env:DATABASE_URL = "postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci"
+$env:AUTODOCS_INTEGRATION_DATABASE_URL = $env:DATABASE_URL
+
+uv run alembic upgrade head
+uv run pytest -m "db_integration and not real_model" -q
+```
+
+```bash
+# For bash
+export DATABASE_URL="postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci"
+export AUTODOCS_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+
+uv run alembic upgrade head
+uv run pytest -m "db_integration and not real_model" -q
+
+uv run pytest -m real_model -q  ## Optional Validation 
+uv run pytest --strict-markers --collect-only -q  ## Validate test collection
 ```
 
 ## Repository map

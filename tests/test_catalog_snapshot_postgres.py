@@ -23,10 +23,7 @@ from models.state import PipelineState
 from services.chunk_importer import persist_pipeline_state
 
 DATABASE_URL = os.getenv("AUTODOCS_INTEGRATION_DATABASE_URL")
-pytestmark = pytest.mark.skipif(
-    not DATABASE_URL,
-    reason="AUTODOCS_INTEGRATION_DATABASE_URL is not set",
-)
+pytestmark = pytest.mark.db_integration
 
 
 def embedding_config() -> EmbeddingConfig:
