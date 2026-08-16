@@ -25,7 +25,7 @@ def validate_source(
     except httpx.TimeoutException as e:
         source.status = "failed"
         source.notes = f"Request timed out: {e}"
-    
+
     except httpx.RequestError as e:
         source.status = "failed"
         source.notes = f"Request failed: {e}"
