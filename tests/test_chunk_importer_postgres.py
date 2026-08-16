@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 import pytest
 from sqlalchemy import func, select
@@ -14,11 +15,11 @@ DATABASE_URL = os.getenv("AUTODOCS_INTEGRATION_DATABASE_URL")
 pytestmark = pytest.mark.db_integration
 
 
-def build_state(content: str) -> PipelineState:
+def build_state(content: str, package: str) -> PipelineState:
     chunk = Chunk(
-        id=f"chunk-{content.lower()}",
+        id=f"chunk-{package}-{content.lower()}",
         content=content,
-        package="Importer_Demo",
+        package=package,
         version="1.0.0",
         source_url="https://example.com/docs/guide",
         page_title="Guide",
@@ -28,7 +29,7 @@ def build_state(content: str) -> PipelineState:
         character_count=len(content),
     )
     return PipelineState(
-        package="Importer_Demo",
+        package=package,
         version="1.0.0",
         cleaned_documents=[
             CleanDocument(
@@ -43,11 +44,12 @@ def build_state(content: str) -> PipelineState:
 
 def test_idempotent_import_and_document_revision():
     assert DATABASE_URL is not None
+    package = f"importer-demo-{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)
     try:
-        first = persist_pipeline_state(build_state("First"), engine)
-        repeated = persist_pipeline_state(build_state("First"), engine)
-        changed = persist_pipeline_state(build_state("Second"), engine)
+        first = persist_pipeline_state(build_state("First", package), engine)
+        repeated = persist_pipeline_state(build_state("First", package), engine)
+        changed = persist_pipeline_state(build_state("Second", package), engine)
 
         assert first.documents_inserted == 1
         assert first.chunks_inserted == 1
@@ -57,18 +59,36 @@ def test_idempotent_import_and_document_revision():
         assert changed.chunks_inserted == 1
 
         with engine.connect() as connection:
-            assert connection.scalar(select(func.count()).select_from(ChunkRecord)) == 2
+            assert (
+                connection.scalar(
+                    select(func.count())
+                    .select_from(ChunkRecord)
+                    .where(ChunkRecord.package_name == package)
+                )
+                == 2
+            )
             assert (
                 connection.scalar(
                     select(func.count())
                     .select_from(SourceDocumentRecord)
+                    .join(
+                        ChunkRecord,
+                        ChunkRecord.source_document_id == SourceDocumentRecord.id,
+                    )
                     .where(SourceDocumentRecord.is_current.is_(True))
+                    .where(ChunkRecord.package_name == package)
                 )
                 == 1
             )
             assert (
                 connection.scalar(
-                    select(func.count()).select_from(SourceDocumentRecord)
+                    select(func.count())
+                    .select_from(SourceDocumentRecord)
+                    .join(
+                        ChunkRecord,
+                        ChunkRecord.source_document_id == SourceDocumentRecord.id,
+                    )
+                    .where(ChunkRecord.package_name == package)
                 )
                 == 2
             )
