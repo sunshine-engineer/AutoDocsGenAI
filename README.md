@@ -180,11 +180,15 @@ Runtime data, environments, logs, and secrets are ignored by Git.
 
 ## Quality checks
 
+Run the repository-wide quality baseline from the development container:
+
 ```bash
-pytest
-ruff check .
-black --check .
-mypy models config indexing ingestion
+uv run mypy .  ## To ensure correct datatypes are passed across pipeline
+uv run ruff check .  ## To catch basic code quality issues
+uv run ruff --fix .  ## To fix all basic code quality issue
+uv run black --check .  ## To keep the code consistently formatted
+uv run black .  ## Fix all formatting related issues
+uv run pytest -q  ## Run all the test cases
 ```
 
 ## Repository map
