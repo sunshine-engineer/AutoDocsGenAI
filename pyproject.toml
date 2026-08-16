@@ -36,6 +36,11 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--strict-markers"
+markers = [
+    "db_integration: tests requiring disposable PostgreSQL/pgvector",
+    "real_model: tests that execute or download an embedding model",
+]
 
 [tool.black]
 target-version = ["py312"]
@@ -68,5 +73,3 @@ disallow_untyped_defs = false
 no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
-
-

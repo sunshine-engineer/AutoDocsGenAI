@@ -178,17 +178,92 @@ data/cleaned/{package}/{version}/
 
 Runtime data, environments, logs, and secrets are ignored by Git.
 
+## CI Environment Setup 
+
+Create and use this environment to run tests in disposable containers
+
+```powershell
+# For powershell 
+## Create a disposable environment
+$env:POSTGRES_DB = "autodocs_ci"
+$env:POSTGRES_USER = "autodocs_ci"
+$env:POSTGRES_PASSWORD = "autodocs_ci_password"
+$env:POSTGRES_HOST_PORT = "55432"
+$env:DATABASE_URL = "postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:55432/autodocs_ci"
+$env:AUTODOCS_INTEGRATION_DATABASE_URL = $env:DATABASE_URL
+$env:POSTGRES_HOST_PORT = "55432"
+docker compose -p autodocs-ci up -d postgres app --force-recreate postgres app
+
+## Check Readiness 
+docker compose -p autodocs-ci exec -T postgres `
+  pg_isready -U autodocs_ci -d autodocs_ci
+
+## Run quality checks inside the app container
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run black --check ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run ruff check ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run mypy ."
+
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run pytest -m 'not db_integration and not real_model' -q"
+
+## Run migrations against the isolated database
+docker compose -p autodocs-ci exec -T app `
+  bash -lc "cd /workspaces/AutoDocsGenAI && uv run alembic upgrade head"
+
+## Run PostgreSQL integration tests 
+docker compose -p autodocs-ci exec -T `
+  -e AUTODOCS_INTEGRATION_DATABASE_URL="postgresql+psycopg://autodocs_ci:autodocs_ci_password@postgres:5432/autodocs_ci" `
+  app bash -lc "cd /workspaces/AutoDocsGenAI && uv run pytest -m 'db_integration and not real_model' -q"
+
+## Remove only the disposable environment
+docker compose -p autodocs-ci down -v
+Remove-Item Env:POSTGRES_HOST_PORT
+
+```
+
 ## Quality checks
 
-Run the repository-wide quality baseline from the development container:
+Run the repository-wide quality baseline from the development container: 
 
 ```bash
+uv run pytest --strict-markers --collect-only -q
 uv run mypy .  ## To ensure correct datatypes are passed across pipeline
 uv run ruff check .  ## To catch basic code quality issues
 uv run ruff --fix .  ## To fix all basic code quality issue
 uv run black --check .  ## To keep the code consistently formatted
 uv run black .  ## Fix all formatting related issues
 uv run pytest -q  ## Run all the test cases
+```
+
+### PostgreSQL integration tests
+
+The PostgreSQL integration tests use a disposable PostgreSQL/pgvector database.
+They are not run against the reusable development database.
+
+```powershell
+# For powershell 
+$env:DATABASE_URL = "postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci"
+$env:AUTODOCS_INTEGRATION_DATABASE_URL = $env:DATABASE_URL
+
+uv run alembic upgrade head
+uv run pytest -m "db_integration and not real_model" -q
+```
+
+```bash
+# For bash
+export DATABASE_URL="postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci"
+export AUTODOCS_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+
+uv run alembic upgrade head
+uv run pytest -m "db_integration and not real_model" -q
+
+uv run pytest -m real_model -q  ## Optional Validation 
+uv run pytest --strict-markers --collect-only -q  ## Validate test collection
 ```
 
 ## Repository map

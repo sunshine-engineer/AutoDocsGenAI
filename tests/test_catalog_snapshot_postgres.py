@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from catalog.snapshot import CatalogSnapshotError, resolve_catalog_snapshot
 from database.engine import create_database_engine, create_session_factory
@@ -23,10 +23,7 @@ from models.state import PipelineState
 from services.chunk_importer import persist_pipeline_state
 
 DATABASE_URL = os.getenv("AUTODOCS_INTEGRATION_DATABASE_URL")
-pytestmark = pytest.mark.skipif(
-    not DATABASE_URL,
-    reason="AUTODOCS_INTEGRATION_DATABASE_URL is not set",
-)
+pytestmark = pytest.mark.db_integration
 
 
 def embedding_config() -> EmbeddingConfig:
@@ -73,13 +70,21 @@ def test_resolve_exact_completed_current_fully_embedded_snapshot():
         imported = persist_pipeline_state(build_state(package), engine)
         with session_factory.begin() as session:
             chunk = session.query(ChunkRecord).filter_by(package_name=package).one()
-            embedding_version = EmbeddingVersionRecord(
-                provider=config.provider,
-                model_name=config.model,
-                dimension=config.dimension,
+            embedding_version = session.scalar(
+                select(EmbeddingVersionRecord).where(
+                    EmbeddingVersionRecord.provider == config.provider,
+                    EmbeddingVersionRecord.model_name == config.model,
+                    EmbeddingVersionRecord.dimension == config.dimension,
+                )
             )
-            session.add(embedding_version)
-            session.flush()
+            if embedding_version is None:
+                embedding_version = EmbeddingVersionRecord(
+                    provider=config.provider,
+                    model_name=config.model,
+                    dimension=config.dimension,
+                )
+                session.add(embedding_version)
+                session.flush()
             session.add(
                 ChunkEmbeddingRecord(
                     chunk_id=chunk.id,

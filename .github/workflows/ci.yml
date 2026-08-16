@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality and unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install dependencies
+        run: uv sync --all-groups --frozen
+
+      - name: Check formatting
+        run: uv run black --check .
+
+      - name: Run Ruff
+        run: uv run ruff check .
+
+      - name: Run MyPy
+        run: uv run mypy .
+
+      - name: Run unit tests
+        run: uv run pytest -m "not db_integration and not real_model" -q
+
+  postgres-integration:
+    name: PostgreSQL integration tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.6-pg17-bookworm
+        env:
+          POSTGRES_DB: autodocs_ci
+          POSTGRES_USER: autodocs_ci
+          POSTGRES_PASSWORD: autodocs_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U autodocs_ci -d autodocs_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+          --health-start-period 10s
+
+    env:
+      DATABASE_URL: postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci
+      AUTODOCS_INTEGRATION_DATABASE_URL: postgresql+psycopg://autodocs_ci:autodocs_ci_password@localhost:5432/autodocs_ci
+      FASTEMBED_CACHE_PATH: /tmp/fastembed
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install dependencies
+        run: uv sync --all-groups --frozen
+
+      - name: Apply migrations to disposable database
+        run: uv run alembic upgrade head
+
+      - name: Run non-model PostgreSQL tests
+        run: uv run pytest -m "db_integration and not real_model" --strict-markers -q
+
+      - name: Show final migration revision
+        run: uv run alembic current
