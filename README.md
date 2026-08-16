@@ -45,6 +45,22 @@ support a claim, the system must not invent it.
 
 ## Development setup
 
+### Database migration policy
+
+Container initialization checks PostgreSQL readiness and reports:
+
+- the current database migration revision;
+- the repository's latest migration revision.
+
+Pending migrations are not applied automatically. This protects the reusable
+`postgres_data` volume from unreleased schema changes.
+
+To intentionally apply pending migrations:
+
+```bash
+AUTO_APPLY_MIGRATIONS=true bash .devcontainer/setup.sh
+```
+
 ### Recommended: VS Code dev container
 
 Prerequisites:
@@ -64,10 +80,14 @@ the following operations automatically:
 4. Installs Playwright Chromium and required Linux packages.
 5. Creates ignored runtime directories.
 6. Confirms that the PostgreSQL service is ready without printing credentials.
-7. Applies pending Alembic migrations idempotently.
+7. Inspects the current and repository Alembic revisions without applying pending migrations.
+
+To intentionally apply pending migrations:
+```bash
+AUTO_APPLY_MIGRATIONS=true bash .devcontainer/setup.sh
+```
 
 Re-run setup inside the container when needed:
-
 ```bash
 bash .devcontainer/setup.sh
 ```

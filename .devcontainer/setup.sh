@@ -5,6 +5,17 @@ set -Eeuo pipefail
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 readonly VENV_ACTIVATE="${PROJECT_ROOT}/.venv/bin/activate"
+readonly AUTO_APPLY_MIGRATIONS="${AUTO_APPLY_MIGRATIONS-false}"
+
+case "${AUTO_APPLY_MIGRATIONS}" in
+    true|false)
+        ;;
+    *)
+        printf 'Invalid AUTO_APPLY_MIGRATIONS=%q; expected true or false.\n' \
+            "${AUTO_APPLY_MIGRATIONS}" >&2
+        exit 1
+        ;;
+esac
 
 log() {
     printf '\n==> %s\n' "$1"
@@ -71,9 +82,25 @@ printf 'PostgreSQL ready: host=%s port=%s database=%s user=%s\n' \
     "${POSTGRES_DB:-autodocs}" \
     "${POSTGRES_USER:-autodocs}"
 
-log "Applying database migrations"
-python -m alembic upgrade head
-printf 'Database migration: %s\n' "$(python -m alembic current)"
+
+
+log "Inspecting database migration state"
+
+current_revision="$(python -m alembic current 2>&1)"
+repository_revisions="$(python -m alembic heads 2>&1)"
+
+printf 'Database migration revision: %s\n' "${current_revision}"
+printf 'Repository migration target: %s\n' "${repository_revisions}"
+
+if [[ "${AUTO_APPLY_MIGRATIONS}" == "true" ]]; then
+    log "Applying database migrations because AUTO_APPLY_MIGRATIONS=true"
+    python -m alembic upgrade head
+
+    printf 'Database migration after upgrade: %s\n' \
+        "$(python -m alembic current)"
+else
+    printf 'Pending migrations were not applied; set AUTO_APPLY_MIGRATIONS=true to opt in.\n'
+fi
 
 log "Preparing the CPU embedding model"
 python -m scripts.prepare_embedding_model
