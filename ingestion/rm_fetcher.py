@@ -8,8 +8,8 @@
 #     title: str,
 #     url: str,
 # ) -> RawDocument:
-    
-    
+
+
 #     response = http_client.get(url)
 #     framework = detect_framework(response.text)
 

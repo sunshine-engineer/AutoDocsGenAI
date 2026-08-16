@@ -1,10 +1,8 @@
-
-
-from utils.http_client import http_client
+from ingestion.fetchers.base import BaseFetcher
 from models.raw_document import RawDocument
 from services.framework_detector import detect_framework
+from utils.http_client import http_client
 
-from ingestion.fetchers.base import BaseFetcher
 
 class HTTPFetcher(BaseFetcher):
 
@@ -25,8 +23,8 @@ class HTTPFetcher(BaseFetcher):
             status_code=response.status_code,
             framework=framework,
             metadata={
-                    "fetch_method": "playwright",
-                    "rendered": True,
-                    "timestamp": "...",
+                "fetch_method": "playwright",
+                "rendered": True,
+                "timestamp": "...",
             },
         )

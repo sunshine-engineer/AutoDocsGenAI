@@ -1,7 +1,6 @@
 import httpx
 
 from models.manifest import DocumentationSource
-
 from utils.http_client import http_client
 
 
@@ -23,10 +22,12 @@ def validate_source(
             source.status = "failed"
             source.notes = f"HTTP {response.status_code}"
 
-    except Exception as e:
-
+    except httpx.TimeoutException as e:
         source.status = "failed"
+        source.notes = f"Request timed out: {e}"
 
-        source.notes = str(e)
+    except httpx.RequestError as e:
+        source.status = "failed"
+        source.notes = f"Request failed: {e}"
 
     return source

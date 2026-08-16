@@ -24,11 +24,11 @@ class DocumentationSource(BaseModel):
         "verified",
         "failed",
     ] = "pending"
-    
+
     http_status: int | None = None
-    
+
     redirect_url: str | None = None
-    
+
     notes: str = ""
 
 

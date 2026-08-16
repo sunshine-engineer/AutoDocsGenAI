@@ -21,11 +21,7 @@ def build_manifest(
         or ""
     )
 
-    repository_url = (
-        project_urls.get("Source")
-        or project_urls.get("Repository")
-        or ""
-    )
+    repository_url = project_urls.get("Source") or project_urls.get("Repository") or ""
 
     sources = []
 

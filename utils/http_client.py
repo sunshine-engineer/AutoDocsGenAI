@@ -12,8 +12,7 @@ class HTTPClient:
             timeout=30,
             headers={
                 "User-Agent": (
-                    "AutoDocPipeline/0.1 "
-                    "(Documentation Knowledge Pipeline)"
+                    "AutoDocPipeline/0.1 " "(Documentation Knowledge Pipeline)"
                 )
             },
         )
@@ -24,7 +23,7 @@ class HTTPClient:
     def head(self, url: str, **kwargs):
         return self.client.head(url, **kwargs)
 
-    def close(self ):
+    def close(self):
         self.client.close()
 
 

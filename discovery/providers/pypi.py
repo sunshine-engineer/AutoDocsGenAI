@@ -1,9 +1,6 @@
 from typing import Any
 
-import httpx
-
 from discovery.providers.base import DiscoveryProvider
-
 from utils.http_client import http_client
 
 

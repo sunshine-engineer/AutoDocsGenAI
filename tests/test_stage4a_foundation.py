@@ -10,6 +10,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SETUP_SCRIPT = PROJECT_ROOT / ".devcontainer" / "setup.sh"
 
+
 def test_compose_uses_pinned_healthy_pgvector_service():
     compose = yaml.safe_load(
         (PROJECT_ROOT / "compose.yaml").read_text(encoding="utf-8")
@@ -80,11 +81,13 @@ def fake_setup_project(tmp_path):
         encoding="utf-8",
     )
     (project / "uv.lock").write_text("", encoding="utf-8")
-    
+
     venv_activate = project / ".venv" / "bin" / "activate"
     venv_activate.parent.mkdir(parents=True)
     venv_activate.write_text("# fake virtualenv\n", encoding="utf-8")
-    (project / ".env.example").write_text("DATABASE_URL=postgresql://user:secret@db/test\n")
+    (project / ".env.example").write_text(
+        "DATABASE_URL=postgresql://user:secret@db/test\n"
+    )
     shutil.copy2(SETUP_SCRIPT, project / ".devcontainer" / "setup.sh")
 
     fake_bin = tmp_path / "bin"
@@ -97,11 +100,11 @@ def fake_setup_project(tmp_path):
         printf 'uv %s\\n' "$*" >> "$FAKE_LOG"
         exit 0
         """,
-                "pg_isready": """#!/usr/bin/env bash
+        "pg_isready": """#!/usr/bin/env bash
         printf 'pg_isready %s\\n' "$*" >> "$FAKE_LOG"
         exit 0
         """,
-                "git": """#!/usr/bin/env bash
+        "git": """#!/usr/bin/env bash
         printf 'git %s\\n' "$*" >> "$FAKE_LOG"
         if [[ "$1" == "config" && "$2" == "--global" && "$3" == "--get-all" ]]; then
             exit 1
@@ -174,6 +177,7 @@ def run_setup(project, fake_bin, log_file, **extra_env):
         env=env,
         text=True,
         capture_output=True,
+        check=False,
     )
 
 

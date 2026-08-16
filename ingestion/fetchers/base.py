@@ -10,5 +10,4 @@ class BaseFetcher(ABC):
         self,
         title: str,
         url: str,
-    ) -> RawDocument:
-        ...
+    ) -> RawDocument: ...

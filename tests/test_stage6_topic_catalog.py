@@ -6,7 +6,12 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 from database import models as database_models  # noqa: F401
 from database.base import Base
-from models.topic import TopicCandidate, TopicCatalogProposal, TopicEvidence
+from models.topic import (
+    EvidenceRole,
+    TopicCandidate,
+    TopicCatalogProposal,
+    TopicEvidence,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,7 +24,9 @@ def candidate(**overrides: object) -> TopicCandidate:
         "slug": "create-agent",
         "output_path": "modules/langchain/agents/functions/create-agent.md",
         "evidence": [
-            TopicEvidence(chunk_id="create-agent-chunk", role="primary", rank=1)
+            TopicEvidence(
+                chunk_id="create-agent-chunk", role=EvidenceRole.PRIMARY, rank=1
+            )
         ],
     }
     values.update(overrides)
