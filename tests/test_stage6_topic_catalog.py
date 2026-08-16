@@ -24,7 +24,9 @@ def candidate(**overrides: object) -> TopicCandidate:
         "slug": "create-agent",
         "output_path": "modules/langchain/agents/functions/create-agent.md",
         "evidence": [
-            TopicEvidence(chunk_id="create-agent-chunk", role=EvidenceRole.PRIMARY, rank=1)
+            TopicEvidence(
+                chunk_id="create-agent-chunk", role=EvidenceRole.PRIMARY, rank=1
+            )
         ],
     }
     values.update(overrides)
