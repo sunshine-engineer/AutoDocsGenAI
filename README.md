@@ -228,7 +228,7 @@ Remove-Item Env:POSTGRES_HOST_PORT
 
 ## Quality checks
 
-Run the repository-wide quality baseline from the development container:
+Run the repository-wide quality baseline from the development container: 
 
 ```bash
 uv run pytest --strict-markers --collect-only -q
