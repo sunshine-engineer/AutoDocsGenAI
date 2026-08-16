@@ -10,11 +10,24 @@ def main() -> None:
         cache_dir=config.cache_directory,
         threads=2,
     )
-    vector = next(model.embed(["model readiness check"], batch_size=1))
+
+    embeddings = iter(
+        model.embed(
+            ["model readiness check"],
+            batch_size=1,
+        )
+    )
+
+    try:
+        vector = next(embeddings)
+    except StopIteration as exc:
+        raise RuntimeError("embedding model returned no vectors") from exc
+
     if len(vector) != config.dimension:
         raise RuntimeError(
             f"model returned {len(vector)} dimensions; expected {config.dimension}"
         )
+
     print(f"Embedding model ready: {config.model} ({len(vector)} dimensions)")
 
 

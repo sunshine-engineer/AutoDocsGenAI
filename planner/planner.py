@@ -6,14 +6,16 @@ from planner.filters import should_include
 from planner.sitemap import discover_links
 
 
-def build_crawl_plan(
-    state: PipelineState,
-) -> PipelineState:
+def build_crawl_plan(state: PipelineState) -> PipelineState:
+    manifest = state.manifest
+
+    if manifest is None:
+        return state
 
     documentation = next(
         (
             source
-            for source in state.manifest.sources
+            for source in manifest.sources
             if source.source_type == "documentation"
         ),
         None,
@@ -24,12 +26,12 @@ def build_crawl_plan(
 
     links = discover_links(documentation.url)
 
-    seen = set()
-    pages = []
+    seen: set[str] = set()
+    pages: list[CrawlPage] = []
 
     for title, href in links:
-
         full_url = urljoin(documentation.url, href)
+
         if not should_include(full_url, documentation.url):
             continue
 
@@ -37,13 +39,7 @@ def build_crawl_plan(
             continue
 
         seen.add(full_url)
-
-        pages.append(
-            CrawlPage(
-                title=title,
-                url=full_url,
-            )
-        )
+        pages.append(CrawlPage(title=title, url=full_url))
 
     state.crawl_plan = CrawlPlan(
         root_url=documentation.url,

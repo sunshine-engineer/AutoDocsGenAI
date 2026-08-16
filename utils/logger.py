@@ -14,9 +14,9 @@ def setup_logger(
     Automatically creates the log directory if it doesn't exist.
     """
 
-    config_path = Path(config_path)
+    config_file = Path(config_path)
 
-    with config_path.open("r", encoding="utf-8") as file:
+    with config_file.open("r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
 
     # Create log directory if using a FileHandler
