@@ -1,7 +1,8 @@
 # Stage 6 Stop B3: catalog persistence and review workflow plan
 
-Status: B3.1 snapshot identity and the Issue #20 schema contract are implemented;
-catalog row persistence, artifacts, and review commands remain pending.
+Status: B3.1 snapshot identity, the Issue #20 schema contract, and the Issue #21
+read-only proposal assembly are implemented; catalog row persistence, artifacts,
+and review commands remain pending.
 
 ## Outcome
 
@@ -97,6 +98,16 @@ duplicate-resolution version
 
 Runtime timestamps, database IDs, artifact paths, and reviewer identity are not
 hash inputs. Unchanged inputs therefore resolve the same catalog identity.
+
+## Implemented proposal assembly boundary
+
+The read-only proposal service resolves one completed pipeline run, reloads the
+exact snapshot chunk IDs, revalidates every content hash, and builds the B2
+proposal from only those chunks. Hybrid search is constrained at the SQL query
+boundary to the snapshot chunk IDs and exact embedding-version identity. The
+typed result retains the canonical configuration snapshot, proposal, coverage,
+exclusions, deferred symbols, and findings. Empty proposals, changed or missing
+chunks, and blocking findings fail before any catalog write.
 
 ## Repository contract
 
