@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from sqlalchemy import Engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from catalog.coverage import CatalogCoverage, calculate_coverage
 from catalog.evidence import (
@@ -26,6 +26,11 @@ from catalog.identity import (
     validate_catalog_config_snapshot,
 )
 from catalog.normalization import NormalizationIssue, normalize_catalog_topics
+from catalog.repository import (
+    PersistenceResult,
+    persist_topics,
+    resolve_draft_catalog,
+)
 from catalog.search import CatalogEvidenceSearch
 from catalog.snapshot import (
     CatalogSnapshot,
@@ -182,3 +187,27 @@ def assemble_snapshot_catalog_proposal(
         deferred_symbols=tuple(result.extraction.deferred_symbols),
         issues=tuple(result.issues),
     )
+
+
+def persist_snapshot_catalog_proposal(
+    session_factory: sessionmaker[Session], build: SnapshotCatalogProposal
+) -> PersistenceResult:
+    """Persist a validated proposal in one caller-visible atomic transaction."""
+
+    validate_catalog_config_snapshot(build.config_snapshot, build.config_hash)
+    if build.proposal.config_hash != build.config_hash:
+        raise ValueError("proposal config_hash does not match the build identity")
+    if build.coverage.blocking_issue_count:
+        raise ValueError("a proposal with blocking findings cannot be persisted")
+
+    with session_factory.begin() as session:
+        catalog, catalog_counts = resolve_draft_catalog(session, build)
+        topic_counts, evidence_counts = persist_topics(session, catalog, build)
+        result = PersistenceResult(
+            catalog_id=str(catalog.id),
+            status=catalog.status,
+            catalogs=catalog_counts,
+            topics=topic_counts,
+            evidence=evidence_counts,
+        )
+    return result

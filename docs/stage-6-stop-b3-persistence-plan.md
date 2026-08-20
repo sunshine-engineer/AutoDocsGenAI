@@ -1,8 +1,8 @@
 # Stage 6 Stop B3: catalog persistence and review workflow plan
 
-Status: B3.1 snapshot identity, the Issue #20 schema contract, and the Issue #21
-read-only proposal assembly are implemented; catalog row persistence, artifacts,
-and review commands remain pending.
+Status: B3.1 snapshot identity, the Issue #20 schema contract, Issue #21
+read-only proposal assembly, and Issue #22 transactional persistence are
+implemented; reconciliation, artifacts, and review commands remain pending.
 
 ## Outcome
 
@@ -128,6 +128,14 @@ reject(catalog_id, reviewer_feedback) -> PersistedCatalog
 `PersistenceResult` reports catalog ID and inserted, updated, reused, and
 removed counts for catalogs, topics, and evidence rows. It must not expose
 credentials or raw embeddings.
+
+The implemented write service owns one transaction, locks the documentation
+version and matching draft catalog, resolves parents topologically, and compares
+normalized values before updating. An unchanged repeat is a true no-op with
+stable IDs and timestamps. Evidence changes are replaced only for the affected
+topic. Stale topics, out-of-snapshot evidence, conflicting lineage, and every
+non-draft status fail without partial writes; explicit stale-row reconciliation
+remains Issue #23.
 
 ## Transaction algorithm
 
