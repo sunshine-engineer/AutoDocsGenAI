@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import hashlib
-import json
 from dataclasses import dataclass
 
 from models.config import EmbeddingConfig
+from models.identity import sha256_identity
 from models.topic import TopicKind
 from services.chunk_importer import normalize_package_name
 
@@ -54,32 +53,17 @@ class CatalogIdentityConfig:
             raise ValueError("retrieval_candidate_multiplier must be positive")
 
 
-def canonical_json(value: object) -> str:
-    """Serialize identity input with stable key ordering and no whitespace."""
-
-    return json.dumps(
-        value,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=False,
-    )
-
-
-def sha256_identity(value: object) -> str:
-    return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
-
-
-def catalog_config_hash(
+def catalog_config_snapshot(
     *,
     package: str,
     version: str,
     source_pipeline_run_id: str,
     input_snapshot_hash: str,
     config: CatalogIdentityConfig,
-) -> str:
-    """Hash every versioned input that can alter a catalog proposal."""
+) -> dict[str, object]:
+    """Return the canonical, non-secret inputs that determine a catalog."""
 
-    identity = {
+    return {
         "schema_version": config.schema_version,
         "package": normalize_package_name(package),
         "package_version": version,
@@ -108,4 +92,36 @@ def catalog_config_hash(
             },
         },
     }
-    return sha256_identity(identity)
+
+
+def catalog_config_hash(
+    *,
+    package: str,
+    version: str,
+    source_pipeline_run_id: str,
+    input_snapshot_hash: str,
+    config: CatalogIdentityConfig,
+) -> str:
+    """Hash every versioned input that can alter a catalog proposal."""
+
+    return sha256_identity(
+        catalog_config_snapshot(
+            package=package,
+            version=version,
+            source_pipeline_run_id=source_pipeline_run_id,
+            input_snapshot_hash=input_snapshot_hash,
+            config=config,
+        )
+    )
+
+
+def validate_catalog_config_snapshot(
+    config_snapshot: dict[str, object], expected_hash: str
+) -> None:
+    """Reject a persisted configuration snapshot that does not match its hash."""
+
+    actual_hash = sha256_identity(config_snapshot)
+    if actual_hash != expected_hash:
+        raise ValueError(
+            "catalog configuration snapshot does not reproduce config_hash"
+        )

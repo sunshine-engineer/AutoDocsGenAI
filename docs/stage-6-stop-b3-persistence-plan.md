@@ -1,7 +1,7 @@
 # Stage 6 Stop B3: catalog persistence and review workflow plan
 
-Status: implementation plan for review; no persistence code or database changes
-have been applied.
+Status: B3.1 snapshot identity and the Issue #20 schema contract are implemented;
+catalog row persistence, artifacts, and review commands remain pending.
 
 ## Outcome
 
@@ -39,8 +39,10 @@ Migration `0003_stage6_topic_catalog` is present in the repository but has not
 been applied to the reusable database. Amend it before its first reusable
 application so approval history can survive supersession.
 
-Add nullable `review_feedback` text to `topic_catalogs`, then correct the catalog
-review constraints to require:
+The amended catalog identity stores `input_snapshot_hash`, the canonical
+non-secret configuration JSON and its SHA-256 `config_hash`, plus the exact
+`embedding_version_id`. It adds nullable `review_feedback` and corrects the
+catalog review constraints to require:
 
 - `approved`: `approved_by` and `approved_at` are both present;
 - `superseded`: `approved_by` and `approved_at` are both present;
@@ -52,6 +54,11 @@ review constraints to require:
 No new migration revision is needed because `0003` is still unapplied outside
 disposable test databases. The migration upgrade/downgrade tests must prove the
 amended revision remains reversible from and to `0002`.
+
+One partial unique index permits only one `approved` catalog per documentation
+version. All lineage foreign keys remain `ON DELETE RESTRICT`, and the reusable
+development database remains at `0002_stage5_embeddings` until explicit demo
+migration approval.
 
 ## Persistence identity
 

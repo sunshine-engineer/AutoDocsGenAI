@@ -283,16 +283,32 @@ class TopicCatalogRecord(TimestampMixin, Base):
             name="valid_status",
         ),
         CheckConstraint(
-            "(status = 'approved' AND approved_by IS NOT NULL AND "
-            "approved_at IS NOT NULL) OR "
-            "(status <> 'approved' AND approved_by IS NULL AND "
-            "approved_at IS NULL)",
-            name="valid_approval",
+            "((status IN ('approved', 'superseded') AND "
+            "approved_by IS NOT NULL AND btrim(approved_by) <> '' AND "
+            "approved_at IS NOT NULL AND review_feedback IS NULL) OR "
+            "(status = 'rejected' AND approved_by IS NULL AND "
+            "approved_at IS NULL AND review_feedback IS NOT NULL AND "
+            "btrim(review_feedback) <> '') OR "
+            "(status IN ('draft', 'awaiting_approval') AND "
+            "approved_by IS NULL AND approved_at IS NULL AND "
+            "review_feedback IS NULL))",
+            name="valid_review_state",
         ),
+        CheckConstraint(
+            "input_snapshot_hash ~ '^[0-9a-f]{64}$'",
+            name="valid_input_snapshot_hash",
+        ),
+        CheckConstraint("config_hash ~ '^[0-9a-f]{64}$'", name="valid_config_hash"),
         UniqueConstraint(
             "documentation_version_id",
             "config_hash",
             name="uq_topic_catalogs_documentation_version_config_hash",
+        ),
+        Index(
+            "uq_topic_catalogs_approved_documentation_version",
+            "documentation_version_id",
+            unique=True,
+            postgresql_where=text("status = 'approved'"),
         ),
     )
 
@@ -307,10 +323,16 @@ class TopicCatalogRecord(TimestampMixin, Base):
     source_pipeline_run_id: Mapped[UUID] = mapped_column(
         ForeignKey("pipeline_runs.id", ondelete="RESTRICT")
     )
+    embedding_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("embedding_versions.id", ondelete="RESTRICT")
+    )
+    input_snapshot_hash: Mapped[str] = mapped_column(Text)
     config_hash: Mapped[str] = mapped_column(Text)
+    config_snapshot: Mapped[dict[str, object]] = mapped_column(JSONB)
     status: Mapped[str] = mapped_column(Text, server_default=text("'draft'"))
     approved_by: Mapped[str | None] = mapped_column(Text)
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    review_feedback: Mapped[str | None] = mapped_column(Text)
 
 
 class TopicRecord(TimestampMixin, Base):

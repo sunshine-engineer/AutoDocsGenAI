@@ -6,6 +6,7 @@ from indexing.vectorstore import SearchHit
 from models.chunk import Chunk
 
 FIXTURE = Path(__file__).parent / "fixtures" / "catalog" / "reference_chunks.json"
+TEST_CONFIG_HASH = "b" * 64
 
 
 def load_chunks() -> list[Chunk]:
@@ -18,9 +19,9 @@ def load_chunks() -> list[Chunk]:
 def test_in_memory_catalog_is_deterministic_and_has_unique_paths():
     chunks = load_chunks()
 
-    first = build_in_memory_catalog(chunks, "langchain", "0.3", "b2-test-config")
+    first = build_in_memory_catalog(chunks, "langchain", "0.3", TEST_CONFIG_HASH)
     second = build_in_memory_catalog(
-        list(reversed(chunks)), "langchain", "0.3", "b2-test-config"
+        list(reversed(chunks)), "langchain", "0.3", TEST_CONFIG_HASH
     )
 
     assert first.proposal == second.proposal
@@ -49,7 +50,7 @@ def test_in_memory_catalog_uses_injected_search_without_persistence():
         ]
 
     result = build_in_memory_catalog(
-        chunks, "langchain", "0.3", "b2-test-config", search
+        chunks, "langchain", "0.3", TEST_CONFIG_HASH, search
     )
 
     assert result.proposal.topics
