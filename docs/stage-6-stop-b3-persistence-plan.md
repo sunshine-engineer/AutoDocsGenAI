@@ -1,7 +1,8 @@
 # Stage 6 Stop B3: catalog persistence and review workflow plan
 
-Status: implementation plan for review; no persistence code or database changes
-have been applied.
+Status: B3.1 snapshot identity, the Issue #20 schema contract, Issue #21
+read-only proposal assembly, and Issue #22 transactional persistence are
+implemented; reconciliation, artifacts, and review commands remain pending.
 
 ## Outcome
 
@@ -39,8 +40,10 @@ Migration `0003_stage6_topic_catalog` is present in the repository but has not
 been applied to the reusable database. Amend it before its first reusable
 application so approval history can survive supersession.
 
-Add nullable `review_feedback` text to `topic_catalogs`, then correct the catalog
-review constraints to require:
+The amended catalog identity stores `input_snapshot_hash`, the canonical
+non-secret configuration JSON and its SHA-256 `config_hash`, plus the exact
+`embedding_version_id`. It adds nullable `review_feedback` and corrects the
+catalog review constraints to require:
 
 - `approved`: `approved_by` and `approved_at` are both present;
 - `superseded`: `approved_by` and `approved_at` are both present;
@@ -52,6 +55,11 @@ review constraints to require:
 No new migration revision is needed because `0003` is still unapplied outside
 disposable test databases. The migration upgrade/downgrade tests must prove the
 amended revision remains reversible from and to `0002`.
+
+One partial unique index permits only one `approved` catalog per documentation
+version. All lineage foreign keys remain `ON DELETE RESTRICT`, and the reusable
+development database remains at `0002_stage5_embeddings` until explicit demo
+migration approval.
 
 ## Persistence identity
 
@@ -91,6 +99,16 @@ duplicate-resolution version
 Runtime timestamps, database IDs, artifact paths, and reviewer identity are not
 hash inputs. Unchanged inputs therefore resolve the same catalog identity.
 
+## Implemented proposal assembly boundary
+
+The read-only proposal service resolves one completed pipeline run, reloads the
+exact snapshot chunk IDs, revalidates every content hash, and builds the B2
+proposal from only those chunks. Hybrid search is constrained at the SQL query
+boundary to the snapshot chunk IDs and exact embedding-version identity. The
+typed result retains the canonical configuration snapshot, proposal, coverage,
+exclusions, deferred symbols, and findings. Empty proposals, changed or missing
+chunks, and blocking findings fail before any catalog write.
+
 ## Repository contract
 
 Add `catalog/repository.py` with methods that accept an existing SQLAlchemy
@@ -110,6 +128,14 @@ reject(catalog_id, reviewer_feedback) -> PersistedCatalog
 `PersistenceResult` reports catalog ID and inserted, updated, reused, and
 removed counts for catalogs, topics, and evidence rows. It must not expose
 credentials or raw embeddings.
+
+The implemented write service owns one transaction, locks the documentation
+version and matching draft catalog, resolves parents topologically, and compares
+normalized values before updating. An unchanged repeat is a true no-op with
+stable IDs and timestamps. Evidence changes are replaced only for the affected
+topic. Stale topics, out-of-snapshot evidence, conflicting lineage, and every
+non-draft status fail without partial writes; explicit stale-row reconciliation
+remains Issue #23.
 
 ## Transaction algorithm
 

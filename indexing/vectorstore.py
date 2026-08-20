@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Collection
 from dataclasses import asdict, dataclass
+from uuid import UUID
 
 from sqlalchemy import Engine, select
 
@@ -225,6 +227,8 @@ def search_similar_chunks(
     hybrid_rerank: bool = True,
     candidate_multiplier: int = 8,
     embedder: LocalEmbedder | None = None,
+    allowed_chunk_ids: Collection[str] | None = None,
+    embedding_version_id: UUID | str | None = None,
 ) -> list[SearchHit]:
     """Return current chunks using cosine retrieval and metadata reranking."""
 
@@ -232,11 +236,27 @@ def search_similar_chunks(
         raise ValueError("limit must be positive")
     if candidate_multiplier <= 0:
         raise ValueError("candidate_multiplier must be positive")
+    if allowed_chunk_ids is not None and not allowed_chunk_ids:
+        return []
     owned_engine = engine is None
     database_engine = engine or create_database_engine()
     query_embedder = embedder or LocalEmbedder(config.model, config.cache_directory)
     query_vector = query_embedder.embed_query(query)
     distance = ChunkEmbeddingRecord.embedding.cosine_distance(query_vector)
+    filters = [
+        ChunkRecord.package_name == normalize_package_name(package),
+        ChunkRecord.package_version == version,
+        SourceDocumentRecord.is_current.is_(True),
+        EmbeddingVersionRecord.provider == config.provider,
+        EmbeddingVersionRecord.model_name == config.model,
+        EmbeddingVersionRecord.dimension == config.dimension,
+    ]
+    if allowed_chunk_ids is not None:
+        filters.append(ChunkRecord.id.in_(sorted(allowed_chunk_ids)))
+    if embedding_version_id is not None:
+        filters.append(
+            ChunkEmbeddingRecord.embedding_version_id == UUID(str(embedding_version_id))
+        )
 
     try:
         with database_engine.connect() as connection:
@@ -262,14 +282,7 @@ def search_similar_chunks(
                     SourceDocumentRecord,
                     ChunkRecord.source_document_id == SourceDocumentRecord.id,
                 )
-                .where(
-                    ChunkRecord.package_name == normalize_package_name(package),
-                    ChunkRecord.package_version == version,
-                    SourceDocumentRecord.is_current.is_(True),
-                    EmbeddingVersionRecord.provider == config.provider,
-                    EmbeddingVersionRecord.model_name == config.model,
-                    EmbeddingVersionRecord.dimension == config.dimension,
-                )
+                .where(*filters)
                 .order_by(distance, ChunkRecord.id)
                 .limit(limit * candidate_multiplier if hybrid_rerank else limit)
             ).all()
