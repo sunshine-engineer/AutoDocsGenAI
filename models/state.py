@@ -6,6 +6,7 @@ from models.crawl import CrawlPlan
 from models.document import GeneratedSection, RetrievalResult, ValidationReport
 from models.manifest import DocumentationManifest
 from models.raw_document import RawDocument
+from models.source_selection import SourceSelection
 
 
 class PipelineState(BaseModel):
@@ -16,6 +17,8 @@ class PipelineState(BaseModel):
     package: str
 
     version: str
+
+    source_selection: SourceSelection | None = None
 
     manifest: DocumentationManifest | None = None
 

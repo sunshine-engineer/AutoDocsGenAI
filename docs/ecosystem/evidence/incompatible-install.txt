@@ -1,0 +1,4 @@
+Using Python 3.12.15 environment at: /tmp/autodocs-ecosystem-v2/incompatible
+error: No solution found when resolving dependencies
+  cause: Because langchain==1.3.18 depends on langgraph>=1.2.11,<1.3.0 and you require langchain==1.3.18, we can conclude that you require langgraph>=1.2.11,<1.3.0.
+         And because you require langgraph==1.1.10, we can conclude that your requirements are unsatisfiable.

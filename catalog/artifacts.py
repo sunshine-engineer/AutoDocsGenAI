@@ -181,7 +181,7 @@ def load_catalog_view(session: Session, catalog_id: UUID | str) -> dict[str, Any
     extraction = extract_catalog_candidates(chunks, package.name)
     normalized = normalize_catalog_topics(extraction, package.name)
     issues: list[dict[str, Any]] = [asdict(issue) for issue in normalized.issues]
-    eligible = eligible_chunk_ids(chunks, package.name)
+    eligible = eligible_chunk_ids(chunks, package.name, identity.namespace_allow_list)
     used = {item.chunk_id for item in evidence}
     for topic in topics:
         items = topic["evidence"]
@@ -215,7 +215,12 @@ def load_catalog_view(session: Session, catalog_id: UUID | str) -> dict[str, Any
     coverage = {
         "input_chunks": len(chunks),
         "eligible_input_chunks": len(eligible),
-        "raw_topic_records": len(extraction.topics),
+        "raw_topic_records": (
+            len(topics)
+            if identity.extractor_version
+            in {"approved-release-pilot-v1", "approved-release-pilot-v2"}
+            else len(extraction.topics)
+        ),
         "final_topics": len(topics),
         "topics_by_kind": dict(
             sorted(Counter(topic["kind"] for topic in topics).items())

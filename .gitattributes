@@ -10,3 +10,8 @@
 *.gif binary
 *.ico binary
 *.pdf binary
+
+# Keep byte-hashed publication inputs stable across Windows checkouts.
+/docs/generated/**/*.md text eol=lf
+/docs/generated/**/*.json text eol=lf
+/website/publication.json text eol=lf

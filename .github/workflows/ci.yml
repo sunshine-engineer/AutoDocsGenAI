@@ -4,6 +4,11 @@ on:
   pull_request:
     branches:
       - main
+      - demo/stage6-catalog-workflow
+      - feature/source-confirmation-pilot
+      - feature/persistent-generation
+      - feature/ecosystem-version-docs
+      - feature/local-docs-reader
   push:
     branches:
       - main
@@ -49,6 +54,31 @@ jobs:
 
       - name: Run unit tests
         run: uv run pytest -m "not db_integration and not real_model" -q
+
+      - name: Build documentation reader
+        run: uv run --group site python -m scripts.build_docs_site
+
+      - name: Install reader test browser
+        run: uv run playwright install --with-deps chromium
+
+      - name: Verify reader links and desktop/mobile interactions
+        run: uv run python -m scripts.check_docs_site_browser
+
+      - name: Preserve reader preview and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-reader-preview
+          path: |
+            .site-work/site
+            .site-work/qa
+          retention-days: 7
+
+      - name: Verify exact-release offline example
+        env:
+          LANGCHAIN_TRACING_V2: "false"
+          LANGSMITH_TRACING: "false"
+        run: uv run --no-project --python 3.12 --with 'langchain==1.4.6' examples/langchain_1_4_6_offline.py
 
   postgres-integration:
     name: PostgreSQL integration tests
@@ -101,3 +131,50 @@ jobs:
 
       - name: Show final migration revision
         run: uv run alembic current
+
+  ecosystem-compatibility:
+    name: Ecosystem version compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Run isolated version contracts
+        run: python -m scripts.ecosystem_matrix --output /tmp/ecosystem-results --env-root /tmp/ecosystem-envs
+      - name: Install integration environment
+        run: |
+          uv venv /tmp/ecosystem-integrations --python 3.12
+          uv pip install --python /tmp/ecosystem-integrations/bin/python -r docs/ecosystem/evidence/integration-requirements.txt
+      - name: Execute offline integration contracts
+        run: /tmp/ecosystem-integrations/bin/python scripts/ecosystem_integrations.py /tmp/ecosystem-results/integrations.json
+      - name: Preserve compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-compatibility
+          path: /tmp/ecosystem-results
+
+  vm-deployment:
+    name: VM container deployment smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate shell syntax
+        run: bash -n deploy/init-vm.sh deploy/ops.sh
+      - name: Build and smoke-test VM containers
+        run: python -m scripts.check_vm_deployment --build
+      - name: Preserve sanitized deployment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vm-deployment-validation
+          path: .deploy-test/validation.json
+          retention-days: 7

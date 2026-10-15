@@ -166,11 +166,26 @@ def rehydrate_catalog_config(snapshot: dict[str, object]) -> CatalogIdentityConf
             "catalog configuration is not a canonical non-secret snapshot"
         ) from None
     if (
-        config.extractor_version != "b1-reference-curated-v1"
-        or config.normalization_version != "b2-normalization-paths-v1"
-        or config.duplicate_resolution_version != "b2-canonical-identity-v1"
-        or config.schema_version != CATALOG_IDENTITY_SCHEMA_VERSION
-    ):
+        config.extractor_version,
+        config.normalization_version,
+        config.duplicate_resolution_version,
+    ) not in {
+        (
+            "b1-reference-curated-v1",
+            "b2-normalization-paths-v1",
+            "b2-canonical-identity-v1",
+        ),
+        (
+            "approved-release-pilot-v2",
+            "approved-pilot-paths-v1",
+            "approved-pilot-identities-v1",
+        ),
+        (
+            "approved-release-pilot-v1",
+            "approved-pilot-paths-v1",
+            "approved-pilot-identities-v1",
+        ),
+    } or config.schema_version != CATALOG_IDENTITY_SCHEMA_VERSION:
         raise ValueError(
             "catalog configuration requires an unavailable historical renderer"
         )

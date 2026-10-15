@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "containerized reader pages/search and security headers",
+    "explicit fresh-database migrations through non-root worker",
+    "mounted-secret database authentication as UID 10001",
+    "offline Chromium launch inside constrained non-root worker",
+    "binary backup restored into a separate disposable database",
+    "database marker survives container restart",
+    "database has no published host port; reader has no secret mount and a read-only root"
+  ],
+  "backup_sha256": "7aa908f1c287bb4744c6f22ed84c42a48d4c089f827478fd42bf585b23960e75",
+  "limits": [
+    "HTTP only; no public DNS/TLS or VM reboot tested",
+    "No Ollama inference or real ingestion batch tested",
+    "Systemd and VM initialization are prepared, not executed on a GCP host"
+  ]
+}
