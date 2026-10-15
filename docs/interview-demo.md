@@ -46,8 +46,8 @@ production documentation service.”
       (Sunny approved the five exact editorial revisions on 2026-10-15).
 - [x] Export the approved catalog and validate its table of contents, citations,
       module navigation, and backlinks.
-- [ ] Record a three-to-five-minute local demonstration, including one failure.
-- [ ] Add the measured outcomes and limitations to the project README/portfolio.
+- [ ] Optional: record a three-to-five-minute local demonstration, including one failure.
+- [x] Add measured outcomes and limitations to the project README and validation report.
 
 Avoid expanding into authentication, cloud hosting, arbitrary-package discovery,
 or a multi-worker service before this demonstration is complete. Native

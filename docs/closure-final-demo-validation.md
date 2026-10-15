@@ -105,3 +105,8 @@ the approved build; no edit is presented as an untouched model response.
 The earlier zero-review restore check proved the pending state could recover.
 A separate approved-state archive is now preserved locally under
 `data/pilot_runs/closure-review-v4/approved-closure-audit.dump`.
+
+The approved-state archive was also restored to a fresh disposable database. All
+five approvals recovered, and a new native export reproduced all six Markdown
+files and the build manifest byte-for-byte. This proves recovery of the actual
+approved demonstration, beyond the fixture-backed exporter test.

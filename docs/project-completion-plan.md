@@ -17,8 +17,8 @@ original plan and should be read with this status table.
 | 3–4 | Deterministic chunking and PostgreSQL lineage/import implemented |
 | 5 | FastEmbed CPU prototype and hybrid retrieval implemented; broader evaluation remains |
 | 6 | B3 persistence, reconciliation, artifacts, review state machine, and CLI implemented for review |
-| 7–9 | Standalone persisted generation, citation checks, review, and export implemented for review; main adapters remain placeholders |
-| 10 | Unit/database CI exists; generated-page evaluation and portfolio demonstration remain |
+| 7–9 | Standalone generation/edit/review/export demonstrated with five Sunny-approved pages; main adapters remain placeholders |
+| 10 | 193 tests, exact-version offline example, source-checked five-page demo, and approved export; broader evaluation remains |
 
 The implemented embedding prototype uses `BAAI/bge-small-en-v1.5` through
 FastEmbed (see `stage-5-embedding-prototype.md`), rather than the embedding
@@ -27,11 +27,12 @@ unperformed; do not present that original requirement as completed.
 
 B3 validation and explicit limitations are in `stage-6-stop-b3-validation.md`.
 The reusable database must not be migrated as part of this implementation batch.
-The next handoff remains B3 human review, followed by the separately authorized
-B4 real-catalog build and outline approval. A five-page generation pilot now runs against the explicitly approved LangChain
-1.4.6 source and outline. Final content approval remains pending. See
-`persistent-generation-validation.md` and `interview-demo.md` for measured
-evidence and the smallest remaining demo checklist.
+The approved-release adapter built a five-topic catalog in a disposable database,
+using Sunny's explicit source and outline approval. Sunny subsequently approved
+five source-checked editorial revisions, and the real exporter published them.
+This completes the bounded LangChain 1.4.6 interview demonstration; broader
+roadmap work and code review/merges remain. See `closure-final-demo-validation.md`
+and `interview-demo.md` for the actual evidence and scope limits.
 
 ## Product definition
 
