@@ -25,7 +25,8 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Embeddings and vector index | Prototype | Small CPU ONNX model and pgvector |
 | Retrieval | Working prototype | Filtered cosine search and API-aware reranking |
 | Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
-| Generation, validation, review | Placeholder | Not implemented |
+| Grounded writing pilot | Experimental | Docker Ollama structured drafts and citation integrity checks |
+| Production generation/review/export | Pending | Pipeline adapters remain placeholders |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
@@ -129,11 +130,18 @@ On Windows PowerShell, activate with:
 
 ## Running the project
 
-The package and version are currently defined in `main.py`.
+The ingestion CLI requires an exact package version and an explicitly confirmed
+source selection. HTTP success alone never counts as version confirmation.
 
 ```bash
-python main.py
+python main.py PACKAGE EXACT_VERSION --source-selection source-selection.json
 ```
+
+Imports without source confirmation remain permitted for historical/test data,
+but their sources are stored as pending rather than falsely attributed to a
+human reviewer. Crawling requires confirmation and stays within the approved
+URL path boundary. Configured crawl limits are enforced; HTTP fetch metadata
+records the actual fetch method and timestamp.
 
 The implemented pipeline now persists package, version, run, source, document,
 and chunk lineage after chunking. To import an existing chunk artifact directly:
@@ -181,6 +189,44 @@ data/cleaned/{package}/{version}/
 ```
 
 Runtime data, environments, logs, and secrets are ignored by Git.
+
+## Exact-release writing pilot (experimental)
+
+The current pilot targets `langchain==1.4.6` at official commit
+`84ba23c414eca6bf6f6ebd1394a3006378113540`. It uses source docstrings/README
+from that immutable release, rather than assuming live docs match the patch.
+See [the reviewed source and outline](docs/pilot-langchain-1.4.6-review.md) and
+[measured pilot results and remaining work](docs/closure-pilot-validation.md).
+
+Prepare/check the release source without importing or executing downloaded code:
+
+```bash
+python -m scripts.prepare_release_snapshot 1.4.6
+```
+
+Run the local model in Docker independently of the database:
+
+```bash
+docker compose -p autodocs-model -f compose.ollama.yaml up -d
+docker exec autodocs-ollama ollama pull qwen3:1.7b
+```
+
+The API binds to localhost, with a separate persistent model cache. The compose
+file uses a pinned available Ollama image and a 4 GB memory cap. If a manually
+started `autodocs-ollama` container already exists, use it directly; do not start
+a second container on the same port/name. `docker stop autodocs-ollama` stops it
+without erasing the model cache.
+
+The generation adapter uses structured outputs, records model digest and prompt
+version, and rejects unknown citations, wrong versions, and unmatched source
+quotations. An exact quotation is not proof that a paraphrase is semantically
+supported: human support review remains required.
+
+`python -m scripts.generate_pilot --help` describes the review-only pilot CLI.
+It requires a recorded source/outline approval artifact and an empty output
+directory. These experimental records do not implement the PostgreSQL-backed
+page revision/checkpoint/review/export product workflow. Failed or abstained
+pages must not be counted as completed documentation. No draft is final output.
 
 ## Topic catalog workflow (Stage 6 B3)
 
@@ -270,7 +316,7 @@ Run the repository-wide quality baseline from the development container:
 uv run pytest --strict-markers --collect-only -q
 uv run mypy .  ## To ensure correct datatypes are passed across pipeline
 uv run ruff check .  ## To catch basic code quality issues
-uv run ruff --fix .  ## To fix all basic code quality issue
+uv run ruff check --fix .  ## To fix all basic code quality issue
 uv run black --check .  ## To keep the code consistently formatted
 uv run black .  ## Fix all formatting related issues
 uv run pytest -q  ## Run all the test cases

@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from config.settings import CrawlConfig
+from discovery.source_selection import confirmed_source_metadata
 from ingestion.cleaner import clean_markdown
 from ingestion.extractor import extract_main_content
 from ingestion.fetchers.selector import get_fetcher
@@ -6,26 +9,36 @@ from ingestion.normalizer import html_to_markdown
 from ingestion.storage import save_document
 from models.clean_document import CleanDocument
 from models.state import PipelineState
+from utils.config_loader import load_config
 
 
 def ingest_documents(
     state: PipelineState,
+    config: CrawlConfig | None = None,
 ) -> PipelineState:
 
     if state.crawl_plan is None:
         return state
 
-    max_pages = CrawlConfig().max_pages
+    if state.source_selection is None:
+        raise ValueError("source confirmation is required before ingestion")
+    state.source_selection.require_confirmed(state.package, state.version)
+    application_config = load_config()
+    max_pages = (config or application_config.crawl).max_pages
     for page in state.crawl_plan.pages[:max_pages]:
+        confirmed_source_metadata(state.source_selection, page.url)
 
         fetcher = get_fetcher(
-            use_browser=True,
+            use_browser=False,
         )
 
         raw = fetcher.fetch(
             page.title,
             page.url,
         )
+        provenance = confirmed_source_metadata(state.source_selection, raw.url)
+        if raw.status_code != 200:
+            raise ValueError("source fetch did not return HTTP 200")
 
         state.raw_documents.append(raw)
 
@@ -42,11 +55,16 @@ def ingest_documents(
             title=page.title,
             url=page.url,
             markdown=markdown,
+            metadata=provenance,
         )
 
         state.cleaned_documents.append(clean_doc)
 
-        output_dir = f"data/cleaned/" f"{state.package}/" f"{state.version}"
+        output_dir = str(
+            Path(application_config.data.cleaned_directory)
+            / state.package
+            / state.version
+        )
 
         save_document(
             clean_doc,

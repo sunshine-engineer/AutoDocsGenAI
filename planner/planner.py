@@ -1,5 +1,6 @@
 from urllib.parse import urljoin
 
+from discovery.source_selection import canonical_crawl_url, source_contains
 from models.crawl import CrawlPage, CrawlPlan
 from models.state import PipelineState
 from planner.filters import should_include
@@ -7,6 +8,12 @@ from planner.sitemap import discover_links
 
 
 def build_crawl_plan(state: PipelineState) -> PipelineState:
+    selection = state.source_selection
+    if selection is None:
+        raise ValueError(
+            "choose and explicitly confirm a versioned source before crawling"
+        )
+    selection.require_confirmed(state.package, state.version)
     manifest = state.manifest
 
     if manifest is None:
@@ -24,15 +31,26 @@ def build_crawl_plan(state: PipelineState) -> PipelineState:
     if documentation is None:
         return state
 
+    if documentation.status != "verified" or not source_contains(
+        selection.root_url, documentation.redirect_url or documentation.url
+    ):
+        raise ValueError(
+            "source is unreachable or redirects outside the confirmed scope"
+        )
+
     links = discover_links(documentation.url)
 
-    seen: set[str] = set()
-    pages: list[CrawlPage] = []
+    seen: set[str] = {canonical_crawl_url(documentation.url)}
+    pages: list[CrawlPage] = [
+        CrawlPage(title=documentation.title, url=documentation.url)
+    ]
 
     for title, href in links:
-        full_url = urljoin(documentation.url, href)
+        full_url = canonical_crawl_url(urljoin(documentation.url, href))
 
-        if not should_include(full_url, documentation.url):
+        if not should_include(full_url, documentation.url) or not source_contains(
+            selection.root_url, full_url
+        ):
             continue
 
         if full_url in seen:
