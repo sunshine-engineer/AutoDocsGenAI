@@ -10,6 +10,7 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
 ## Start here
 
+- [Run the local documentation website](docs/local-docs-reader.md): navigation, search, catalog and review labels.
 - [Approved LangChain 1.4.6 documentation](docs/generated/langchain/1.4.6/README.md): five reviewed pages.
 - [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
 - [Current findings and closure checklist](docs/closure-tracker.md): website MVP, GCP VM delivery and acceptance criteria.
@@ -43,7 +44,7 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Persistent generation/review/export | Implemented for review | Bounded jobs, immutable revisions, citation checks, explicit page review, complete Markdown export |
 | Ecosystem source references | Generated for bounded scope | 30 packages / 89 releases / 8,432 modules; static declarations and upstream docstrings |
 | Cross-version checks | Executed; CI passing | Four compatible core pairs, one rejected dependency pair, six offline integration checks |
-| Reader website | Planned | Package/version navigation, search, provenance and review-status labels |
+| Reader website | Local MVP implemented for review | Five approved articles, searchable reader, package/version catalog, provenance and compatibility |
 | GCP VM deployment | Planned | No live deployment, production Compose definition or measured VM sizing yet |
 
 The pipeline adapters for retrieval, generation, validation, and final page
@@ -73,6 +74,23 @@ official-source discovery -> crawl plan -> fetch HTML -> extract main content
 Every generated section must be supported by official source material
 and traceable back to its page and chunk metadata. If the source does not
 support a claim, the system must not invent it.
+
+## Local documentation website
+
+```bash
+uv run --frozen --group site python -m scripts.build_docs_site --serve
+```
+
+Open **http://127.0.0.1:8000/**. The command builds the static site and serves it
+locally until Ctrl+C; use `--port 8001` if needed. It works from the repository
+root in PowerShell or Bash with Python 3.12 and uv installed.
+
+The first reader includes the five approved LangChain pages, search, a filterable
+30-package/version catalog, the compatibility report, and provenance/review labels.
+PostgreSQL and Ollama are not required for reading or building it. Broader source
+references are visibly marked as not published, rather than shown as approved
+articles. See [the reader guide](docs/local-docs-reader.md) for publication checks,
+verification, and build-only commands. Static output: `.site-work/site/`.
 
 ## Development setup
 
@@ -407,16 +425,16 @@ Current delivery priorities and verified findings are tracked in
 ## Roadmap
 
 1. Review/integrate the existing PR stack in dependency order; keep CI green.
-2. Build a read-only documentation website with package/version navigation,
-   search, provenance, review labels and the compatibility findings.
+2. Review the implemented local reader and its browser/publication checks.
 3. Package content reproducibly, then prepare a private batch worker and static
    web server for one GCP Compute Engine VM.
 4. Verify HTTPS, persistence across reboot, backup/restore and publication rollback.
 5. Publish the live URL and a short interview walkthrough; then expand provider
    inference tests and API/example coverage.
 
-The next implementation task is the **local website MVP**, starting from the
-five approved pages. The target is a central Python-package documentation reader;
+The local website MVP is implemented for review. The next implementation task is
+a **separate production VM deployment definition**, with persistent storage and
+private batch services. The target is a central Python-package documentation reader;
 coverage currently remains limited to the recorded LangChain/LangGraph ecosystem.
 Use [the closure tracker](docs/closure-tracker.md) for acceptance criteria and
 pending deployment inputs. Existing `compose.yaml` is a development environment,
@@ -451,7 +469,8 @@ and exhaustive example execution remain gaps. Provider client/schema checks do
 not verify hosted inference. The broad reference has not received the final-page
 approval recorded for the five-page demo.
 
-Local validation recorded 156 passing offline tests and 198 collected tests.
+The ecosystem batch recorded 156 passing offline tests. With reader regression
+tests, the current local baseline is 162 offline tests passing (204 collected).
 [PR #33's CI](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806)
 passed quality/unit, PostgreSQL integration and ecosystem compatibility checks.
 These checks do not establish website or cloud deployment readiness.

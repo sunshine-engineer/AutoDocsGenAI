@@ -10,7 +10,8 @@ Sunny requested a central documentation website and GCP VM deployment. The
 [current findings and closure tracker](closure-tracker.md) records this delivery
 surface, verified compatibility findings, pending work and acceptance criteria.
 This extends how approved artifacts are served; it does not remove source or
-human approval gates. The website and VM are planned, not implemented.
+human approval gates. The local website MVP is implemented for review; VM deployment remains planned.
+See [local reader validation](local-docs-reader.md).
 
 ## Implementation update — 2026-10-15
 

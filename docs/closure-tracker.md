@@ -20,7 +20,7 @@ Sunny requested the GCP VM and central documentation website direction on 2026-1
 | F06 | Six integration checks pass, but four verify only client construction/tool-schema binding. | [Integration report](ecosystem/evidence/integrations.json) | Hosted inference untested. Qdrant retrieval and text splitting actually executed locally. |
 | F07 | Full reference and ZIP are ignored local artifacts, not files recoverable from a normal Git clone. | `data/generated_docs/ecosystem-2026-10-15/`; [replay plan](ecosystem/release-plan.json) | Deployment blocker for the full reference: produce a versioned artifact with checksums and licenses, store it durably and prove download/rebuild. Five approved pages are already tracked in Git. |
 | F08 | `compose.yaml` builds a dev container, bind-mounts the repository and runs `sleep infinity`; PostgreSQL publishes a host port. | [Development Compose](../compose.yaml) | Deployment blocker: write a separate production deployment definition; keep DB and model endpoints private. |
-| F09 | No reader website or production VM deployment has been implemented or validated. | Repository inspection on 2026-10-16 | Next milestone; no live URL or cloud availability claim yet. |
+| F09 | Local reader is implemented and browser-checked; production VM deployment remains unimplemented. | [Reader guide](local-docs-reader.md) | Website MVP ready for review; GCP deployment is next. |
 | F10 | Main orchestration adapters still stop short of an integrated generation/review/export flow. | [Current workflow boundaries](../README.md#current-status) | Keep operator-driven standalone workflow for first release; do not advertise unattended end-to-end generation. |
 | F11 | Five exact LangChain 1.4.6 editorial revisions have Sunny's final approval and an exporter-generated artifact. | [Approved output](generated/langchain/1.4.6/README.md), [closure validation](closure-final-demo-validation.md) | Ready as the first website content set; approval does not extend to the 89-release reference. |
 
@@ -33,9 +33,9 @@ All tasks below are pending unless marked otherwise. Favor these milestones over
 | Task | Priority | Deliverable | Completion evidence |
 | --- | --- | --- | --- |
 | C01 | P0 | Review and integrate the existing PR stack in dependency order: #30 -> #31 -> #32 -> #33. | Each reviewed change lands with green CI; dependent PR bases are checked after every merge. No merges are authorized by this checklist alone. |
-| C02 | P0 — next implementation | Build a local MkDocs reader site from an explicit publication manifest. | Home -> package -> exact version -> module/class/function page works; search finds a known symbol; mobile navigation works; build and internal-link checks pass. |
-| C03 | P0 | Add provenance and review-status labels plus a compatibility view. | Every published page identifies package/version, origin and approval state; the three version findings are visible; no unreviewed reference is silently presented as an approved article. |
-| C04 | P0 | Package website inputs and generated reference reproducibly. | Fresh clone builds the initial five-page site; full reference is either rebuilt from exact pins with recorded hash comparison or fetched from a checksummed release artifact with licenses. No dependency on a developer's ignored directories. |
+| C02 | Implemented locally | Local MkDocs reader built from an explicit publication manifest. | Home -> package -> exact version -> module/class/function page works; search finds a known symbol; mobile navigation works; build and internal-link checks pass. |
+| C03 | Implemented locally | Provenance/review labels and compatibility view added. | Every published page identifies package/version, origin and approval state; the three version findings are visible; no unreviewed reference is silently presented as an approved article. |
+| C04 | Initial site implemented; wider artifact pending | Approved reader builds from tracked inputs; durable broader-reference packaging remains pending when selected for publication. | Fresh clone builds the initial five-page site; full reference is either rebuilt from exact pins with recorded hash comparison or fetched from a checksummed release artifact with licenses. No dependency on a developer's ignored directories. |
 | C05 | P0 | Prepare a separate VM Docker deployment and runbook. | Reproducible install/start; pinned images, explicit worker entrypoint, private DB/Ollama, persistent data/model directories, bounded jobs and logs. Fresh DB migrations are an explicit operator step. |
 | C06 | P0 | Deploy a staging VM after project/region/budget and content selection are settled. | HTTPS site loads; DB/model ports are inaccessible publicly; operator can run a bounded job; a reboot preserves state and restores services. Record VM type, runtime, memory peak, URL and actual cost estimate. |
 | C07 | P0 | Prove backup/restore and publication rollback. | Restore a database backup and site artifact into a disposable target, verify page/manifest hashes, then demonstrate switching to the previous site release. |
@@ -72,7 +72,7 @@ Set a user-selected budget and a stop/cleanup procedure. [Alerts-only budgets do
 
 ## Focus for the next work sessions
 
-1. Build and verify the local reader with approved content, provenance labels and version navigation (C02–C03).
+1. Review the implemented local reader and its publication/browser checks (C02–C03): see [reader guide](local-docs-reader.md).
 2. Package inputs and prepare a repeatable deployment, measuring a representative batch locally (C04–C05).
 3. Deploy, prove recovery and capture the interview walkthrough (C06–C08).
 

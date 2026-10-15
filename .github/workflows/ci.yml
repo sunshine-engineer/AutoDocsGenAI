@@ -7,6 +7,7 @@ on:
       - demo/stage6-catalog-workflow
       - feature/source-confirmation-pilot
       - feature/persistent-generation
+      - feature/ecosystem-version-docs
   push:
     branches:
       - main
@@ -52,6 +53,25 @@ jobs:
 
       - name: Run unit tests
         run: uv run pytest -m "not db_integration and not real_model" -q
+
+      - name: Build documentation reader
+        run: uv run --group site python -m scripts.build_docs_site
+
+      - name: Install reader test browser
+        run: uv run playwright install --with-deps chromium
+
+      - name: Verify reader links and desktop/mobile interactions
+        run: uv run python -m scripts.check_docs_site_browser
+
+      - name: Preserve reader preview and browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-reader-preview
+          path: |
+            .site-work/site
+            .site-work/qa
+          retention-days: 7
 
       - name: Verify exact-release offline example
         env:
