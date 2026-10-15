@@ -57,6 +57,7 @@ line-length = 88
 ignore = ["EXE002"]
 
 [tool.mypy]
+exclude = ["^data/"]
 python_version = "3.12"
 files = [
     "config",

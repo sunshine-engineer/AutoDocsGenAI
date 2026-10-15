@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - demo/stage6-catalog-workflow
   push:
     branches:
       - main
