@@ -27,7 +27,7 @@ original plan and should be read with this status table.
 | 5 | FastEmbed CPU prototype and hybrid retrieval implemented; broader evaluation remains |
 | 6 | B3 persistence, reconciliation, artifacts, review state machine, and CLI implemented for review |
 | 7–9 | Standalone generation/edit/review/export demonstrated with five Sunny-approved pages; main adapters remain placeholders |
-| 10 | Current inventory: 198 tests collected; 156 offline tests passed; CI also passed PostgreSQL and ecosystem compatibility checks. Exact-version example and approved five-page export demonstrated; broader evaluation remains. |
+| 10 | Current inventory: 204 tests collected; 162 offline tests passed; CI also passed PostgreSQL and ecosystem compatibility checks. Exact-version example and approved five-page export demonstrated; broader evaluation remains. |
 
 The implemented embedding prototype uses `BAAI/bge-small-en-v1.5` through
 FastEmbed (see `stage-5-embedding-prototype.md`), rather than the embedding

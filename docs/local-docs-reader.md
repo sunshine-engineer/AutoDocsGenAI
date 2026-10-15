@@ -44,7 +44,7 @@ The catalog and compatibility view are assembled from tracked reports. No local 
 
 ## Verification
 
-- Strict MkDocs build passed, including Markdown link/anchor checks.
+- Strict MkDocs build passed, including Markdown link/anchor checks, both in a tracked-files-only clean checkout and a checkout with `core.autocrlf=true`.
 - Rendered HTML check validated **892 local link/asset references**.
 - Chromium desktop at 1440 px: home, package/version filters, no-match state, article navigation, approval banners and search-result navigation passed.
 - Chromium mobile at 390 px: keyboard-operated menu, package filter and horizontal-overflow checks passed.

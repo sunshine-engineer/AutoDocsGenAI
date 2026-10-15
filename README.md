@@ -21,8 +21,9 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 Updated **2026-10-16 (Asia/Calcutta)** on the review branch. Changes in PRs
 [#30](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/30),
 [#31](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/31),
-[#32](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/32) and
-[#33](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/33) are still open;
+[#32](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/32),
+[#33](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/33) and
+[#34](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/34) are still open;
 this branch's capabilities must not be assumed to exist on `main`.
 
 The main pipeline runs through chunk persistence and embedding indexing.
@@ -405,9 +406,11 @@ models/       Pydantic pipeline contracts
 pipeline/     end-to-end orchestration
 planner/      documentation link discovery and crawl planning
 retrieval/    relevant-chunk retrieval
+scripts/      operator CLIs and documentation reader build/browser checks
 services/     shared domain services
 tests/        automated tests
 utils/        configuration, HTTP, and logging utilities
+website/      reader templates, styling, catalog behavior, publication allowlist
 ```
 
 For system boundaries and design decisions, read

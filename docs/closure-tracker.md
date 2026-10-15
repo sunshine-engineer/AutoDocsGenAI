@@ -24,7 +24,7 @@ Sunny requested the GCP VM and central documentation website direction on 2026-1
 | F10 | Main orchestration adapters still stop short of an integrated generation/review/export flow. | [Current workflow boundaries](../README.md#current-status) | Keep operator-driven standalone workflow for first release; do not advertise unattended end-to-end generation. |
 | F11 | Five exact LangChain 1.4.6 editorial revisions have Sunny's final approval and an exporter-generated artifact. | [Approved output](generated/langchain/1.4.6/README.md), [closure validation](closure-final-demo-validation.md) | Ready as the first website content set; approval does not extend to the 89-release reference. |
 
-PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. Local inventory: 198 tests collected; 156 offline tests passed in the prior implementation batch. These results do not prove website or VM behavior.
+PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. The ecosystem batch collected 198 tests and passed 156 offline tests. The local reader increases the current inventory to 204 tests, with 162 offline tests passing. These results do not prove website or VM behavior.
 
 ## Ordered work queue
 
@@ -32,7 +32,7 @@ All tasks below are pending unless marked otherwise. Favor these milestones over
 
 | Task | Priority | Deliverable | Completion evidence |
 | --- | --- | --- | --- |
-| C01 | P0 | Review and integrate the existing PR stack in dependency order: #30 -> #31 -> #32 -> #33. | Each reviewed change lands with green CI; dependent PR bases are checked after every merge. No merges are authorized by this checklist alone. |
+| C01 | P0 | Review and integrate the existing PR stack in dependency order: #30 -> #31 -> #32 -> #33 -> #34. | Each reviewed change lands with green CI; dependent PR bases are checked after every merge. No merges are authorized by this checklist alone. |
 | C02 | Implemented locally | Local MkDocs reader built from an explicit publication manifest. | Home -> package -> exact version -> module/class/function page works; search finds a known symbol; mobile navigation works; build and internal-link checks pass. |
 | C03 | Implemented locally | Provenance/review labels and compatibility view added. | Every published page identifies package/version, origin and approval state; the three version findings are visible; no unreviewed reference is silently presented as an approved article. |
 | C04 | Initial site implemented; wider artifact pending | Approved reader builds from tracked inputs; durable broader-reference packaging remains pending when selected for publication. | Fresh clone builds the initial five-page site; full reference is either rebuilt from exact pins with recorded hash comparison or fetched from a checksummed release artifact with licenses. No dependency on a developer's ignored directories. |
