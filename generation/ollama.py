@@ -9,6 +9,7 @@ from typing import Any
 import httpx
 
 from generation.contracts import EvidenceChunk, PageDraft, validate_citations
+from models.identity import sha256_identity
 
 PROMPT_VERSION = "grounded-page-v3"
 SYSTEM_PROMPT = """Summarize the supplied official source text into a short technical page as JSON.
@@ -25,6 +26,19 @@ sections. Set abstained=false and reason="" whenever at least one factual
 sentence can be supported. Abstain only if NO relevant sentence can be supported.
 Return only JSON matching the supplied schema. Quote source text exactly.
 """
+WRITER_OPTIONS = {"temperature": 0, "num_ctx": 8192, "num_predict": 1200}
+
+
+def writer_contract_hash() -> str:
+    return sha256_identity(
+        {
+            "system_prompt": SYSTEM_PROMPT,
+            "schema": PageDraft.model_json_schema(),
+            "options": WRITER_OPTIONS,
+            "stream": False,
+            "think": False,
+        }
+    )
 
 
 @dataclass(frozen=True)
@@ -49,6 +63,7 @@ def write_page(
     version: str,
     title: str,
     evidence: list[EvidenceChunk],
+    revision_feedback: str | None = None,
 ) -> WritingResult:
     """One bounded local request; callers own approval, persistence, and retries."""
     if not evidence or len({chunk.chunk_id for chunk in evidence}) != len(evidence):
@@ -68,7 +83,7 @@ def write_page(
         "stream": False,
         "think": False,
         "format": PageDraft.model_json_schema(),
-        "options": {"temperature": 0, "num_ctx": 8192, "num_predict": 1200},
+        "options": dict(WRITER_OPTIONS),
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {
@@ -78,6 +93,7 @@ def write_page(
                         "package": package,
                         "version": version,
                         "title": title,
+                        "revision_feedback": revision_feedback,
                         "evidence": [
                             chunk.model_dump(mode="json") for chunk in evidence
                         ],

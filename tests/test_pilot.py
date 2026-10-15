@@ -11,16 +11,16 @@ from generation.pilot import PilotApproval, generate_pilot, outline_hash, pilot_
 from models.source_selection import SourceSelection
 
 
-def snapshot_fixture(tmp_path):
+def snapshot_fixture(tmp_path, version="1.4.6"):
     def source(request):
         if request.url.host == "pypi.org":
-            return httpx.Response(200, json={"info": {"version": "1.4.6"}})
+            return httpx.Response(200, json={"info": {"version": version}})
         if request.url.host == "api.github.com":
             return httpx.Response(
                 200, json={"object": {"type": "commit", "sha": "a" * 40}}
             )
         if request.url.path.endswith("pyproject.toml"):
-            return httpx.Response(200, text='[project]\nversion = "1.4.6"\n')
+            return httpx.Response(200, text=f'[project]\nversion = "{version}"\n')
         if request.url.path.endswith("factory.py"):
             text = 'def create_agent():\n    """Creates an agent graph that calls tools in a loop."""\n    pass\n'
         elif request.url.path.endswith("types.py"):
@@ -32,7 +32,7 @@ def snapshot_fixture(tmp_path):
         return httpx.Response(200, text=text)
 
     with httpx.Client(transport=httpx.MockTransport(source)) as client:
-        path = prepare_langchain_snapshot("1.4.6", tmp_path / "sources", client)
+        path = prepare_langchain_snapshot(version, tmp_path / "sources", client)
     raw = json.loads(path.read_text())["source_selection"]
     selected = SourceSelection.model_validate(
         {**raw, "confirmed_by": "Test human", "confirmed_at": datetime.now(UTC)}

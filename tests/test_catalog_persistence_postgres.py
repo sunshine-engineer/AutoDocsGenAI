@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -69,7 +70,7 @@ def prepare_build():
             page_title=documents[index].title,
             header_path=[documents[index].title],
             chunk_index=0,
-            content_hash=f"{package}-hash-{index}",
+            content_hash=hashlib.sha256(content.encode()).hexdigest(),
             character_count=len(content),
         )
         for index, content in enumerate(contents)

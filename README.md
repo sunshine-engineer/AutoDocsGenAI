@@ -26,12 +26,12 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Retrieval | Working prototype | Filtered cosine search and API-aware reranking |
 | Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
 | Grounded writing pilot | Experimental | Docker Ollama structured drafts and citation integrity checks |
-| Production generation/review/export | Pending | Pipeline adapters remain placeholders |
+| Persistent generation/review/export | Implemented for review | Bounded jobs, immutable revisions, citation checks, explicit page review, complete Markdown export |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
-are implemented; generated documentation and export are not. Catalog approval
-never starts generation.
+are implemented alongside a standalone persistent generation workflow. Catalog
+approval never starts generation. See [the workflow guide](docs/persistent-generation.md).
 
 ## Pipeline
 
