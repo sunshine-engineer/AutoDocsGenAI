@@ -29,12 +29,16 @@ case "$action" in
   model-stop) "${compose[@]}" --profile model stop ollama ;;
   worker)
     if [[ $# -eq 0 ]]; then echo "Supply the explicit worker command" >&2; exit 1; fi
+    job_timeout=${AUTODOCS_JOB_TIMEOUT:-900}
+    if [[ ! "$job_timeout" =~ ^[1-9][0-9]{0,4}$ ]] || [[ "$job_timeout" -gt 86400 ]]; then
+      echo "AUTODOCS_JOB_TIMEOUT must be 1..86400 seconds" >&2; exit 1
+    fi
     job_name="autodocs-job-$(date -u +%Y%m%d%H%M%S)-$$"
     cleanup_job() { docker rm -f "$job_name" >/dev/null 2>&1 || true; }
     trap cleanup_job EXIT
     trap 'exit 130' INT
     trap 'exit 143' TERM
-    timeout --signal=TERM --kill-after=15s "${AUTODOCS_JOB_TIMEOUT:-900}" "${compose[@]}" --profile jobs run --name "$job_name" --rm worker "$@"
+    timeout --signal=TERM --kill-after=15s "$job_timeout" "${compose[@]}" --profile jobs run --name "$job_name" --rm worker "$@"
     ;;
   backup)
     install -d -m 0700 /srv/autodocs/backups

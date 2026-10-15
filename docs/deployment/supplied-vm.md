@@ -84,7 +84,7 @@ sudo bash deploy/ops.sh worker python -m scripts.generation --help
 
 No migration runs automatically. The local tests use a new database; do not redirect this procedure to the reusable development database. Back up an existing deployment before schema changes and assess compatibility separately.
 
-Every worker invocation is a one-shot non-root container. The helper bounds it to 900 seconds (override `AUTODOCS_JOB_TIMEOUT` deliberately for longer batches), forwards termination through Docker, and force-removes its named container on timeout/interruption. A fake-Docker timeout regression test checks that cleanup behavior. Existing source/outline/final-page approval gates still apply; VM setup does not approve any content.
+Every worker invocation is a one-shot non-root container. The helper bounds it to 900 seconds (override using `sudo env AUTODOCS_JOB_TIMEOUT=1800 bash deploy/ops.sh worker ...` for longer batches; only 1–86400 seconds are accepted), forwards termination through Docker, and force-removes its named container on timeout/interruption. A fake-Docker timeout regression test checks that cleanup behavior. Existing source/outline/final-page approval gates still apply; VM setup does not approve any content.
 
 Enable the private model only when needed:
 

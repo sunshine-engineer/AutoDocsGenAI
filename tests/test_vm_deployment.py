@@ -101,7 +101,7 @@ def test_timed_out_worker_forces_container_cleanup(tmp_path):
     env = dict(
         os.environ,
         AUTODOCS_ENV_FILE=str(env_file),
-        AUTODOCS_JOB_TIMEOUT="0.1s",
+        AUTODOCS_JOB_TIMEOUT="1",
         VM_TEST_LOG=str(log),
     )
     env["PATH"] = str(binary) + os.pathsep + env["PATH"]
@@ -114,3 +114,13 @@ def test_timed_out_worker_forces_container_cleanup(tmp_path):
     )
     assert result.returncode == 124
     assert log.read_text().strip() == "cleanup"
+    env["AUTODOCS_JOB_TIMEOUT"] = "0"
+    invalid = subprocess.run(
+        ["bash", str(ROOT / "deploy/ops.sh"), "worker", "python", "--version"],
+        env=env,
+        capture_output=True,
+        check=False,
+        timeout=5,
+    )
+    assert invalid.returncode != 0
+    assert b"1..86400" in invalid.stderr
