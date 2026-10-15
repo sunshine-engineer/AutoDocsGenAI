@@ -38,6 +38,8 @@ The wider reference is inventoried but not published as article pages. Other pac
 
 The builder stages checked source bytes and inserts a website-only review banner after the heading. It does not rewrite approved Markdown in `docs/generated/`. The version overview is labelled “Approved collection” and “Generated navigation,” rather than falsely attributing a model draft to the navigation page. Hashes/records establish consistency with the checked-in selection; they are not signed reviewer attestations.
 
+Approved export files use LF checkout rules in `.gitattributes` so Windows line-ending conversion does not invalidate their byte-level hashes.
+
 The catalog and compatibility view are assembled from tracked reports. No local `data/` snapshot, archive, database backup, browser installation or cloud account is needed to build or serve the site. MkDocs and its transitive dependencies are in the `site` dependency group and frozen lockfile; existing application dependencies are retained.
 
 ## Verification
