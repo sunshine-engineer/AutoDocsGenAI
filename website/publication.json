@@ -1,0 +1,16 @@
+{
+  "schema_version": "reader-publication-v1",
+  "package": "langchain",
+  "version": "1.4.6",
+  "source_root": "docs/generated/langchain/1.4.6",
+  "files": {
+    "docs/generated/langchain/1.4.6/README.md": "21b7e5d0417aa9a1a4c0a68645908e1961313575525898f42757784a319535e1",
+    "docs/generated/langchain/1.4.6/approval-record.json": "1ba14e1fb3d138dbda8c9c86d477a71f3d6fba1872fc3ea9a1916f34ea35a4a4",
+    "docs/generated/langchain/1.4.6/build-manifest.json": "f70cdc1b05f02338420cfacf7eefda1845038a1edb594a7fe9e57e2d90e6e14e",
+    "docs/generated/langchain/1.4.6/concepts/agent-architecture.md": "d18b50458a0ffcbad73681f7cdde0cfa1d4c983df25d4bc06ae8a4d19b80b819",
+    "docs/generated/langchain/1.4.6/guides/installation.md": "4db6600e4bb7a2abc9d3f446410f18bbe5b9ff4bad09318bfe7d3792494612e1",
+    "docs/generated/langchain/1.4.6/modules/agents/README.md": "b90b8f552cb9d0ce06bd6ec02f1e46cc978013b07aad1dc0eacb08ff857cffb6",
+    "docs/generated/langchain/1.4.6/modules/agents/classes/agent-middleware.md": "ffa94855111250fd297880e0ad79ba07629f62a04ad1575bbfed4d4e78a30d1f",
+    "docs/generated/langchain/1.4.6/modules/agents/functions/create-agent.md": "91b09dcdc290ea99b831c8894fe146382e8ecaba3c5365f546aa2639b2832805"
+  }
+}
