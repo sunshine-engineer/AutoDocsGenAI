@@ -13,7 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def publication_root(tmp_path):
-    for name in ("website", "docs/generated/langchain/1.4.6", "docs/ecosystem"):
+    for name in (
+        "website",
+        "docs/generated/langchain/1.4.6",
+        "docs/ecosystem",
+        "docs/quality",
+    ):
         shutil.copytree(ROOT / name, tmp_path / name)
     return tmp_path
 
@@ -83,3 +88,39 @@ def test_rendered_links_reject_missing_anchor(tmp_path):
     (tmp_path / "index.html").write_text('<a href="#missing">Broken</a>')
     with pytest.raises(ValueError, match="Missing reader anchor"):
         check_static_links(tmp_path)
+
+
+def test_human_review_placeholders_do_not_publish_model_or_resolution_text(
+    publication_root,
+):
+    path = publication_root / "docs/quality/human-review-queue.json"
+    queue = json.loads(path.read_text())
+    item = next(item for item in queue["items"] if item["surface"] == "reader")
+    item["status"] = "reviewed_not_published"
+    item["topic"] = "<script>unsafe()</script>"
+    item["resolution"] = "SECRET_UNREVIEWED_DRAFT"
+    path.write_text(json.dumps(queue))
+    page = (prepare(publication_root) / "learning.md").read_text()
+    assert "Human review pending" in page
+    assert "SECRET_UNREVIEWED_DRAFT" not in page
+    assert "<script>" not in page
+    assert "&lt;script&gt;" in page
+    assert (
+        len(
+            list(
+                (publication_root / ".site-work/docs/packages/langchain/1.4.6").rglob(
+                    "*.md"
+                )
+            )
+        )
+        == 6
+    )
+
+
+def test_human_review_queue_cannot_bypass_article_approval(publication_root):
+    path = publication_root / "docs/quality/human-review-queue.json"
+    queue = json.loads(path.read_text())
+    queue["items"][0]["status"] = "approved"
+    path.write_text(json.dumps(queue))
+    with pytest.raises(ValueError, match="cannot authorize publication"):
+        prepare(publication_root)

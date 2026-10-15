@@ -16,16 +16,26 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 - [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
 - [Current findings and closure checklist](docs/closure-tracker.md): website MVP, GCP VM delivery and acceptance criteria.
 - [Interview runbook](docs/interview-demo.md): the bounded demonstration and evidence.
+- [Executable learning recipes](docs/learning/langchain-1.4.6/README.md): three author-written teaching drafts with exact dependencies and execution evidence.
+- [Documentation quality evaluation](docs/quality/README.md): recorded model comparison, factual accuracy, clarity and editing-effort protocol.
+- [Human review queue](docs/quality/human-review-queue.json): seven deferred issues; the reader displays safe learning placeholders while review is pending.
 
 ## Current status
 
-Updated **2026-10-16 (Asia/Calcutta)** on the review branch. Changes in PRs
-[#30](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/30),
-[#31](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/31),
-[#32](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/32),
-[#33](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/33) and
-[#34](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/34) are still open;
-this branch's capabilities must not be assumed to exist on `main`.
+**Demo status: interview-ready for the bounded five-page LangChain 1.4.6 portfolio demonstration.**
+The evidence includes Sunny-approved editorial revisions of actual Docker Ollama
+drafts, source provenance, approval-gated export, an executed offline API example,
+and approved-state recovery. This is independent portfolio work; it does not
+establish commercial production use or unattended generation quality.
+
+PRs #30–#35 were merged, but their stacked targets left later changes outside
+`main`. [Integration PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36)
+consolidates the implementation into `main`; all four CI checks passed at this
+assessment. Release integration remains pending until that PR is merged.
+Actual VM deployment remains separate from interview readiness.
+
+See the [interview runbook](docs/interview-demo.md) for the demonstration scope
+and prioritized documentation-quality improvements.
 
 The main pipeline runs through chunk persistence and embedding indexing.
 Standalone commands provide retrieval and the Stage 6 catalog review workflow:

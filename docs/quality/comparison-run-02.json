@@ -1,0 +1,345 @@
+{
+  "started_at": "2026-10-15T20:22:56.277686+00:00",
+  "input_sha256": "156e795b2586b045f93e1ec60c2bd46a1f160050da5a05d4f637be6a5bee4787",
+  "writer_contract_sha256": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+  "limits": "Exploratory, one attempt per model/topic, sequential trials, loading included when needed; no statistical ranking. Human scores and editing time are not measured automatically.",
+  "runs": [
+    {
+      "model": "qwen3:1.7b",
+      "model_digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+      "title": "create_agent",
+      "human_review": {
+        "factual_accuracy_0_to_4": null,
+        "clarity_0_to_4": null,
+        "editing_seconds": null,
+        "reviewer": null,
+        "notes": null
+      },
+      "draft": {
+        "title": "create_agent",
+        "abstained": false,
+        "reason": "Provides factual information about the function's purpose, inputs, and behavior.",
+        "sections": [
+          {
+            "heading": "Purpose and Returned Graph",
+            "claims": [
+              {
+                "text": "Creates an agent graph that calls tools in a loop until a stopping condition is met.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "Creates an agent graph that calls tools in a loop until a stopping condition is met."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Model and Tools Inputs",
+            "claims": [
+              {
+                "text": "The function takes `model`, `tools`, `system_prompt`, and `checkpointer` as inputs.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "model: The language model for the agent.\ntools: A list of tools, `dict`, or `Callable`."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Tool-Call Loop Stopping Condition",
+            "claims": [
+              {
+                "text": "The loop stops when no more `tool_calls` are present in the response.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "The process repeats until no more `tool_calls` are present in the response."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Checkpointer Usage",
+            "claims": [
+              {
+                "text": "The `checkpointer` is used for persisting state for a single thread, while `store` is used across threads.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "checkpointer: An optional checkpoint saver object.\n        Used for persisting the state of the graph (e.g., as chat memory) for a\n        single thread (e.g., a single conversation).\n        store: An optional store object.\n        Used for persisting data across multiple threads (e.g., multiple\n        conversations / users)."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "prompt_version": "grounded-page-v6",
+      "request_hash": "73344be92ab0eeb55fa42b6533fc6afde429cb34c16cc11555f8fd1479c0a77e",
+      "elapsed_seconds": 140.538,
+      "prompt_tokens": 734,
+      "output_tokens": 485,
+      "citation_issues": [
+        "citation quotation does not occur in source evidence"
+      ],
+      "status": "citation_issues",
+      "wall_seconds": 140.547
+    },
+    {
+      "model": "qwen3:1.7b",
+      "model_digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+      "title": "AgentMiddleware",
+      "human_review": {
+        "factual_accuracy_0_to_4": null,
+        "clarity_0_to_4": null,
+        "editing_seconds": null,
+        "reviewer": null,
+        "notes": null
+      },
+      "draft": {
+        "title": "AgentMiddleware",
+        "abstained": false,
+        "reason": "Provides factual information about the purpose and functionality of the AgentMiddleware class.",
+        "sections": [
+          {
+            "heading": "Purpose",
+            "claims": [
+              {
+                "text": "Base middleware class for an agent.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "Base middleware class for an agent."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Before/After Agent Hooks",
+            "claims": [
+              {
+                "text": "Logic to run before the agent execution starts.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "Logic to run before the agent execution starts."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Before/After Model Hooks",
+            "claims": [
+              {
+                "text": "Logic to run before the model is called.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "Logic to run before the model is called."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Model/Tool Execution Control",
+            "claims": [
+              {
+                "text": "Intercept and control model execution via handler callback.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "Intercept and control model execution via handler callback."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "prompt_version": "grounded-page-v6",
+      "request_hash": "7e8bf0792a94394bdac4bde297ddd773664307de1052ef806dc4118213a1fd5c",
+      "elapsed_seconds": 101.77,
+      "prompt_tokens": 539,
+      "output_tokens": 343,
+      "citation_issues": [],
+      "status": "citation_valid",
+      "wall_seconds": 101.778
+    },
+    {
+      "model": "qwen3:4b",
+      "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+      "title": "create_agent",
+      "human_review": {
+        "factual_accuracy_0_to_4": null,
+        "clarity_0_to_4": null,
+        "editing_seconds": null,
+        "reviewer": null,
+        "notes": null
+      },
+      "draft": {
+        "title": "create_agent",
+        "abstained": false,
+        "reason": "",
+        "sections": [
+          {
+            "heading": "Purpose and returned graph",
+            "claims": [
+              {
+                "text": "The `create_agent` function generates a state graph that iteratively calls tools until a stopping condition is met.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "Creates an agent graph that calls tools in a loop until a stopping condition is met."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Model and tool inputs",
+            "claims": [
+              {
+                "text": "The function accepts a language model, tools (as a list, dictionary, or callable), and an optional system prompt for the L. M.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "model: The language model for the agent.\ntools: A list of tools, `dict`, or `Callable`.\n\nsystem_prompt: An optional system prompt for the LLM."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Tool-call loop stopping condition",
+            "claims": [
+              {
+                "text": "The loop terminates when the language model's response contains no more `tool_calls`.",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "The agent node calls the language model with the messages list (after applying the system prompt). If the resulting [`AIMessage`][langchain.messages.AIMessage]\ncontains `tool_calls`, the graph will then call the tools. The tools node executes\nthe tools and adds the responses to the messages list as\n[`ToolMessage`][langchain.messages.ToolMessage] objects. The agent node then calls\nthe language model again. The process repeats until no more `tool_calls` are present\nin the response."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Checkpointer for single vs. multiple threads",
+            "claims": [
+              {
+                "text": "The `checkpointer` persists state for a single thread (e.g., one conversation), while `store` persists data across multiple threads (e.g., multiple users).",
+                "citations": [
+                  {
+                    "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+                    "quote": "checkpointer: An optional checkpoint saver object.\n\n        Used for persisting the state of the graph (e.g., as chat memory) for a\n        single thread (e.g., a single conversation).\n    store: An optional store object.\n\n        Used for persisting data across multiple threads (e.g., multiple\n        conversations / users)."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "prompt_version": "grounded-page-v6",
+      "request_hash": "ad3114ed6aefe1fcee204366f0c83708bf09b5cf0af2206f22242934448d618f",
+      "elapsed_seconds": 183.864,
+      "prompt_tokens": 728,
+      "output_tokens": 603,
+      "citation_issues": [
+        "citation quotation does not occur in source evidence"
+      ],
+      "status": "citation_issues",
+      "wall_seconds": 183.874
+    },
+    {
+      "model": "qwen3:4b",
+      "model_digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+      "title": "AgentMiddleware",
+      "human_review": {
+        "factual_accuracy_0_to_4": null,
+        "clarity_0_to_4": null,
+        "editing_seconds": null,
+        "reviewer": null,
+        "notes": null
+      },
+      "draft": {
+        "title": "AgentMiddleware",
+        "abstained": false,
+        "reason": "",
+        "sections": [
+          {
+            "heading": "Subclassing purpose",
+            "claims": [
+              {
+                "text": "AgentMiddleware subclasses provide hooks for executing logic before and after agent operations, model calls, and tool executions.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "Base middleware class for an agent."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Before/after agent hooks",
+            "claims": [
+              {
+                "text": "The before_agent hook runs logic prior to agent execution starting, while the after_agent hook executes after agent completion.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "before_agent\nLogic to run before the agent execution starts."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Before/after model hooks",
+            "claims": [
+              {
+                "text": "The before_model hook runs before model invocation, and the after_model hook executes post-model call.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "before_model\nLogic to run before the model is called."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "heading": "Model execution wrapping",
+            "claims": [
+              {
+                "text": "wrap_model_call intercepts model execution to allow modification via a handler callback.",
+                "citations": [
+                  {
+                    "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+                    "quote": "wrap_model_call\nIntercept and control model execution via handler callback."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "prompt_version": "grounded-page-v6",
+      "request_hash": "8462c990d7d74262ad55fb42e5ac12839dafad0eead6e74b2853ac22396d7c79",
+      "elapsed_seconds": 104.4,
+      "prompt_tokens": 533,
+      "output_tokens": 383,
+      "citation_issues": [],
+      "status": "citation_valid",
+      "wall_seconds": 104.405
+    }
+  ],
+  "completed_at": "2026-10-15T20:31:47.054774+00:00"
+}

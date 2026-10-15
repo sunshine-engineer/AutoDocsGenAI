@@ -12,3 +12,5 @@ Compose model-driven applications and inspect the API for your exact release.
 | 0.3.30 | Source reference generated; not published here | Tested with LangGraph 0.6.11; modern create_agent unavailable |
 
 [Read the compatibility report](../../compatibility.md). Version entries without a link are inventory entries, not missing articles.
+
+[Learning examples · human review pending](../../learning.md). Approved articles remain available while new teaching pages are reviewed.

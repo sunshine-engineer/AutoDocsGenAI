@@ -34,6 +34,7 @@ nav:
           - AgentMiddleware: packages/langchain/1.4.6/modules/agents/classes/agent-middleware.md
           - Agent architecture: packages/langchain/1.4.6/concepts/agent-architecture.md
   - LangGraph: packages/langgraph/index.md
+  - Learning · review pending: learning.md
   - Compatibility: compatibility.md
   - Sources & review policy: provenance.md
 validation:

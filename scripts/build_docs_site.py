@@ -183,6 +183,47 @@ The separate source reference covers 30 packages and 89 releases. Source declara
     )
 
 
+def human_review_page(root: Path) -> str:
+    """Render placeholders only; queue resolution never publishes draft prose."""
+    queue = json.loads(
+        (root / "docs/quality/human-review-queue.json").read_text(encoding="utf-8")
+    )
+    if queue.get("schema_version") != "human-review-v1":
+        raise ValueError("unknown human review queue schema")
+    lines = [
+        "# Learning examples · human review pending",
+        "",
+        "Runnable teaching examples are being reviewed. These placeholders are not approved documentation.",
+        "",
+        "The five approved LangChain articles remain available while editorial work continues.",
+        "",
+        "[Read approved LangChain pages](packages/langchain/1.4.6/README.md)",
+        "",
+    ]
+    identities = set()
+    for item in queue["items"]:
+        if item["id"] in identities:
+            raise ValueError("duplicate human review issue ID")
+        identities.add(item["id"])
+        if item["status"] not in {
+            "pending",
+            "revision_requested",
+            "reviewed_not_published",
+        }:
+            raise ValueError("review queue cannot authorize publication")
+        if item["surface"] != "reader":
+            continue
+        # Never render model output, resolution notes or arbitrary Markdown here.
+        lines += [
+            f'<section class="review-banner"><h2>{html.escape(item["topic"])}</h2>',
+            "<p><strong>Human review pending</strong></p>",
+            "<p>Example execution is recorded. The explanation will appear after editorial review and explicit publication approval.</p>",
+            "</section>",
+            "",
+        ]
+    return "\n".join(lines)
+
+
 def prepare(root: Path = ROOT) -> Path:
     selection = json.loads(
         (root / "website/publication.json").read_text(encoding="utf-8")
@@ -236,6 +277,7 @@ def prepare(root: Path = ROOT) -> Path:
         shutil.copy2(root / "website/pages" / (package + ".md"), folder / "index.md")
     (work / "packages/index.md").write_text(catalog_page(root), encoding="utf-8")
     (work / "compatibility.md").write_text(compatibility_page(root), encoding="utf-8")
+    (work / "learning.md").write_text(human_review_page(root), encoding="utf-8")
     return work
 
 

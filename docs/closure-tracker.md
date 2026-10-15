@@ -2,6 +2,25 @@
 
 Updated: 2026-10-16 (Asia/Calcutta). This is the current findings register and next-work checklist. Update task status and evidence here as work lands; do not treat this plan as deployment evidence.
 
+## Interview readiness
+
+The bounded five-page LangChain 1.4.6 local portfolio demo is **interview-ready**
+on its recorded approval, export, API execution, recovery and CI evidence.
+See [the interview runbook](interview-demo.md) for presentation boundaries and
+prioritized documentation improvements. This does not mark C01 or VM deployment
+complete: integration PR #36 is still open at assessment, with four green checks.
+A local rehearsal is required before presenting on an interview machine.
+
+## Documentation quality increment
+
+Three author-written learning recipes now cover minimal invocation, middleware,
+and conversation state with exact dependencies, expected outputs and execution
+records. They remain separate from approved exports pending final content review.
+See [learning recipes](learning/langchain-1.4.6/README.md) and
+[quality evaluation](quality/README.md). CI checks snippet consistency and offline
+execution. Model comparisons retain raw failures and keep editorial scores and
+editing time separate from citation integrity. A persistent human-review queue and safe reader placeholders let unrelated work continue without publishing unresolved drafts.
+
 ## Next outcome
 
 Ship one read-only documentation website with package/version navigation, search, source provenance and visible review status. Run the batch pipeline privately on one GCP Compute Engine VM. The website serves built artifacts; a reader request must not start Ollama or a database job.
@@ -24,7 +43,7 @@ Sunny requested the GCP VM and central documentation website direction on 2026-1
 | F10 | Main orchestration adapters still stop short of an integrated generation/review/export flow. | [Current workflow boundaries](../README.md#current-status) | Keep operator-driven standalone workflow for first release; do not advertise unattended end-to-end generation. |
 | F11 | Five exact LangChain 1.4.6 editorial revisions have Sunny's final approval and an exporter-generated artifact. | [Approved output](generated/langchain/1.4.6/README.md), [closure validation](closure-final-demo-validation.md) | Ready as the first website content set; approval does not extend to the 89-release reference. |
 
-PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. The ecosystem batch collected 198 tests and passed 156 offline tests. The local reader added six tests; the supplied-VM bundle added six more. Current inventory is 210 tests, with 168 offline tests passing. These results do not prove website or VM behavior.
+PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. The ecosystem batch collected 198 tests and passed 156 offline tests. The local reader added six tests; the supplied-VM bundle added six more. The documentation-quality increment adds one benchmark failure-handling test and two placeholder/publication-boundary tests. Current inventory is 213 tests, with 171 offline tests passing. These results do not prove website or VM behavior.
 
 ## Ordered work queue
 

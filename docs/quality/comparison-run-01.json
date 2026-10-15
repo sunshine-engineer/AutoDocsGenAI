@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-10-15T20:16:55.096465+00:00",
+  "input_sha256": "a5694fa12fc406cd573ffa56d36b61da9d32653af03780841c87e500d176c29d",
+  "writer_contract_sha256": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+  "limits": "Exploratory, one attempt per model/topic, sequential cold loads; no statistical ranking. Human scores and editing time are not measured automatically.",
+  "runs": [
+    {
+      "model": "qwen3:1.7b",
+      "model_digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+      "title": "create_agent",
+      "human_review": {
+        "factual_accuracy_0_to_4": null,
+        "clarity_0_to_4": null,
+        "editing_seconds": null,
+        "reviewer": null,
+        "notes": null
+      },
+      "status": "failed",
+      "error": "timed out",
+      "wall_seconds": 240.111
+    }
+  ]
+}

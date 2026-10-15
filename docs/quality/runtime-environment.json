@@ -1,0 +1,10 @@
+{
+  "image": "ollama/ollama:0.11.11",
+  "memory_limit_bytes": 4294967296,
+  "nano_cpus": 4000000000,
+  "recorded_at": "2026-10-15T20:23:42.249358+00:00",
+  "ollama": {
+    "version": "0.11.11"
+  },
+  "limits": "Container limits, not physical host hardware. Runtime /api/ps reported size_vram=0 during generation."
+}

@@ -81,6 +81,14 @@ def check_browser(base: str, out: Path):
             "heading", name="Know the version. Follow the source."
         ).wait_for()
         page.screenshot(path=str(out / "desktop-home.png"), full_page=True)
+        page.goto(base.rstrip("/") + "/learning/")
+        page.get_by_role(
+            "heading", name="Learning examples · human review pending"
+        ).wait_for()
+        assert page.locator("section.review-banner").count() == 3
+        assert "Example execution is recorded" in page.locator("body").inner_text()
+        page.goto(base)
+
         page.get_by_role("link", name="Browse packages →").click()
         field = page.get_by_label("Filter by package name or exact version")
         field.fill("langchain-openai")

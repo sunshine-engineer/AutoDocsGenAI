@@ -80,6 +80,23 @@ jobs:
           LANGSMITH_TRACING: "false"
         run: uv run --no-project --python 3.12 --with 'langchain==1.4.6' examples/langchain_1_4_6_offline.py
 
+      - name: Verify teaching recipes and documentation snippets
+        env:
+          LANGCHAIN_TRACING_V2: "false"
+          LANGSMITH_TRACING: "false"
+        run: |
+          uv venv /tmp/learning-recipes --python 3.12
+          uv pip sync --python /tmp/learning-recipes examples/learning/langchain_1_4_6/requirements.txt
+          /tmp/learning-recipes/bin/python -m scripts.check_learning_examples
+
+      - name: Preserve teaching recipe execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teaching-recipe-validation
+          path: .site-work/learning-results.json
+          retention-days: 7
+
   postgres-integration:
     name: PostgreSQL integration tests
     runs-on: ubuntu-latest
