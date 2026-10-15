@@ -1,0 +1,109 @@
+name: autodocs-vm
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+services:
+  web:
+    image: autodocs-reader:${RELEASE_ID:?Set an immutable release ID}
+    build:
+      context: ..
+      args:
+        RELEASE_ID: ${RELEASE_ID:?Set an immutable release ID}
+      dockerfile: deploy/web.Dockerfile
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Set the website hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set certificate contact email}
+    ports:
+      - "${WEB_BIND_IP:-0.0.0.0}:${HTTP_PORT:-80}:80"
+      - "${WEB_BIND_IP:-0.0.0.0}:${HTTPS_PORT:-443}:443"
+    volumes:
+      - ${STATE_DIR:?Set persistent state path}/caddy-data:/data
+      - ${STATE_DIR:?Set persistent state path}/caddy-config:/config
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    logging: *logging
+    healthcheck:
+      test: [CMD, wget, -q, --spider, "http://127.0.0.1:8080/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    networks: [public]
+  postgres:
+    profiles: [jobs]
+    image: pgvector/pgvector:0.8.6-pg17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: autodocs
+      POSTGRES_USER: autodocs
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes:
+      - ${STATE_DIR:?Set persistent state path}/postgres:/var/lib/postgresql/data
+    mem_limit: 1g
+    logging: *logging
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U autodocs -d autodocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [private]
+  ollama:
+    image: ollama/ollama:0.11.11
+    profiles: [model]
+    restart: unless-stopped
+    volumes:
+      - ${STATE_DIR:?Set persistent state path}/ollama:/root/.ollama
+    mem_limit: 4g
+    cpus: 4
+    logging: *logging
+    networks: [private, egress]
+    healthcheck:
+      test: [CMD, ollama, list]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+  worker:
+    image: autodocs-worker:${RELEASE_ID:?Set an immutable release ID}
+    build:
+      context: ..
+      args:
+        RELEASE_ID: ${RELEASE_ID:?Set an immutable release ID}
+      dockerfile: deploy/worker.Dockerfile
+    profiles: [jobs]
+    init: true
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    secrets: [db_password]
+    environment:
+      FASTEMBED_CACHE_PATH: /models/fastembed
+      LANGCHAIN_TRACING_V2: "false"
+      LANGSMITH_TRACING: "false"
+    volumes:
+      - ${STATE_DIR:?Set persistent state path}/data:/app/data
+      - ${STATE_DIR:?Set persistent state path}/logs:/app/logs
+      - ${STATE_DIR:?Set persistent state path}/embeddings:/models
+    read_only: true
+    tmpfs: ["/tmp:mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 2g
+    pids_limit: 256
+    logging: *logging
+    networks: [private, egress]
+networks:
+  public: {}
+  private:
+    internal: true
+  egress: {}
+secrets:
+  db_password:
+    file: ${DB_PASSWORD_FILE:?Set an external secret file path}

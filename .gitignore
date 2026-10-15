@@ -30,3 +30,8 @@ data/pilot_runs/
 
 # Local documentation website build
 .site-work/
+
+# Disposable deployment validation state / secrets
+.deploy-test/
+deploy/.env*
+deploy/runtime.env

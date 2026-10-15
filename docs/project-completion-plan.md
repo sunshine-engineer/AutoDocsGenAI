@@ -10,7 +10,7 @@ Sunny requested a central documentation website and GCP VM deployment. The
 [current findings and closure tracker](closure-tracker.md) records this delivery
 surface, verified compatibility findings, pending work and acceptance criteria.
 This extends how approved artifacts are served; it does not remove source or
-human approval gates. The local website MVP is implemented for review; VM deployment remains planned.
+human approval gates. The local website MVP is implemented for review; the supplied-VM deployment bundle is prepared and container-tested, with actual host deployment pending.
 See [local reader validation](local-docs-reader.md).
 
 ## Implementation update — 2026-10-15
@@ -27,7 +27,7 @@ original plan and should be read with this status table.
 | 5 | FastEmbed CPU prototype and hybrid retrieval implemented; broader evaluation remains |
 | 6 | B3 persistence, reconciliation, artifacts, review state machine, and CLI implemented for review |
 | 7–9 | Standalone generation/edit/review/export demonstrated with five Sunny-approved pages; main adapters remain placeholders |
-| 10 | Current inventory: 204 tests collected; 162 offline tests passed; CI also passed PostgreSQL and ecosystem compatibility checks. Exact-version example and approved five-page export demonstrated; broader evaluation remains. |
+| 10 | Current inventory: 210 tests collected; 168 offline tests passed; CI also passed PostgreSQL and ecosystem compatibility checks. Exact-version example and approved five-page export demonstrated; broader evaluation remains. |
 
 The implemented embedding prototype uses `BAAI/bge-small-en-v1.5` through
 FastEmbed (see `stage-5-embedding-prototype.md`), rather than the embedding

@@ -8,6 +8,7 @@ on:
       - feature/source-confirmation-pilot
       - feature/persistent-generation
       - feature/ecosystem-version-docs
+      - feature/local-docs-reader
   push:
     branches:
       - main
@@ -157,3 +158,23 @@ jobs:
         with:
           name: ecosystem-compatibility
           path: /tmp/ecosystem-results
+
+  vm-deployment:
+    name: VM container deployment smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate shell syntax
+        run: bash -n deploy/init-vm.sh deploy/ops.sh
+      - name: Build and smoke-test VM containers
+        run: python -m scripts.check_vm_deployment --build
+      - name: Preserve sanitized deployment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vm-deployment-validation
+          path: .deploy-test/validation.json
+          retention-days: 7
