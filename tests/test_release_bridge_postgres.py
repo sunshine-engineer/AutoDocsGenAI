@@ -83,7 +83,7 @@ def test_approved_release_to_persistent_pages_and_reviewed_export(
             factory, result.catalog_id, root=tmp_path / "catalog", repair=True
         )
         assert artifacts is not None and artifacts.complete
-        assert view["coverage"]["eligible_input_chunks"] == 5
+        assert view["coverage"]["eligible_input_chunks"] == 6
         assert view["coverage"]["blocking_issue_count"] == 0
         review_catalog(factory, result.catalog_id, "submit", root=tmp_path / "catalog")
         review_catalog(
@@ -107,5 +107,8 @@ def test_approved_release_to_persistent_pages_and_reviewed_export(
             review_page(factory, page, "approved", reviewer="Test human")
         destination = export_catalog(factory, result.catalog_id, tmp_path / "export")
         assert len(list(destination.rglob("*.md"))) == 6
+        module = (destination / "modules/agents/README.md").read_text()
+        assert "(functions/create-agent.md)" in module
+        assert "(classes/agent-middleware.md)" in module
     finally:
         engine.dispose()

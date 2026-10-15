@@ -61,15 +61,16 @@ def import_release_pilot(
         )
     pages = pilot_evidence(snapshot_path)
     chunks: list[Chunk] = []
+    page_chunks: list[list[Chunk]] = []
     for page in pages:
-        evidence = page["evidence"][0]
-        url = evidence.source_url.replace(
-            "https://github.com/langchain-ai/langchain/blob/",
-            "https://raw.githubusercontent.com/langchain-ai/langchain/",
-        ).split("#", 1)[0]
-        content = evidence.content
-        chunks.append(
-            Chunk(
+        selected = []
+        for evidence in page["evidence"]:
+            url = evidence.source_url.replace(
+                "https://github.com/langchain-ai/langchain/blob/",
+                "https://raw.githubusercontent.com/langchain-ai/langchain/",
+            ).split("#", 1)[0]
+            content = evidence.content
+            chunk = Chunk(
                 id=sha256_identity(
                     {
                         "package": manifest["package"],
@@ -88,7 +89,9 @@ def import_release_pilot(
                 content_hash=hashlib.sha256(content.encode()).hexdigest(),
                 character_count=len(content),
             )
-        )
+            selected.append(chunk)
+            chunks.append(chunk)
+        page_chunks.append(selected)
     state = state_from_chunks(chunks, manifest["package"], manifest["version"])
     state.source_selection = approval.source
     for document in state.cleaned_documents:
@@ -96,7 +99,7 @@ def import_release_pilot(
         document.metadata.update(
             source_file_sha256=source["sha256"],
             source_commit=manifest["commit"],
-            evidence_recipe="approved-release-pilot-v1",
+            evidence_recipe="approved-release-pilot-v2",
             derived_excerpt=True,
         )
     imported = persist_pipeline_state(state, engine)
@@ -112,7 +115,7 @@ def import_release_pilot(
     config = CatalogIdentityConfig(
         embedding=embedding,
         namespace_allow_list=(approval.source.root_url,),
-        extractor_version="approved-release-pilot-v1",
+        extractor_version="approved-release-pilot-v2",
         normalization_version="approved-pilot-paths-v1",
         duplicate_resolution_version="approved-pilot-identities-v1",
         hybrid_retrieval_enabled=False,
@@ -127,12 +130,15 @@ def import_release_pilot(
     config_snapshot = catalog_config_snapshot(**identity_args)
     config_hash = catalog_config_hash(**identity_args)
     topics = []
-    for index, (page, original) in enumerate(zip(pages, chunks, strict=True)):
-        persisted_id = next(
-            identifier
-            for identifier in snapshot.chunk_ids
-            if identifier.startswith(original.id + ":")
-        )
+    for index, (page, originals) in enumerate(zip(pages, page_chunks, strict=True)):
+        persisted_ids = [
+            next(
+                identifier
+                for identifier in snapshot.chunk_ids
+                if identifier.startswith(original.id + ":")
+            )
+            for original in originals
+        ]
         path = page["output_path"]
         topics.append(
             TopicCandidate(
@@ -149,14 +155,21 @@ def import_release_pilot(
                 sort_order=index,
                 evidence=[
                     TopicEvidence(
-                        chunk_id=persisted_id, role=EvidenceRole.PRIMARY, rank=1
+                        chunk_id=identifier,
+                        role=(
+                            EvidenceRole.PRIMARY
+                            if rank == 1
+                            else EvidenceRole.SUPPORTING
+                        ),
+                        rank=rank,
                     )
+                    for rank, identifier in enumerate(persisted_ids, 1)
                 ],
             )
         )
     coverage = CatalogCoverage(
-        input_chunks=5,
-        eligible_input_chunks=5,
+        input_chunks=len(chunks),
+        eligible_input_chunks=len(chunks),
         raw_topic_records=5,
         final_topics=5,
         topics_by_kind={kind.value: 1 for kind in TopicKind},
@@ -164,8 +177,8 @@ def import_release_pilot(
         deferred_symbols=0,
         exclusions_by_reason={},
         topics_with_primary_evidence=5,
-        topics_with_multiple_evidence=0,
-        evidence_chunk_coverage=5,
+        topics_with_multiple_evidence=sum(len(items) > 1 for items in page_chunks),
+        evidence_chunk_coverage=len(chunks),
         unused_input_chunks=0,
         blocking_issue_count=0,
         warning_count=sum(chunk.character_count < 50 for chunk in chunks),

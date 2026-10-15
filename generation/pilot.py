@@ -52,7 +52,7 @@ def pilot_evidence(snapshot: Path) -> list[dict[str, Any]]:
         (prefix + "README.md", None),
         (prefix + "README.md", None),
     ]
-    pages = []
+    pages: list[dict[str, Any]] = []
     for (kind, title, path), (source_path, symbol) in zip(
         PILOT_OUTLINE, definitions, strict=True
     ):
@@ -74,13 +74,19 @@ def pilot_evidence(snapshot: Path) -> list[dict[str, Any]]:
                 if isinstance(node, ast.FunctionDef)
                 else f"class {node.name}"
             )
-            # Start the pilot with the supported definition. Long overload/type
-            # signatures and every parameter can be added after this quality gate.
-            content = (
-                docstring.split("\n\n", 1)[0]
-                if kind == "function"
-                else signature + "\n\n" + docstring
-            )
+            content = signature + "\n\n" + docstring
+            if isinstance(node, ast.ClassDef):
+                hooks = {
+                    "before_agent",
+                    "before_model",
+                    "after_model",
+                    "after_agent",
+                    "wrap_model_call",
+                    "wrap_tool_call",
+                }
+                for method in node.body:
+                    if isinstance(method, ast.FunctionDef) and method.name in hooks:
+                        content += f"\n\ndef {method.name}({ast.unparse(method.args)})\n\n{ast.get_docstring(method) or ''}"
             start, end = node.lineno, node.end_lineno or node.lineno
             if len(content) > 10000:
                 raise ValueError("pilot docstring exceeds the context budget")
@@ -118,6 +124,23 @@ def pilot_evidence(snapshot: Path) -> list[dict[str, Any]]:
                 ],
             }
         )
+        if kind == "guide":
+            metadata_path = prefix + "pyproject.toml"
+            metadata = (root / metadata_path).read_text(encoding="utf-8")
+            # Keep project identity, Python range, and dependencies; exclude
+            # development tooling and unrelated provider extras.
+            metadata = metadata.split("[project.optional-dependencies]", 1)[0]
+            pages[-1]["evidence"].append(
+                EvidenceChunk(
+                    chunk_id=hashlib.sha256(
+                        (metadata_path + metadata).encode()
+                    ).hexdigest(),
+                    package=package,
+                    version=version,
+                    source_url=f"https://github.com/langchain-ai/langchain/blob/{commit}/{metadata_path}",
+                    content=metadata,
+                )
+            )
     return pages
 
 

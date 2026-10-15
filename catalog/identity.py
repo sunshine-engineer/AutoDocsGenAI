@@ -176,6 +176,11 @@ def rehydrate_catalog_config(snapshot: dict[str, object]) -> CatalogIdentityConf
             "b2-canonical-identity-v1",
         ),
         (
+            "approved-release-pilot-v2",
+            "approved-pilot-paths-v1",
+            "approved-pilot-identities-v1",
+        ),
+        (
             "approved-release-pilot-v1",
             "approved-pilot-paths-v1",
             "approved-pilot-identities-v1",

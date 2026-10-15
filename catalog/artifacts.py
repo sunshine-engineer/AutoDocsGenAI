@@ -217,7 +217,8 @@ def load_catalog_view(session: Session, catalog_id: UUID | str) -> dict[str, Any
         "eligible_input_chunks": len(eligible),
         "raw_topic_records": (
             len(topics)
-            if identity.extractor_version == "approved-release-pilot-v1"
+            if identity.extractor_version
+            in {"approved-release-pilot-v1", "approved-release-pilot-v2"}
             else len(extraction.topics)
         ),
         "final_topics": len(topics),

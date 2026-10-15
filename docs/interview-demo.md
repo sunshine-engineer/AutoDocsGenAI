@@ -53,3 +53,20 @@ Avoid expanding into authentication, cloud hosting, arbitrary-package discovery,
 or a multi-worker service before this demonstration is complete. Native
 LangGraph checkpoints and wiring the main pipeline adapters can be a later
 increment; describe the current standalone workflow accurately.
+
+## Executed exact-version API example
+
+From the repository root, with uv installed:
+
+```bash
+uv run --no-project --python 3.12 --with 'langchain==1.4.6' examples/langchain_1_4_6_offline.py
+```
+
+This author-written example uses two distinct fixed model responses. It executes
+`create_agent`, synchronous before/after model middleware, and two invocations
+sharing an in-memory checkpoint thread. Assertions check the returned messages,
+hook order, and retained thread state. It needs no provider credentials.
+
+It does not test live model quality, tool calls, or disk-backed checkpoints.
+Its LangGraph in-memory saver belongs to the example agent; AutoDocsGenAI's own
+resumption mechanism remains PostgreSQL generation jobs and leases.

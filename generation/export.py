@@ -146,6 +146,19 @@ def render_page(
     return "\n".join(lines) + "\n"
 
 
+def child_navigation(path: str, pages: list[dict[str, Any]]) -> str:
+    parent = Path(path).parent
+    if Path(path).name != "README.md":
+        return ""
+    links = [
+        f"- [{page['title']}]({Path(page['output_path']).relative_to(parent).as_posix()})"
+        for page in pages
+        if page["output_path"] != path
+        and Path(page["output_path"]).is_relative_to(parent)
+    ]
+    return "\n## Pages in this module\n\n" + "\n".join(links) + "\n" if links else ""
+
+
 def export_catalog(
     factory: sessionmaker[Session], catalog_id: str, output: Path
 ) -> Path:
@@ -176,7 +189,8 @@ def export_catalog(
                 target.parent.mkdir(parents=True, exist_ok=True)
                 depth = len(Path(page["output_path"]).parts) - 1
                 target.write_text(
-                    render_page(page, package, version, "../" * depth + "README.md"),
+                    render_page(page, package, version, "../" * depth + "README.md")
+                    + child_navigation(page["output_path"], pages),
                     encoding="utf-8",
                 )
                 index.append(f"- [{page['title']}]({page['output_path']})")
@@ -211,8 +225,8 @@ def export_catalog(
                 + "\n",
                 encoding="utf-8",
             )
-            # Parent/child directory README pages are approved topic pages, not
-            # silently generated content. The master TOC and backlink cover all pages.
+            # Module indexes link to their approved descendants; no extra
+            # technical content is silently generated for missing directories.
             for page in pages:
                 if not (staging / page["output_path"]).is_file():
                     raise GenerationError("export navigation points to a missing page")

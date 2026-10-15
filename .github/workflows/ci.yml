@@ -52,6 +52,12 @@ jobs:
       - name: Run unit tests
         run: uv run pytest -m "not db_integration and not real_model" -q
 
+      - name: Verify exact-release offline example
+        env:
+          LANGCHAIN_TRACING_V2: "false"
+          LANGSMITH_TRACING: "false"
+        run: uv run --no-project --python 3.12 --with 'langchain==1.4.6' examples/langchain_1_4_6_offline.py
+
   postgres-integration:
     name: PostgreSQL integration tests
     runs-on: ubuntu-latest

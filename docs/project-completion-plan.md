@@ -13,11 +13,11 @@ original plan and should be read with this status table.
 | Stage | Current code status |
 | --- | --- |
 | 0 | Environment and locked dependency foundation implemented |
-| 1–2 | Discovery/crawl/ingestion MVP; exact source-version confirmation remains a blocker |
+| 1–2 | Discovery/crawl/ingestion MVP; exact release source confirmation implemented |
 | 3–4 | Deterministic chunking and PostgreSQL lineage/import implemented |
 | 5 | FastEmbed CPU prototype and hybrid retrieval implemented; broader evaluation remains |
 | 6 | B3 persistence, reconciliation, artifacts, review state machine, and CLI implemented for review |
-| 7–9 | Generation, page validation/review, and final export remain unimplemented |
+| 7–9 | Standalone persisted generation, citation checks, review, and export implemented for review; main adapters remain placeholders |
 | 10 | Unit/database CI exists; generated-page evaluation and portfolio demonstration remain |
 
 The implemented embedding prototype uses `BAAI/bge-small-en-v1.5` through
@@ -28,8 +28,10 @@ unperformed; do not present that original requirement as completed.
 B3 validation and explicit limitations are in `stage-6-stop-b3-validation.md`.
 The reusable database must not be migrated as part of this implementation batch.
 The next handoff remains B3 human review, followed by the separately authorized
-B4 real-catalog build and outline approval. A five-page generation pilot is the
-proposed subsequent release scope, not a completed capability.
+B4 real-catalog build and outline approval. A five-page generation pilot now runs against the explicitly approved LangChain
+1.4.6 source and outline. Final content approval remains pending. See
+`persistent-generation-validation.md` and `interview-demo.md` for measured
+evidence and the smallest remaining demo checklist.
 
 ## Product definition
 
