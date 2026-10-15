@@ -4,6 +4,33 @@ Status: frozen on 2026-08-13. This document is the authoritative delivery
 roadmap. Changes to its product boundaries or approved architecture decisions
 require an explicit decision and a documented revision.
 
+## Implementation update — 2026-10-15
+
+This update records implementation progress; the product boundaries and human
+approval gates below remain in force. Earlier stage descriptions preserve the
+original plan and should be read with this status table.
+
+| Stage | Current code status |
+| --- | --- |
+| 0 | Environment and locked dependency foundation implemented |
+| 1–2 | Discovery/crawl/ingestion MVP; exact source-version confirmation remains a blocker |
+| 3–4 | Deterministic chunking and PostgreSQL lineage/import implemented |
+| 5 | FastEmbed CPU prototype and hybrid retrieval implemented; broader evaluation remains |
+| 6 | B3 persistence, reconciliation, artifacts, review state machine, and CLI implemented for review |
+| 7–9 | Generation, page validation/review, and final export remain unimplemented |
+| 10 | Unit/database CI exists; generated-page evaluation and portfolio demonstration remain |
+
+The implemented embedding prototype uses `BAAI/bge-small-en-v1.5` through
+FastEmbed (see `stage-5-embedding-prototype.md`), rather than the embedding
+comparison envisaged in the original decisions. A broader comparison is still
+unperformed; do not present that original requirement as completed.
+
+B3 validation and explicit limitations are in `stage-6-stop-b3-validation.md`.
+The reusable database must not be migrated as part of this implementation batch.
+The next handoff remains B3 human review, followed by the separately authorized
+B4 real-catalog build and outline approval. A five-page generation pilot is the
+proposed subsequent release scope, not a completed capability.
+
 ## Product definition
 
 AutoDocsGenAI accepts a Python package name and version, discovers and confirms

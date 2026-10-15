@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from sqlalchemy import Engine
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
 from catalog.coverage import CatalogCoverage, calculate_coverage
@@ -27,6 +28,7 @@ from catalog.identity import (
 )
 from catalog.normalization import NormalizationIssue, normalize_catalog_topics
 from catalog.repository import (
+    CatalogPersistenceError,
     PersistenceResult,
     persist_topics,
     resolve_draft_catalog,
@@ -190,7 +192,10 @@ def assemble_snapshot_catalog_proposal(
 
 
 def persist_snapshot_catalog_proposal(
-    session_factory: sessionmaker[Session], build: SnapshotCatalogProposal
+    session_factory: sessionmaker[Session],
+    build: SnapshotCatalogProposal,
+    *,
+    reconcile: bool = False,
 ) -> PersistenceResult:
     """Persist a validated proposal in one caller-visible atomic transaction."""
 
@@ -200,14 +205,33 @@ def persist_snapshot_catalog_proposal(
     if build.coverage.blocking_issue_count:
         raise ValueError("a proposal with blocking findings cannot be persisted")
 
-    with session_factory.begin() as session:
-        catalog, catalog_counts = resolve_draft_catalog(session, build)
-        topic_counts, evidence_counts = persist_topics(session, catalog, build)
-        result = PersistenceResult(
-            catalog_id=str(catalog.id),
-            status=catalog.status,
-            catalogs=catalog_counts,
-            topics=topic_counts,
-            evidence=evidence_counts,
-        )
-    return result
+    # The version lock serializes cooperating builders. Retry once if another
+    # writer bypasses that lock and wins the exact catalog uniqueness race.
+    for attempt in range(2):
+        try:
+            with session_factory.begin() as session:
+                catalog, catalog_counts = resolve_draft_catalog(session, build)
+                topic_counts, evidence_counts = persist_topics(
+                    session, catalog, build, reconcile=reconcile
+                )
+                result = PersistenceResult(
+                    catalog_id=str(catalog.id),
+                    status=catalog.status,
+                    catalogs=catalog_counts,
+                    topics=topic_counts,
+                    evidence=evidence_counts,
+                )
+            return result
+        except IntegrityError as error:
+            diagnostic = getattr(error.orig, "diag", None)
+            if (
+                getattr(error.orig, "sqlstate", None) != "23505"
+                or getattr(diagnostic, "constraint_name", None)
+                != "uq_topic_catalogs_documentation_version_config_hash"
+            ):
+                raise
+            if attempt:
+                raise CatalogPersistenceError(
+                    "catalog identity conflict persisted after one retry"
+                ) from None
+    raise AssertionError("unreachable catalog persistence result")

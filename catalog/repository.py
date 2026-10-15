@@ -104,8 +104,16 @@ def persist_topics(
     session: Session,
     catalog: TopicCatalogRecord,
     build: SnapshotCatalogProposal,
+    *,
+    reconcile: bool = False,
 ) -> tuple[MutationCounts, MutationCounts]:
-    """Upsert a complete draft hierarchy without deleting stale topics."""
+    """Upsert a draft, removing exact stale rows only with explicit consent."""
+
+    if catalog.status != "draft":
+        raise CatalogPersistenceError("only draft catalogs can be reconciled or built")
+    if not build.proposal.topics:
+        raise CatalogPersistenceError("an empty proposal cannot replace a catalog")
+    ordered_topics = _parent_first(build.proposal.topics)
 
     snapshot_ids = set(build.snapshot.chunk_ids)
     evidence_ids = {
@@ -118,6 +126,17 @@ def persist_topics(
         raise CatalogPersistenceError(
             f"proposal contains {len(outside_snapshot)} out-of-snapshot evidence chunk(s)"
         )
+    for proposed_topic in ordered_topics:
+        evidence = sorted(proposed_topic.evidence, key=lambda item: item.rank)
+        if (
+            not evidence
+            or evidence[0].role != "primary"
+            or any(item.role != "supporting" for item in evidence[1:])
+            or [item.rank for item in evidence] != list(range(1, len(evidence) + 1))
+        ):
+            raise CatalogPersistenceError(
+                "each topic requires one rank-one primary and contiguous evidence ranks"
+            )
 
     existing_topics = list(
         session.scalars(
@@ -134,15 +153,47 @@ def persist_topics(
         topic.qualified_name.casefold() for topic in build.proposal.topics
     }
     stale_names = sorted(set(existing_by_name) - proposed_names)
-    if stale_names:
+    if stale_names and not reconcile:
         raise CatalogPersistenceError(
             f"draft contains {len(stale_names)} stale topic(s); explicit reconciliation is required"
         )
 
     topic_counts = MutationCounts()
     evidence_counts = MutationCounts()
+    detached_ids: set[UUID] = set()
+    if stale_names:
+        stale = [existing_by_name[name] for name in stale_names]
+        stale_ids = {topic.id for topic in stale}
+        # Retained children may move to another parent in the new proposal.
+        # Detach them inside this transaction before removing the old parents.
+        for topic in existing_topics:
+            if topic.id not in stale_ids and topic.parent_id in stale_ids:
+                detached_ids.add(topic.id)
+                topic.parent_id = None
+        session.flush()
+        removed = list(
+            session.scalars(
+                delete(TopicEvidenceRecord)
+                .where(TopicEvidenceRecord.topic_id.in_(stale_ids))
+                .returning(TopicEvidenceRecord.id)
+            )
+        )
+        evidence_counts = MutationCounts(removed=len(removed))
+        remaining = {topic.id: topic for topic in stale}
+        while remaining:
+            parent_ids = {topic.parent_id for topic in remaining.values()}
+            leaves = [
+                topic for topic in remaining.values() if topic.id not in parent_ids
+            ]
+            if not leaves:
+                raise CatalogPersistenceError("stale topic hierarchy contains a cycle")
+            for topic in sorted(leaves, key=lambda item: item.qualified_name):
+                session.delete(topic)
+                del remaining[topic.id]
+            session.flush()
+        topic_counts = MutationCounts(removed=len(stale))
     resolved_ids: dict[str, UUID] = {}
-    for proposed in _parent_first(build.proposal.topics):
+    for proposed in ordered_topics:
         key = proposed.qualified_name.casefold()
         parent_id = (
             resolved_ids[proposed.parent_qualified_name.casefold()]
@@ -156,7 +207,7 @@ def persist_topics(
             session.add(stored)
             session.flush()
             topic_counts = _increment(topic_counts, "inserted")
-        elif _topic_changed(stored, values):
+        elif stored.id in detached_ids or _topic_changed(stored, values):
             for field, value in values.items():
                 setattr(stored, field, value)
             session.flush()

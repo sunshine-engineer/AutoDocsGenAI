@@ -24,3 +24,4 @@ data/chunks/
 data/embeddings/
 data/vectorstore/
 data/generated_docs/
+data/catalogs/
