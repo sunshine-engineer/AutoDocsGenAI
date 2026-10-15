@@ -7,6 +7,19 @@
 3. Independent factual and clarity review.
 4. Measured editing time and model selection.
 
+## Priority status
+
+| Priority | Delivered evidence | Human follow-up |
+| --- | --- | --- |
+| Runnable examples | Four complete files, exact dependencies, expected output and executed assertions | Review usefulness; no provider-quality claim |
+| When/why and mistakes | Four task-focused teaching drafts, including invalid tool arguments | Final Sunny editorial approval |
+| Verification labels | Executed scenarios distinguished from fake-model and untested capabilities | Preserve labels in any revised publication |
+| Readable sourcing | One source-mapping section per teaching page; approved exports unchanged | Review claim-to-source meaning |
+| Model comparison | Two installed models, two identical focused tasks; raw runs, latency and agent assessments | Independent human scores and timed editing remain pending |
+
+Mechanical issues now generate review handoffs automatically. Unresolved content
+uses reader placeholders while the five approved pages remain available.
+
 ## Page acceptance criteria
 
 A teaching page needs a concrete task, when/why guidance, prerequisites, a
@@ -16,7 +29,7 @@ Link claims to a pinned source in one source-mapping section rather than
 interrupting every sentence with repeated quotations. Preserve the underlying
 evidence and keep unsupported claims out of the page.
 
-[Three authored recipes](../learning/langchain-1.4.6/README.md) implement this
+[Four authored recipes](../learning/langchain-1.4.6/README.md) implement this
 format. They are review drafts outside the approved reader publication manifest.
 Original approved exports remain unchanged.
 
@@ -105,7 +118,7 @@ including loading when needed, rather than controlled cold-load benchmarks.
 
 [Findings](findings.md) summarize the completed exploratory comparison.
 [human-review-queue.json](human-review-queue.json) tracks outstanding model issues
-and the three teaching-page reviews with artifact hashes and exact draft pointers.
+and the four teaching-page reviews with artifact hashes and exact draft pointers.
 The reader shows placeholders for teaching pages; model drafts and resolution
 notes are never rendered by this queue. Pending issues do not block unrelated work.
 
@@ -120,3 +133,29 @@ export and publication-manifest workflow before replacing approved pages.
 Human factual/clarity scores and editing time are intentionally unfilled in raw
 benchmark reports. [agent-review.json](agent-review.json) is an attributed Codex
 assessment, not a Sunny review or final content approval.
+
+
+## Automatic review handoff for future runs
+
+The comparison runner now checkpoints a sibling `<run>.review-queue.json` after
+each attempt and at completion. It records generation failures, citation issues,
+non-empty reasons on non-abstaining drafts, and quotations over the writer's
+160-character instruction. Every draft still needs semantic/clarity review even
+when no mechanical issue is detected. A failed task does not stop later tasks.
+
+A queue item's artifact hash follows the checkpointed raw report, including the
+final completion timestamp. Begin human review after the run has stopped; keep
+human resolutions in separate records so a running checkpoint cannot overwrite
+review decisions. These per-run handoffs supplement the central queue; reconcile
+by artifact and draft pointer rather than counting them as new independent issues.
+
+Existing immutable reports can be assessed without calling a model again:
+
+```bash
+uv run --frozen python -m scripts.doc_review_queue --report docs/quality/comparison-run-02.json --output .site-work/review-handoff.json
+```
+
+Existing destination queues are protected from CLI overwrite. The recorded
+[automatic handoff](comparison-run-02.review-queue.json) preserves human scores
+and editing time as unknown. It neither modifies the raw comparison nor updates
+approval records or published articles.

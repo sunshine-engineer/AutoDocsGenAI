@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-15T20:29:33.148223+00:00",
+  "executed_at": "2026-10-15T22:09:17.374708+00:00",
   "python": "3.12.15",
   "dependencies": {
     "annotated-types": "0.8.0",
@@ -44,7 +44,7 @@
   },
   "requirements_sha256": "3f85b9a22af8500b19837c0533234fe66d504acbf249589320db75a2c81f4804",
   "review_status": "author-written; final human content approval pending",
-  "scope": "fixed-response model, no tools/provider inference/durable storage",
+  "scope": "fixed-response models; local tool execution and invalid arguments tested; no provider inference/durable storage",
   "network": "Python socket connections and DNS denied; not a security sandbox",
   "results": [
     {
@@ -71,6 +71,15 @@
       "page_sha256": "6f99411f092d4cd5611be0b459deee33cee045d8b30969011bc23a8110ec65bf",
       "status": "passed",
       "stdout": "Same conversation: 2 -> 4 messages\nSeparate conversation: 2 messages\nMissing thread configuration: rejected\n",
+      "stderr": "",
+      "returncode": 0
+    },
+    {
+      "example": "examples/learning/langchain_1_4_6/04_tool_call.py",
+      "source_sha256": "1b7a324f6cf10c46f4d68f48decfbce61dfeafef2650cd6486d007da4e1756b6",
+      "page_sha256": "cf12ee272370a4bbc7d5d29f1182e337d16a05a22436080bb7cf7d27d9245502",
+      "status": "passed",
+      "stdout": "Executed tool: add(2, 3) = 5\nMessage order: human -> ai -> tool -> ai\nInvalid integer argument: tool error; function not executed\n",
       "stderr": "",
       "returncode": 0
     }

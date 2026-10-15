@@ -85,7 +85,7 @@ def check_browser(base: str, out: Path):
         page.get_by_role(
             "heading", name="Learning examples · human review pending"
         ).wait_for()
-        assert page.locator("section.review-banner").count() == 3
+        assert page.locator("section.review-banner").count() == 4
         assert "Example execution is recorded" in page.locator("body").inner_text()
         page.goto(base)
 

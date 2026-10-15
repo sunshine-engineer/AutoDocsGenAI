@@ -1,4 +1,4 @@
-# Learn agents through three executable recipes
+# Learn agents through four executable recipes
 
 This teaching collection is separate from the five approved exports. It adds
 complete examples and practical explanations without changing their approved bytes.
@@ -10,13 +10,16 @@ results do not constitute editorial approval.
 1. Create an agent and inspect its result.
 2. Observe the model step with middleware.
 3. Retain one conversation and isolate another.
-4. Reproduce the environment and inspect verification limits.
+4. Execute a real local tool and inspect an invalid-argument error.
+5. Reproduce the environment and inspect verification limits.
 
 | Recipe | What its assertions verify | Status |
 | --- | --- | --- |
 | [Minimal invocation](01_minimal_agent.md) | Message types and exact fixture reply | See execution record |
 | [Middleware](02_middleware.md) | Synchronous hook order and reply | See execution record |
 | [Conversation state](03_conversation_state.md) | Same-thread retention, separate-thread isolation, missing-config rejection | See execution record |
+
+| [Local tool call](04_tool_call.md) | Actual Python execution, message routing and invalid-argument rejection | See execution record |
 
 ## Environment and execution
 
@@ -38,8 +41,9 @@ requires internet access; example execution denies Python socket connections and
 DNS in the runner. This guard is not a sandbox for untrusted code.
 
 The examples need no API keys or model downloads. The fake chat model returns
-fixed responses. No tool calls, real-provider quality, asynchronous middleware,
-or durable checkpoint storage are verified.
+fixed responses. The fourth recipe executes a real local Python tool. Real-provider
+quality, model-selected tool use, asynchronous middleware and durable checkpoint
+storage remain unverified.
 
 ## Status vocabulary
 

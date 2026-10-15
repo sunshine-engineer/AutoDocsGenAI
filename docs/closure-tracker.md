@@ -13,8 +13,8 @@ A local rehearsal is required before presenting on an interview machine.
 
 ## Documentation quality increment
 
-Three author-written learning recipes now cover minimal invocation, middleware,
-and conversation state with exact dependencies, expected outputs and execution
+Four author-written learning recipes now cover minimal invocation, middleware,
+conversation state and real local tool execution with exact dependencies, expected outputs and execution
 records. They remain separate from approved exports pending final content review.
 See [learning recipes](learning/langchain-1.4.6/README.md) and
 [quality evaluation](quality/README.md). CI checks snippet consistency and offline
@@ -43,7 +43,7 @@ Sunny requested the GCP VM and central documentation website direction on 2026-1
 | F10 | Main orchestration adapters still stop short of an integrated generation/review/export flow. | [Current workflow boundaries](../README.md#current-status) | Keep operator-driven standalone workflow for first release; do not advertise unattended end-to-end generation. |
 | F11 | Five exact LangChain 1.4.6 editorial revisions have Sunny's final approval and an exporter-generated artifact. | [Approved output](generated/langchain/1.4.6/README.md), [closure validation](closure-final-demo-validation.md) | Ready as the first website content set; approval does not extend to the 89-release reference. |
 
-PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. The ecosystem batch collected 198 tests and passed 156 offline tests. The local reader added six tests; the supplied-VM bundle added six more. The documentation-quality increment adds one benchmark failure-handling test and two placeholder/publication-boundary tests. Current inventory is 213 tests, with 171 offline tests passing. These results do not prove website or VM behavior.
+PR #33's recorded [CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806) passed quality/unit tests, PostgreSQL integration tests, and ecosystem compatibility. The ecosystem batch collected 198 tests and passed 156 offline tests. The local reader added six tests; the supplied-VM bundle added six more. The documentation-quality increment adds one benchmark failure-handling test and two placeholder/publication-boundary tests. Two additional review-handoff tests cover instruction violations and the semantic-review boundary. Current inventory is 215 tests, with 173 offline tests passing. These results do not prove website or VM behavior.
 
 ## Ordered work queue
 

@@ -82,6 +82,17 @@
       "issue": "Example executed; teaching explanation needs final Sunny review.",
       "required_action": "Review explanation, source mapping and expected output; request changes or approve a new publication revision explicitly.",
       "resolution": null
+    },
+    {
+      "id": "LEARN-04",
+      "surface": "reader",
+      "topic": "Execute a local tool",
+      "status": "pending",
+      "artifact": "docs/learning/langchain-1.4.6/04_tool_call.md",
+      "artifact_sha256": "cf12ee272370a4bbc7d5d29f1182e337d16a05a22436080bb7cf7d27d9245502",
+      "issue": "Local execution and invalid-argument rejection verified; explanation needs final Sunny review.",
+      "required_action": "Review fixture limitations, tool-result assertions and failure guidance; request changes or explicitly approve a new publication revision.",
+      "resolution": null
     }
   ]
 }

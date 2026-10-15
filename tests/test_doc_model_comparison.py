@@ -1,5 +1,6 @@
 """Benchmark failures must remain visible and never become successful scores."""
 
+import hashlib
 import json
 import sys
 from types import SimpleNamespace
@@ -67,5 +68,57 @@ def test_model_failure_is_recorded_and_next_model_still_runs(tmp_path, monkeypat
     assert all(row["status"] == "failed" for row in report["runs"])
     assert all(row["human_review"]["editing_seconds"] is None for row in report["runs"])
     assert unloaded == ["small", "large"]
+    queue = json.loads(output.with_suffix(".review-queue.json").read_text())
+    assert len(queue["items"]) == 2
+    assert all(item["status"] == "pending" for item in queue["items"])
+    assert all(
+        item["artifact_sha256"] == hashlib.sha256(output.read_bytes()).hexdigest()
+        for item in queue["items"]
+    )
+    assert all("incomplete draft" in item["detected_issues"] for item in queue["items"])
     with pytest.raises(SystemExit):
         compare_doc_models.main()
+
+
+def test_quote_valid_draft_still_requires_semantic_review():
+    from scripts.doc_review_queue import build_queue
+
+    report = {
+        "runs": [
+            {
+                "model": "fixture",
+                "title": "topic",
+                "status": "citation_valid",
+                "citation_issues": [],
+                "draft": {
+                    "abstained": False,
+                    "reason": "unsupported explanation",
+                    "sections": [{"claims": [{"citations": [{"quote": "x" * 161}]}]}],
+                },
+            }
+        ]
+    }
+    item = build_queue(report, "run.json", "a" * 64)["items"][0]
+    assert item["status"] == "pending"
+    assert len(item["detected_issues"]) == 2
+    assert item["human_scores"]["factual_accuracy"] is None
+    assert item["resolution"] is None
+
+
+def test_clean_citations_do_not_automatically_approve_a_draft():
+    from scripts.doc_review_queue import build_queue
+
+    report = {
+        "runs": [
+            {
+                "model": "fixture",
+                "title": "topic",
+                "status": "citation_valid",
+                "draft": {"abstained": False, "reason": "", "sections": []},
+            }
+        ]
+    }
+    item = build_queue(report, "run.json", "a" * 64)["items"][0]
+    assert item["detected_issues"] == []
+    assert item["status"] == "pending"
+    assert "semantic support" in item["required_action"]

@@ -15,6 +15,7 @@ import httpx
 
 from generation.contracts import EvidenceChunk
 from generation.ollama import write_page, writer_contract_hash
+from scripts.doc_review_queue import save_report
 
 
 def main():
@@ -26,7 +27,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--base-url", default="http://127.0.0.1:11434")
     args = parser.parse_args()
-    if args.output.exists():
+    if args.output.exists() or args.output.with_suffix(".review-queue.json").exists():
         parser.error("Choose a new output file; benchmark evidence is not overwritten")
     payload = args.input.read_bytes()
     tasks = json.loads(payload)["tasks"]
@@ -88,7 +89,7 @@ def main():
                     row.update(status="failed", error=str(error))
                 row["wall_seconds"] = round(time.monotonic() - started, 3)
                 report["runs"].append(row)
-                args.output.write_text(json.dumps(report, indent=2) + "\n")
+                save_report(report, args.output)
                 print(f"{model}: {task['title']}: {row['status']}", flush=True)
                 # Release model memory between trials; loading time is included when needed.
                 response = client.post(
@@ -97,7 +98,7 @@ def main():
                 )
                 response.raise_for_status()
     report["completed_at"] = datetime.now(UTC).isoformat()
-    args.output.write_text(json.dumps(report, indent=2) + "\n")
+    save_report(report, args.output)
 
 
 if __name__ == "__main__":

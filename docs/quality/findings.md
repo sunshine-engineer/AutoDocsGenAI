@@ -29,6 +29,8 @@ The model writer generates short grounded claims, not these authored runnable tu
 
 The [review queue](human-review-queue.json) binds each issue to an artifact hash and draft pointer. Keep raw runs immutable; record corrections as new revisions. Human editing time stays unknown until a timed editing session actually happens. Do not infer it from response length or generation time.
 
-The reader displays safe placeholders for the three teaching pages. Pending review does not block serving the five approved articles or running unrelated examples. Queue resolution alone does not publish corrected model text.
+The reader displays safe placeholders for the four teaching pages. Pending review does not block serving the five approved articles or running unrelated examples. Queue resolution alone does not publish corrected model text.
 
 Evidence: [raw focused run](comparison-run-02.json), [agent assessment](agent-review.json), [input](benchmark-input.json), [environment](runtime-environment.json), [full-context timeout](comparison-run-01.json).
+
+Future comparisons automatically checkpoint a review handoff. [Recorded deterministic checks](comparison-run-02.review-queue.json) supplement the same central model issues; they do not constitute human approval.

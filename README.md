@@ -16,9 +16,9 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 - [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
 - [Current findings and closure checklist](docs/closure-tracker.md): website MVP, GCP VM delivery and acceptance criteria.
 - [Interview runbook](docs/interview-demo.md): the bounded demonstration and evidence.
-- [Executable learning recipes](docs/learning/langchain-1.4.6/README.md): three author-written teaching drafts with exact dependencies and execution evidence.
+- [Executable learning recipes](docs/learning/langchain-1.4.6/README.md): four author-written teaching drafts with exact dependencies and execution evidence.
 - [Documentation quality evaluation](docs/quality/README.md): recorded model comparison, factual accuracy, clarity and editing-effort protocol.
-- [Human review queue](docs/quality/human-review-queue.json): seven deferred issues; the reader displays safe learning placeholders while review is pending.
+- [Human review queue](docs/quality/human-review-queue.json): eight deferred issues; the reader displays safe learning placeholders while review is pending.
 
 ## Current status
 

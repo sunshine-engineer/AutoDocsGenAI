@@ -26,6 +26,14 @@ CASES = (
             "Missing thread configuration: rejected\n"
         ),
     ),
+    (
+        "04_tool_call",
+        (
+            "Executed tool: add(2, 3) = 5\n"
+            "Message order: human -> ai -> tool -> ai\n"
+            "Invalid integer argument: tool error; function not executed\n"
+        ),
+    ),
 )
 
 
@@ -94,7 +102,7 @@ def main():
         "dependencies": pins,
         "requirements_sha256": digest(EXAMPLES / "requirements.txt"),
         "review_status": "author-written; final human content approval pending",
-        "scope": "fixed-response model, no tools/provider inference/durable storage",
+        "scope": "fixed-response models; local tool execution and invalid arguments tested; no provider inference/durable storage",
         "network": "Python socket connections and DNS denied; not a security sandbox",
         "results": results,
     }
