@@ -11,20 +11,20 @@ from generation.pilot import PilotApproval, generate_pilot, outline_hash, pilot_
 from models.source_selection import SourceSelection
 
 
-def snapshot_fixture(tmp_path):
+def snapshot_fixture(tmp_path, version="1.4.6"):
     def source(request):
         if request.url.host == "pypi.org":
-            return httpx.Response(200, json={"info": {"version": "1.4.6"}})
+            return httpx.Response(200, json={"info": {"version": version}})
         if request.url.host == "api.github.com":
             return httpx.Response(
                 200, json={"object": {"type": "commit", "sha": "a" * 40}}
             )
         if request.url.path.endswith("pyproject.toml"):
-            return httpx.Response(200, text='[project]\nversion = "1.4.6"\n')
+            return httpx.Response(200, text=f'[project]\nversion = "{version}"\n')
         if request.url.path.endswith("factory.py"):
-            text = 'def create_agent():\n    """Creates an agent graph that calls tools in a loop."""\n    pass\n'
+            text = 'def create_agent():\n    """Creates an agent graph that calls tools in a loop.\n\n    Args:\n        model: The model used by the agent.\n    """\n    pass\n'
         elif request.url.path.endswith("types.py"):
-            text = 'class AgentMiddleware:\n    """Base middleware class for an agent with customizable behavior."""\n    pass\n'
+            text = 'class AgentMiddleware:\n    """Base middleware class for an agent with customizable behavior."""\n    def before_model(self, state, runtime):\n        """Run before the model is invoked."""\n        pass\n'
         elif request.url.path.endswith("README.md"):
             text = "## Quick Install\n\nuv add langchain\n\n## 🤔 What is this?\n\nLangChain provides pre-built agent architecture.\n\n## 📖 Documentation\n"
         else:
@@ -32,7 +32,7 @@ def snapshot_fixture(tmp_path):
         return httpx.Response(200, text=text)
 
     with httpx.Client(transport=httpx.MockTransport(source)) as client:
-        path = prepare_langchain_snapshot("1.4.6", tmp_path / "sources", client)
+        path = prepare_langchain_snapshot(version, tmp_path / "sources", client)
     raw = json.loads(path.read_text())["source_selection"]
     selected = SourceSelection.model_validate(
         {**raw, "confirmed_by": "Test human", "confirmed_at": datetime.now(UTC)}
@@ -168,3 +168,13 @@ def test_pilot_can_regenerate_one_approved_topic_without_rewriting_other_pages(
             client=client,
             topic="Unapproved topic",
         )
+
+
+def test_pilot_keeps_parameter_hook_and_installation_evidence(tmp_path):
+    snapshot, _ = snapshot_fixture(tmp_path)
+    pages = pilot_evidence(snapshot)
+    assert "model: The model used by the agent." in pages[1]["evidence"][0].content
+    assert "def before_model(" in pages[2]["evidence"][0].content
+    assert len(pages[4]["evidence"]) == 2
+    assert "pyproject.toml" in pages[4]["evidence"][1].source_url
+    assert 'version = "1.4.6"' in pages[4]["evidence"][1].content

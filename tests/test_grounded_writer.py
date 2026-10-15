@@ -81,7 +81,8 @@ def test_claims_without_citations_fail_schema_validation():
         PageDraft.model_validate(payload)
 
 
-def test_ollama_request_is_bounded_structured_and_records_digest():
+@pytest.mark.parametrize("label", ["e1", "e999"])
+def test_ollama_request_is_bounded_structured_and_records_digest(label):
     seen = []
 
     def handle(request):
@@ -93,14 +94,18 @@ def test_ollama_request_is_bounded_structured_and_records_digest():
             )
         payload = json.loads(request.content)
         assert payload["stream"] is False and payload["think"] is False
-        assert payload["options"]["num_predict"] == 1200
+        assert payload["options"]["num_predict"] == 1600
         assert payload["format"]["type"] == "object"
+        sent = json.loads(payload["messages"][1]["content"])
+        assert sent["evidence"][0]["chunk_id"] == "e1"
+        page = draft().model_dump()
+        page["sections"][0]["claims"][0]["citations"][0]["chunk_id"] = label
         return httpx.Response(
             200,
             json={
                 "done": True,
                 "done_reason": "stop",
-                "message": {"content": draft().model_dump_json()},
+                "message": {"content": json.dumps(page)},
                 "prompt_eval_count": 100,
                 "eval_count": 50,
             },
@@ -118,7 +123,12 @@ def test_ollama_request_is_bounded_structured_and_records_digest():
         )
     assert result.model_digest == "sha256:fixture"
     assert result.prompt_tokens == 100 and result.output_tokens == 50
-    assert result.citation_issues == ()
+    assert result.draft.sections[0].claims[0].citations[0].chunk_id == (
+        "fixture-1" if label == "e1" else "e999"
+    )
+    assert result.citation_issues == (
+        () if label == "e1" else ("citation references unknown evidence",)
+    )
     assert len(seen) == 2
 
 
