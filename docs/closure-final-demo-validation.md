@@ -89,8 +89,7 @@ The disposable audit archive was restored in a separate PostgreSQL 17 container:
 22 saved revisions, including six editorial revisions, and zero final page
 reviews. The five selected editorial pages all passed citation validation.
 Attempting the real export before approval failed as required. The restore-check
-container was removed; the temporary review database remains available for the
-final approval/export step. Its archive is ignored under
+container was removed. The pre-approval archive is preserved under
 `data/pilot_runs/closure-review-v4/closure-audit.dump`.
 
 
@@ -110,3 +109,7 @@ The approved-state archive was also restored to a fresh disposable database. All
 five approvals recovered, and a new native export reproduced all six Markdown
 files and the build manifest byte-for-byte. This proves recovery of the actual
 approved demonstration, beyond the fixture-backed exporter test.
+
+The temporary PostgreSQL test/review container was removed after approved-state
+recovery verification. Both audit archives and the source snapshot remain local;
+the reusable database and its volume were not accessed or migrated.
