@@ -10,6 +10,7 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
 ## Start here
 
+- [Prepare the supplied VM deployment](docs/deployment/supplied-vm.md): website image, optional private worker, environment configuration and recovery runbook.
 - [Run the local documentation website](docs/local-docs-reader.md): navigation, search, catalog and review labels.
 - [Approved LangChain 1.4.6 documentation](docs/generated/langchain/1.4.6/README.md): five reviewed pages.
 - [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
@@ -46,7 +47,7 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Ecosystem source references | Generated for bounded scope | 30 packages / 89 releases / 8,432 modules; static declarations and upstream docstrings |
 | Cross-version checks | Executed; CI passing | Four compatible core pairs, one rejected dependency pair, six offline integration checks |
 | Reader website | Local MVP implemented for review | Five approved articles, searchable reader, package/version catalog, provenance and compatibility |
-| GCP VM deployment | Planned | No live deployment, production Compose definition or measured VM sizing yet |
+| VM deployment bundle | Prepared and container-tested | Static Caddy image, private opt-in pipeline, mounted secrets, systemd and recovery runbook; supplied VM not deployed yet |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
@@ -92,6 +93,20 @@ PostgreSQL and Ollama are not required for reading or building it. Broader sourc
 references are visibly marked as not published, rather than shown as approved
 articles. See [the reader guide](docs/local-docs-reader.md) for publication checks,
 verification, and build-only commands. Static output: `.site-work/site/`.
+
+## Supplied VM deployment
+
+The separate deployment bundle is in [`deploy/`](deploy/). It builds a static
+website image with Caddy and optional private PostgreSQL/Ollama/one-shot worker
+services. Hostname, certificate contact and release SHA are configured in an
+external runtime env file. No project, region or budget configuration is needed:
+you provide the existing VM.
+
+Start with [the supplied-VM runbook](docs/deployment/supplied-vm.md).
+Container tests verified reader/search responses, secret-based database access,
+explicit migrations, offline worker Chromium, backup/restore and restart persistence.
+Public HTTPS, guest startup/reboot, model inference and workload sizing still need
+validation on the supplied host. No VM resources have been created or deployed.
 
 ## Development setup
 
@@ -398,6 +413,7 @@ uv run pytest --strict-markers --collect-only -q  ## Validate test collection
 ```text
 agents/       generation, validation, and review stages
 config/       YAML configuration and typed settings
+deploy/       supplied-VM images, Compose, systemd and operator helpers
 discovery/    official documentation source discovery
 docs/         focused architecture and stage documentation
 indexing/     chunking, embedding, and vector-index stages
@@ -429,19 +445,19 @@ Current delivery priorities and verified findings are tracked in
 
 1. Review/integrate the existing PR stack in dependency order; keep CI green.
 2. Review the implemented local reader and its browser/publication checks.
-3. Package content reproducibly, then prepare a private batch worker and static
-   web server for one GCP Compute Engine VM.
+3. Review the prepared [supplied-VM bundle](docs/deployment/supplied-vm.md); deploy
+   the website on the supplied Linux VM with runtime hostname settings.
 4. Verify HTTPS, persistence across reboot, backup/restore and publication rollback.
 5. Publish the live URL and a short interview walkthrough; then expand provider
    inference tests and API/example coverage.
 
-The local website MVP is implemented for review. The next implementation task is
-a **separate production VM deployment definition**, with persistent storage and
-private batch services. The target is a central Python-package documentation reader;
+The local website MVP is implemented for review. The VM deployment definition is also prepared
+and locally smoke-tested. The next task is to **deploy and verify it on the
+supplied Linux VM**, then enable private batch services only if needed. The target is a central Python-package documentation reader;
 coverage currently remains limited to the recorded LangChain/LangGraph ecosystem.
 Use [the closure tracker](docs/closure-tracker.md) for acceptance criteria and
 pending deployment inputs. Existing `compose.yaml` is a development environment,
-not a production worker/server deployment.
+not a production worker/server deployment; use `deploy/compose.vm.yml` instead.
 
 ## Ecosystem documentation and compatibility
 
@@ -473,7 +489,8 @@ not verify hosted inference. The broad reference has not received the final-page
 approval recorded for the five-page demo.
 
 The ecosystem batch recorded 156 passing offline tests. With reader regression
-tests, the current local baseline is 162 offline tests passing (204 collected).
+tests, the reader baseline was 162 offline tests passing. With deployment regression checks,
+the current baseline is 168 offline tests passing (210 collected).
 [PR #33's CI](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806)
 passed quality/unit, PostgreSQL integration and ecosystem compatibility checks.
 These checks do not establish website or cloud deployment readiness.

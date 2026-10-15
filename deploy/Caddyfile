@@ -1,0 +1,26 @@
+{
+    admin off
+    email {$ACME_EMAIL}
+}
+{$SITE_ADDRESS} {
+    root * /srv/site
+    encode gzip zstd
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+        -Server
+    }
+    @health path /healthz
+    respond @health "ok" 200
+    file_server
+    log {
+        output stdout
+        format json
+    }
+}
+
+# Internal health listener, never mapped to a host port.
+http://:8080 {
+    respond /healthz "ok" 200
+}
