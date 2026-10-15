@@ -1,0 +1,1235 @@
+{
+  "created_at": "2026-10-15T18:33:19.594403+00:00",
+  "requested_packages": [
+    "langchain",
+    "langchain-core",
+    "langchain-classic",
+    "langchain-community",
+    "langchain-text-splitters",
+    "langchain-experimental",
+    "langchain-openai",
+    "langchain-anthropic",
+    "langchain-google-genai",
+    "langchain-google-vertexai",
+    "langchain-ollama",
+    "langchain-groq",
+    "langchain-huggingface",
+    "langchain-chroma",
+    "langchain-qdrant",
+    "langchain-deepseek",
+    "langchain-exa",
+    "langchain-fireworks",
+    "langchain-mistralai",
+    "langchain-nomic",
+    "langchain-openrouter",
+    "langchain-perplexity",
+    "langchain-xai",
+    "langgraph",
+    "langgraph-checkpoint",
+    "langgraph-checkpoint-postgres",
+    "langgraph-checkpoint-sqlite",
+    "langgraph-prebuilt",
+    "langgraph-sdk",
+    "langgraph-cli"
+  ],
+  "results": [
+    {
+      "package": "langchain",
+      "version": "1.4.6",
+      "sha256": "7c3fbd5460ddc180115c10bbd385fbbde335fa166dd525ad22c0f599d13a9fad",
+      "module_count": 40,
+      "symbol_count": 239,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain",
+      "version": "1.3.18",
+      "sha256": "f29cbef985848e5cfff5398f3c8c1568994a3a6f2a8f4fa720df30b6e0668b9c",
+      "module_count": 36,
+      "symbol_count": 223,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain",
+      "version": "0.3.30",
+      "sha256": "37e6fcce92faf70cc7bac23739d13d6c3b9a3282da4dbcc06cb7e78330ed406a",
+      "module_count": 1329,
+      "symbol_count": 1081,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-core",
+      "version": "1.6.11",
+      "sha256": "0036e7cc6c6be6eac28970bd7e46df5d2b5da9cced583507a5ffcda2ec57a401",
+      "module_count": 182,
+      "symbol_count": 1662,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-core",
+      "version": "1.5.6",
+      "sha256": "d6cf37bf695ecc22cddeb8461a684e353190b2ce430d99eb22bc11c0c7c00ea5",
+      "module_count": 181,
+      "symbol_count": 1652,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-core",
+      "version": "1.4.9",
+      "sha256": "28e3909e2a10cc81504952d795ac0a9e014c0018121ef89d48dd396fa09ec624",
+      "module_count": 180,
+      "symbol_count": 1645,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-classic",
+      "version": "1.0.8",
+      "sha256": "1a11ea7fbe630c4f2af2f3873d27718ceac9488cf32d0821030be7cf039a6213",
+      "module_count": 1321,
+      "symbol_count": 1078,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-community",
+      "version": "0.4.2",
+      "sha256": "84dd8c5122532394d5b6849a5fc9995ef28e4f77227daeb09f24b3d942e9e466",
+      "module_count": 1204,
+      "symbol_count": 6238,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-community",
+      "version": "0.3.31",
+      "sha256": "1c727e3ebbacd4d891b07bd440647668001cea3e39cbe732499ad655ec5cb569",
+      "module_count": 1246,
+      "symbol_count": 6600,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-community",
+      "version": "0.2.19",
+      "sha256": "651d761f2d37d63f89de75d65858f6c7f6ea99c455622e9c13ca041622dad0c5",
+      "module_count": 1218,
+      "symbol_count": 6299,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-text-splitters",
+      "version": "1.1.3",
+      "sha256": "50edeb318b3be6a6308dddd7d616ab82823a9ccbea59a9c14c58a7b91df60295",
+      "module_count": 13,
+      "symbol_count": 77,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-text-splitters",
+      "version": "1.0.0",
+      "sha256": "f00c8219d3468f2c5bd951b708b6a7dd9bc3c62d0cfb83124c377f7170f33b2e",
+      "module_count": 13,
+      "symbol_count": 76,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-text-splitters",
+      "version": "0.3.11",
+      "sha256": "cf079131166a487f1372c8ab5d0bfaa6c0a4291733d9c43a34a16ac9bcd6a393",
+      "module_count": 13,
+      "symbol_count": 76,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-experimental",
+      "version": "0.4.2",
+      "sha256": "fd98b9948cb6f991e0f632ea3d5fb839bcfe21e6d5a190a51126a76270a66d40",
+      "module_count": 159,
+      "symbol_count": 557,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-experimental",
+      "version": "0.3.4",
+      "sha256": "2e587306aea36b60fa5e5fc05dc7281bee9f60a806f0bf9d30916e0ee096af80",
+      "module_count": 159,
+      "symbol_count": 557,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-experimental",
+      "version": "0.0.65",
+      "sha256": "2a0f268cfb8c79d43cedf9c4840f70bd8b25934e595311e6690804d0355dd7ee",
+      "module_count": 159,
+      "symbol_count": 554,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openai",
+      "version": "1.7.2",
+      "sha256": "9be7980edf355ca2dd595b795a5125836ccf04515ef9377228913246156e59f5",
+      "module_count": 31,
+      "symbol_count": 112,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openai",
+      "version": "1.6.7",
+      "sha256": "e1b9b318fafc47b2dbc3485778aa23f809195065ee313611c188af29744b8e8e",
+      "module_count": 24,
+      "symbol_count": 76,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openai",
+      "version": "1.5.2",
+      "sha256": "ace745b422eecce5cec3f4a1802c95853de91a8283adbfcea4f2ac457f2a8181",
+      "module_count": 24,
+      "symbol_count": 68,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-anthropic",
+      "version": "1.7.6",
+      "sha256": "06bee97006d99e9a04abc4bd56599fc356c0c7f7f2a97629645cb603d9785c73",
+      "module_count": 16,
+      "symbol_count": 52,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-anthropic",
+      "version": "1.6.1",
+      "sha256": "befb743448b3e4c2fa0d2406ea7d564be118f21464e7984ce7dc1f5b05bad82d",
+      "module_count": 15,
+      "symbol_count": 52,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-anthropic",
+      "version": "1.5.6",
+      "sha256": "c358ed2ca90ef75254bb73a96b0a8a8ef0efc1deabe529ea06db6ff403001a27",
+      "module_count": 15,
+      "symbol_count": 43,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-genai",
+      "version": "4.4.2",
+      "sha256": "db68bd24e5372b2688f6902e47521a6802bfecc36e2d5bbff14076f8cbb26c83",
+      "module_count": 13,
+      "symbol_count": 42,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-genai",
+      "version": "4.3.7",
+      "sha256": "8d4b1aa8f2c2e17b8e790d34a7e9a7b8e7d13e9a00175679d17647c235104bf9",
+      "module_count": 13,
+      "symbol_count": 42,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-genai",
+      "version": "4.2.7",
+      "sha256": "0d9c388d0e6c629718fca6abb19c6fdca728a9a7873d0324c1ec821288b5b571",
+      "module_count": 13,
+      "symbol_count": 34,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-vertexai",
+      "version": "3.2.4",
+      "sha256": "65b5615e596fdabc2e149f0160fded88bebef2bbc1ea70095ff81714f7570183",
+      "module_count": 37,
+      "symbol_count": 152,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-vertexai",
+      "version": "3.1.1",
+      "sha256": "100587669ab38330e9b1cac0035f8f341b5df65e70ddbec73efa9e8d45a3bf96",
+      "module_count": 34,
+      "symbol_count": 134,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-google-vertexai",
+      "version": "3.0.3",
+      "sha256": "aa7aae407c2188da638edc473b859b99f0b09bb2b80e40e3b1de0930a0ff1aac",
+      "module_count": 32,
+      "symbol_count": 134,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-ollama",
+      "version": "1.1.0",
+      "sha256": "43ac83a6eacb0f43855810739794dd55019e0d9b17bdcf3ecb3b1991ac3b59dd",
+      "module_count": 6,
+      "symbol_count": 12,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-ollama",
+      "version": "1.0.1",
+      "sha256": "37eb939a4718a0255fe31e19fbb0def044746c717b01b97d397606ebc3e9b440",
+      "module_count": 6,
+      "symbol_count": 12,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-ollama",
+      "version": "0.3.10",
+      "sha256": "7550792872e8f86d362568e9ceb0f8085428bc59946c7b44e726358ba4b280f9",
+      "module_count": 5,
+      "symbol_count": 12,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-groq",
+      "version": "1.1.3",
+      "sha256": "a69bb8212b7a699f407c033bf41ca526db8de68f438d51a41740a72bf6dc09bf",
+      "module_count": 6,
+      "symbol_count": 8,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-groq",
+      "version": "1.0.1",
+      "sha256": "088f408794ddf6d9959dbbef3d9de6a978fb6a9a7a2a85cf51fac4a147563bd2",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-groq",
+      "version": "0.3.8",
+      "sha256": "d7ef98c23f1f4fc9e9e21cddd4e155f3dc989fbe1ff6fefeb52c49c870876219",
+      "module_count": 3,
+      "symbol_count": 8,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-huggingface",
+      "version": "1.2.3",
+      "sha256": "d687cd9554a20edb6af86aceae2465b4d0f73557acfb9b9c6778cb0e6d5929a7",
+      "module_count": 15,
+      "symbol_count": 30,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-huggingface",
+      "version": "1.1.0",
+      "sha256": "a3a5218a839062941cb616992bcbc4fe73352454727bafc351a452e76aead1a8",
+      "module_count": 14,
+      "symbol_count": 30,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-huggingface",
+      "version": "1.0.1",
+      "sha256": "032325539dd6b2970910356ecfc363283e8b4e51fb1890de40666a52e95e7d53",
+      "module_count": 12,
+      "symbol_count": 30,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-chroma",
+      "version": "1.1.0",
+      "sha256": "ff65e4a2ccefb0fb9fde2ff38705022ace402f979d557f018f6e623f7288f0fc",
+      "module_count": 2,
+      "symbol_count": 28,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-chroma",
+      "version": "1.0.0",
+      "sha256": "b7adb991090f066f8d5e746a2d338de3116b192cec3990deef3052b7ea07324c",
+      "module_count": 2,
+      "symbol_count": 27,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-chroma",
+      "version": "0.2.6",
+      "sha256": "d7e10101b0942cd990eedb798c3d85ed3e8415a992c8a388843196f6ab97b41b",
+      "module_count": 2,
+      "symbol_count": 27,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-qdrant",
+      "version": "1.1.0",
+      "sha256": "546c5c9aa57f543dbcee07343f730c331e4ec2af2ec55b541010af08d872bf35",
+      "module_count": 6,
+      "symbol_count": 60,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-qdrant",
+      "version": "1.0.0",
+      "sha256": "c47e18073474c25ae04ae3106af1823c1dae92d8d3c59265369076d0e9e2bdca",
+      "module_count": 6,
+      "symbol_count": 60,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-qdrant",
+      "version": "0.2.1",
+      "sha256": "d82637eae4828ca67ac806d722fc21b660617fdd5d7eef07b99249d0e7976c3b",
+      "module_count": 6,
+      "symbol_count": 60,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-deepseek",
+      "version": "1.1.1",
+      "sha256": "aec298233606b1289898543e56f90373f71e919b586f580f5e161c018ab21dcb",
+      "module_count": 5,
+      "symbol_count": 5,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-deepseek",
+      "version": "1.0.1",
+      "sha256": "0a9862f335f1873370bb0fe1928ac19b8b9292b014ef5412da462ded8bb82c5a",
+      "module_count": 2,
+      "symbol_count": 5,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-deepseek",
+      "version": "0.1.4",
+      "sha256": "9ce3dbfc7a40f221657ffe31e8623ea6e397f6c90de2a58d38204ac63e8f41ff",
+      "module_count": 2,
+      "symbol_count": 4,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-exa",
+      "version": "1.1.0",
+      "sha256": "7eb4e1b6004f74fe278467470a4e76ba3b74a17df13f64e64745f0780f63d845",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-exa",
+      "version": "1.0.0",
+      "sha256": "1d12dd401043d896c4affea5239ad983cf21113efc3427adafeb443874036ea9",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-exa",
+      "version": "0.3.1",
+      "sha256": "f707fd19ee04dd062b777cf6f0df60fb8905a43eb7e7c0e26f2c3afb84fe2bfb",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-fireworks",
+      "version": "1.7.1",
+      "sha256": "55ad528fd4bff3ea0155f0c4ae06f8ee1054b8deee418afc6d50d4bda844973d",
+      "module_count": 12,
+      "symbol_count": 40,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-fireworks",
+      "version": "1.6.3",
+      "sha256": "9ab3ee844598beffdffc3717f45cb104ae3e820e36563d983f8ab4d8822bd968",
+      "module_count": 10,
+      "symbol_count": 35,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-fireworks",
+      "version": "1.5.2",
+      "sha256": "26cdaa0966ab952f7fb5f2b66ae0f91a81d8966870aaa151250db97841ecd91b",
+      "module_count": 9,
+      "symbol_count": 21,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-mistralai",
+      "version": "1.1.6",
+      "sha256": "0aa59b313b406ee934dc0431873b0e11849d8d746a6a7e281103c6848a9b1319",
+      "module_count": 7,
+      "symbol_count": 20,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-mistralai",
+      "version": "1.0.1",
+      "sha256": "1777de4ceef3d3d5b2d08ab7cf6ce2d27188469eeae4d09756fd3b08ea3751a6",
+      "module_count": 4,
+      "symbol_count": 20,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-mistralai",
+      "version": "0.2.12",
+      "sha256": "64a85947776017eec787b586f4bfa092d237c5e95a9ed719b5ff22a81747dedf",
+      "module_count": 3,
+      "symbol_count": 18,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-nomic",
+      "version": "1.0.1",
+      "sha256": "65befe8662018b009c7589898a79d434851ba8af2371171e1260b677e4974b72",
+      "module_count": 2,
+      "symbol_count": 9,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-nomic",
+      "version": "0.1.5",
+      "sha256": "0d5c1d9ce6ad5e97514d181a23787f1e4e3289210ee20b17435b825d66692b20",
+      "module_count": 2,
+      "symbol_count": 9,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-nomic",
+      "version": "0.0.2",
+      "sha256": "89e27cdcdd917e2b4f02a821504f3eef8b656e9c264d82ae186bd73353dbd180",
+      "module_count": 2,
+      "symbol_count": 5,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openrouter",
+      "version": "0.2.9",
+      "sha256": "375a79a4a849069d2254627185210b2f2b9fe84c69326e10d71c3d48f8b41f06",
+      "module_count": 5,
+      "symbol_count": 8,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openrouter",
+      "version": "0.1.0",
+      "sha256": "263a2d6e133a8a39cacafe499a7c29a191e39af8352e6f177d73af78673ebe8d",
+      "module_count": 4,
+      "symbol_count": 8,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-openrouter",
+      "version": "0.0.2",
+      "sha256": "5c1714c10644f3a902581c29294439fdba7ebb8c0b88870382315b5774b2e8e2",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-perplexity",
+      "version": "1.4.1",
+      "sha256": "f286ffc666e3da34fb1f7f07d8bcbf7ceb0e94ee6e6f46cbef327ad5fbb0ec57",
+      "module_count": 11,
+      "symbol_count": 29,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-perplexity",
+      "version": "1.3.2",
+      "sha256": "ba9424c0447906704a6d1a49003689e29480291c8716311934ab305990dd0fc3",
+      "module_count": 10,
+      "symbol_count": 28,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-perplexity",
+      "version": "1.2.0",
+      "sha256": "2992ed788dbff13cf8b80d9fb265acda20d5c3956c712ea8da47733b7b5ede3e",
+      "module_count": 10,
+      "symbol_count": 26,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-xai",
+      "version": "1.3.0",
+      "sha256": "a40e0664a8bdf9eb31fed73998d88b7f49610ad596bc4a115d0270ad22a09098",
+      "module_count": 5,
+      "symbol_count": 6,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-xai",
+      "version": "1.2.2",
+      "sha256": "f7bab093d2256efa2079a1d2df32cd3a6432118f3e6d0beca110111d0f2a8ec7",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain-xai",
+      "version": "1.1.0",
+      "sha256": "f61a8e0d7269f52cd85a013124c0ac57d57985be30b7e716495aa34fdb1c1677",
+      "module_count": 4,
+      "symbol_count": 7,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph",
+      "version": "1.2.15",
+      "sha256": "6e1611c4dad33d933b8cf21a91db73285221e67508feb2db5a0397af55fb838f",
+      "module_count": 79,
+      "symbol_count": 702,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph",
+      "version": "1.1.10",
+      "sha256": "8a4f163f72f4401648d0c11b48ee906947d938ba8cf1f474540fe591534f0d17",
+      "module_count": 67,
+      "symbol_count": 536,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph",
+      "version": "0.6.11",
+      "sha256": "49268de69d85b7db3da9e2ca582a474516421c1c44be5cff390416cfa6967faa",
+      "module_count": 64,
+      "symbol_count": 476,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint",
+      "version": "4.3.0",
+      "sha256": "bedfafe2f997ded60e4fa593e79f56f436a6e45586392dc382aa810d0c751c64",
+      "module_count": 17,
+      "symbol_count": 180,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint",
+      "version": "4.2.0",
+      "sha256": "0547fd228935a0b758865de3a3d6d7a2537c308895d0f9ab092ce9151b5da942",
+      "module_count": 17,
+      "symbol_count": 178,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint",
+      "version": "4.1.1",
+      "sha256": "25d29144b082827218e7bc3f1e9b0566a4bb007895cd6cc26f66a8428739f56e",
+      "module_count": 17,
+      "symbol_count": 178,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-postgres",
+      "version": "3.2.0",
+      "sha256": "4d89526ab3dff0c71d575233e4132327f95812deb07b6c2e75fc473525b5b8fc",
+      "module_count": 9,
+      "symbol_count": 79,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-postgres",
+      "version": "3.1.3",
+      "sha256": "050ae583223e24d97747f27b9e06e7345bf13c972f1fb6ed33bb3d1f9c11cee4",
+      "module_count": 9,
+      "symbol_count": 76,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-postgres",
+      "version": "3.0.5",
+      "sha256": "86d7040a88fd70087eaafb72251d796696a0a2d856168f5c11ef620771411552",
+      "module_count": 9,
+      "symbol_count": 73,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-sqlite",
+      "version": "3.1.2",
+      "sha256": "249640b84efd4872585a9ce596a63c2593e543f748341791591aeaf4c878329c",
+      "module_count": 8,
+      "symbol_count": 66,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-sqlite",
+      "version": "3.0.3",
+      "sha256": "02eb683a79aa6fcda7cd4de43861062a5d160dbbb990ef8a9fd76c979998a952",
+      "module_count": 7,
+      "symbol_count": 58,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-checkpoint-sqlite",
+      "version": "2.0.11",
+      "sha256": "11c40d93225ce99fa2800332c97b16280addf9f15274def32c4d547955290d3f",
+      "module_count": 7,
+      "symbol_count": 58,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-prebuilt",
+      "version": "1.1.1",
+      "sha256": "fae17c22562e501940eb7aa052a15c58a431febbabf33f8ad172e1b44354a7e4",
+      "module_count": 7,
+      "symbol_count": 33,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-prebuilt",
+      "version": "1.0.13",
+      "sha256": "7055e9fad41fbd3593800aed0aea0a6e974b17f33ed51b80d3d3a031212dd7c0",
+      "module_count": 5,
+      "symbol_count": 23,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-prebuilt",
+      "version": "0.6.5",
+      "sha256": "b6ceb5db31c16a30a3ee3c0b923667f02e7c9e27852621abf9d5bd5603534141",
+      "module_count": 5,
+      "symbol_count": 19,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-sdk",
+      "version": "0.4.7",
+      "sha256": "a005c7ac662c318a3405e436e9effaa90c05343f9f4ae9e11dca19c9369727dd",
+      "module_count": 45,
+      "symbol_count": 406,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-sdk",
+      "version": "0.3.15",
+      "sha256": "3838773acf7456d158165385d49f48f1e856f28b56ccd99ea139a8f27004815d",
+      "module_count": 31,
+      "symbol_count": 291,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-sdk",
+      "version": "0.2.15",
+      "sha256": "746566a5d89aa47160eccc17d71682a78771c754126f6c235a68353d61ed7462",
+      "module_count": 10,
+      "symbol_count": 254,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-cli",
+      "version": "0.4.35",
+      "sha256": "ada9dd2e236803308b63a9a628c768785936c1fdd780f028ede2f48008ecbba4",
+      "module_count": 20,
+      "symbol_count": 172,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-cli",
+      "version": "0.3.8",
+      "sha256": "e570cd7ed15b52b6eb1fb72ffaba271846f415170292f99a77720d7ddd2eb62f",
+      "module_count": 12,
+      "symbol_count": 51,
+      "parse_failures": []
+    },
+    {
+      "package": "langgraph-cli",
+      "version": "0.2.12",
+      "sha256": "ee38475233056c6e033d8cee0053d1d82c24b50054d8a77facbce2f416a05b32",
+      "module_count": 12,
+      "symbol_count": 50,
+      "parse_failures": []
+    },
+    {
+      "package": "langchain",
+      "version": "1.2.18",
+      "sha256": "8432d43a65540845ed6f1a783d38d869c4659a6b9405f9a510169ad40d2f7bae",
+      "module_count": 31,
+      "symbol_count": 189,
+      "parse_failures": []
+    }
+  ],
+  "errors": [],
+  "status": "source reference only; not final approved documentation or proof all examples execute",
+  "module_count": 8432,
+  "declaration_count": 34452,
+  "release_count": 89,
+  "change_counts": [
+    {
+      "package": "langchain-core",
+      "older": "1.5.6",
+      "newer": "1.6.11",
+      "removed_declarations": 0,
+      "added_declarations": 10,
+      "changed_signatures": 7
+    },
+    {
+      "package": "langchain-core",
+      "older": "1.4.9",
+      "newer": "1.5.6",
+      "removed_declarations": 0,
+      "added_declarations": 7,
+      "changed_signatures": 3
+    },
+    {
+      "package": "langchain-community",
+      "older": "0.3.31",
+      "newer": "0.4.2",
+      "removed_declarations": 360,
+      "added_declarations": 0,
+      "changed_signatures": 27
+    },
+    {
+      "package": "langchain-community",
+      "older": "0.2.19",
+      "newer": "0.3.31",
+      "removed_declarations": 26,
+      "added_declarations": 329,
+      "changed_signatures": 358
+    },
+    {
+      "package": "langchain-text-splitters",
+      "older": "1.0.0",
+      "newer": "1.1.3",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 3
+    },
+    {
+      "package": "langchain-text-splitters",
+      "older": "0.3.11",
+      "newer": "1.0.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 17
+    },
+    {
+      "package": "langchain-experimental",
+      "older": "0.3.4",
+      "newer": "0.4.2",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 1
+    },
+    {
+      "package": "langchain-experimental",
+      "older": "0.0.65",
+      "newer": "0.3.4",
+      "removed_declarations": 0,
+      "added_declarations": 3,
+      "changed_signatures": 20
+    },
+    {
+      "package": "langchain-openai",
+      "older": "1.6.7",
+      "newer": "1.7.2",
+      "removed_declarations": 0,
+      "added_declarations": 36,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-openai",
+      "older": "1.5.2",
+      "newer": "1.6.7",
+      "removed_declarations": 0,
+      "added_declarations": 8,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-anthropic",
+      "older": "1.6.1",
+      "newer": "1.7.6",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-anthropic",
+      "older": "1.5.6",
+      "newer": "1.6.1",
+      "removed_declarations": 0,
+      "added_declarations": 9,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-google-genai",
+      "older": "4.3.7",
+      "newer": "4.4.2",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-google-genai",
+      "older": "4.2.7",
+      "newer": "4.3.7",
+      "removed_declarations": 0,
+      "added_declarations": 8,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-google-vertexai",
+      "older": "3.1.1",
+      "newer": "3.2.4",
+      "removed_declarations": 0,
+      "added_declarations": 18,
+      "changed_signatures": 8
+    },
+    {
+      "package": "langchain-google-vertexai",
+      "older": "3.0.3",
+      "newer": "3.1.1",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-ollama",
+      "older": "1.0.1",
+      "newer": "1.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-ollama",
+      "older": "0.3.10",
+      "newer": "1.0.1",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 4
+    },
+    {
+      "package": "langchain-groq",
+      "older": "1.0.1",
+      "newer": "1.1.3",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 1
+    },
+    {
+      "package": "langchain-groq",
+      "older": "0.3.8",
+      "newer": "1.0.1",
+      "removed_declarations": 1,
+      "added_declarations": 0,
+      "changed_signatures": 2
+    },
+    {
+      "package": "langchain-huggingface",
+      "older": "1.1.0",
+      "newer": "1.2.3",
+      "removed_declarations": 1,
+      "added_declarations": 1,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-huggingface",
+      "older": "1.0.1",
+      "newer": "1.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-chroma",
+      "older": "1.0.0",
+      "newer": "1.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-chroma",
+      "older": "0.2.6",
+      "newer": "1.0.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 17
+    },
+    {
+      "package": "langchain-qdrant",
+      "older": "1.0.0",
+      "newer": "1.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-qdrant",
+      "older": "0.2.1",
+      "newer": "1.0.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 40
+    },
+    {
+      "package": "langchain-deepseek",
+      "older": "1.0.1",
+      "newer": "1.1.1",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-deepseek",
+      "older": "0.1.4",
+      "newer": "1.0.1",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 1
+    },
+    {
+      "package": "langchain-exa",
+      "older": "1.0.0",
+      "newer": "1.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-exa",
+      "older": "0.3.1",
+      "newer": "1.0.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-fireworks",
+      "older": "1.6.3",
+      "newer": "1.7.1",
+      "removed_declarations": 0,
+      "added_declarations": 5,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-fireworks",
+      "older": "1.5.2",
+      "newer": "1.6.3",
+      "removed_declarations": 0,
+      "added_declarations": 14,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-mistralai",
+      "older": "1.0.1",
+      "newer": "1.1.6",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-mistralai",
+      "older": "0.2.12",
+      "newer": "1.0.1",
+      "removed_declarations": 0,
+      "added_declarations": 2,
+      "changed_signatures": 4
+    },
+    {
+      "package": "langchain-nomic",
+      "older": "0.1.5",
+      "newer": "1.0.1",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 1
+    },
+    {
+      "package": "langchain-nomic",
+      "older": "0.0.2",
+      "newer": "0.1.5",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 4
+    },
+    {
+      "package": "langchain-openrouter",
+      "older": "0.1.0",
+      "newer": "0.2.9",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 1
+    },
+    {
+      "package": "langchain-openrouter",
+      "older": "0.0.2",
+      "newer": "0.1.0",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-perplexity",
+      "older": "1.3.2",
+      "newer": "1.4.1",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-perplexity",
+      "older": "1.2.0",
+      "newer": "1.3.2",
+      "removed_declarations": 0,
+      "added_declarations": 2,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-xai",
+      "older": "1.2.2",
+      "newer": "1.3.0",
+      "removed_declarations": 1,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langchain-xai",
+      "older": "1.1.0",
+      "newer": "1.2.2",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph",
+      "older": "1.1.10",
+      "newer": "1.2.15",
+      "removed_declarations": 9,
+      "added_declarations": 169,
+      "changed_signatures": 28
+    },
+    {
+      "package": "langgraph",
+      "older": "0.6.11",
+      "newer": "1.1.10",
+      "removed_declarations": 4,
+      "added_declarations": 38,
+      "changed_signatures": 18
+    },
+    {
+      "package": "langgraph-checkpoint",
+      "older": "4.2.0",
+      "newer": "4.3.0",
+      "removed_declarations": 0,
+      "added_declarations": 2,
+      "changed_signatures": 4
+    },
+    {
+      "package": "langgraph-checkpoint",
+      "older": "4.1.1",
+      "newer": "4.2.0",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-checkpoint-postgres",
+      "older": "3.1.3",
+      "newer": "3.2.0",
+      "removed_declarations": 0,
+      "added_declarations": 3,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-checkpoint-postgres",
+      "older": "3.0.5",
+      "newer": "3.1.3",
+      "removed_declarations": 0,
+      "added_declarations": 3,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-checkpoint-sqlite",
+      "older": "3.0.3",
+      "newer": "3.1.2",
+      "removed_declarations": 0,
+      "added_declarations": 8,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-checkpoint-sqlite",
+      "older": "2.0.11",
+      "newer": "3.0.3",
+      "removed_declarations": 0,
+      "added_declarations": 0,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-prebuilt",
+      "older": "1.0.13",
+      "newer": "1.1.1",
+      "removed_declarations": 0,
+      "added_declarations": 10,
+      "changed_signatures": 0
+    },
+    {
+      "package": "langgraph-prebuilt",
+      "older": "0.6.5",
+      "newer": "1.0.13",
+      "removed_declarations": 3,
+      "added_declarations": 7,
+      "changed_signatures": 6
+    },
+    {
+      "package": "langgraph-sdk",
+      "older": "0.3.15",
+      "newer": "0.4.7",
+      "removed_declarations": 0,
+      "added_declarations": 115,
+      "changed_signatures": 2
+    },
+    {
+      "package": "langgraph-sdk",
+      "older": "0.2.15",
+      "newer": "0.3.15",
+      "removed_declarations": 132,
+      "added_declarations": 159,
+      "changed_signatures": 2
+    },
+    {
+      "package": "langgraph-cli",
+      "older": "0.3.8",
+      "newer": "0.4.35",
+      "removed_declarations": 11,
+      "added_declarations": 132,
+      "changed_signatures": 23
+    },
+    {
+      "package": "langgraph-cli",
+      "older": "0.2.12",
+      "newer": "0.3.8",
+      "removed_declarations": 0,
+      "added_declarations": 1,
+      "changed_signatures": 12
+    },
+    {
+      "package": "langchain",
+      "older": "1.3.18",
+      "newer": "1.4.6",
+      "removed_declarations": 0,
+      "added_declarations": 16,
+      "changed_signatures": 3
+    },
+    {
+      "package": "langchain",
+      "older": "1.2.18",
+      "newer": "1.3.18",
+      "removed_declarations": 0,
+      "added_declarations": 31,
+      "changed_signatures": 11
+    },
+    {
+      "package": "langchain",
+      "older": "0.3.30",
+      "newer": "1.2.18",
+      "removed_declarations": 1074,
+      "added_declarations": 170,
+      "changed_signatures": 2
+    }
+  ],
+  "limitations": [
+    "Static declarations include private implementation modules to retain sources behind re-exports. Counts are not a count of verified public APIs.",
+    "Inherited methods, dynamic exports, conditional definitions and import resolution are not exhaustively documented or checked.",
+    "Docstring examples are preserved, not automatically executed.",
+    "The package list is bounded; this is not every third-party integration or a full authored learning curriculum.",
+    "Runtime matrix tests core contracts, not all 89 release environments."
+  ]
+}

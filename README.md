@@ -394,3 +394,7 @@ The original Stage 4 lineage schema review is in
 ## License
 
 This project is licensed under the terms in [LICENSE](LICENSE).
+
+## Ecosystem documentation and compatibility
+
+The [ecosystem report](docs/ecosystem/README.md) records source references for 30 packages across 89 pinned releases, plus executable core-version and offline integration checks. It distinguishes static declarations, demonstrated migration failures and provider inference that remains untested.
