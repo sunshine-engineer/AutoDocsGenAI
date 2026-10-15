@@ -6,6 +6,7 @@ RUN uv sync --frozen --only-group site --no-install-project
 COPY scripts/__init__.py scripts/build_docs_site.py ./scripts/
 COPY docs/generated ./docs/generated
 COPY docs/ecosystem ./docs/ecosystem
+COPY docs/quality/human-review-queue.json ./docs/quality/human-review-queue.json
 COPY website ./website
 COPY mkdocs.yml ./
 RUN .venv/bin/python -m scripts.build_docs_site
