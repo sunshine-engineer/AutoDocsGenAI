@@ -303,3 +303,68 @@ def test_two_workers_cannot_claim_one_job(tmp_path):
         assert sum(item is not None for item in results) == 1
     finally:
         engine.dispose()
+
+
+def test_editorial_revision_is_traceable_idempotent_and_not_approved(
+    tmp_path, monkeypatch
+):
+    from generation.persistence import edit_page
+
+    engine, factory, build, catalog = approved_build(tmp_path)
+    try:
+        job = plan(factory, build, catalog)
+        claim = claim_page(factory, job)
+        assert claim is not None
+        parent_id = finish_page(factory, claim, result_for(claim, invalid=True))
+        draft = result_for(claim).draft
+        monkeypatch.setattr(
+            "generation.persistence.write_page",
+            lambda *a, **kw: pytest.fail("editorial changes must not call a model"),
+        )
+        monkeypatch.setattr(
+            "generation.persistence.writer_contract_hash",
+            lambda: "new-provider-contract",
+        )
+        page_id = edit_page(
+            factory,
+            parent_id,
+            draft,
+            editor="Test editor",
+            feedback="Replace invented quotation using the source",
+        )
+        assert (
+            edit_page(
+                factory,
+                parent_id,
+                draft,
+                editor="Test editor",
+                feedback="Replace invented quotation using the source",
+            )
+            == page_id
+        )
+        with factory() as session:
+            parent = session.get(GeneratedPageRecord, parent_id)
+            page = session.get(GeneratedPageRecord, page_id)
+            assert parent.payload["sections"][0]["claims"][0]["citations"][0][
+                "quote"
+            ].startswith("Invented quotation")
+            assert page.id != parent.id and page.model_metadata["origin"] == "editorial"
+            assert page.model_metadata["parent_page_id"] == parent_id
+            assert page.model_metadata["model_call_performed"] is False
+            assert page.model_metadata["source_model_metadata"]["origin"] == "model"
+            assert (
+                session.scalar(
+                    select(PageReviewRecord).where(PageReviewRecord.page_id == page.id)
+                )
+                is None
+            )
+        with pytest.raises(GenerationError, match="valid source citations"):
+            edit_page(
+                factory,
+                parent_id,
+                result_for(claim, invalid=True).draft,
+                editor="Test editor",
+                feedback="Invalid edit",
+            )
+    finally:
+        engine.dispose()

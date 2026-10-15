@@ -63,3 +63,22 @@ Fixture reviewers and generated text are test data. Real model pages still need
 Sunny's content review, deeper API examples, and an interview demonstration.
 Durable job leases provide attempt recovery; native LangGraph checkpointing and
 a background worker service are not implemented.
+
+## Explicit editorial corrections
+
+```bash
+python -m scripts.generation page PARENT_PAGE_ID > edited-page.json
+# Edit the supported claims/citations in this PageDraft JSON.
+python -m scripts.generation edit PARENT_PAGE_ID --draft edited-page.json --editor Codex --feedback "Correct quotations and version bounds"
+```
+
+The input must match the PageDraft JSON schema and the approved topic title.
+Edits keep the original model revision, freeze their parent/editor/content hash,
+validate against the same approved source snapshot, and create a new revision.
+Metadata explicitly says `origin=editorial` and `model_call_performed=false`;
+the parent's model metadata is retained as provenance. An editor can correct
+older writer output after a prompt upgrade, provided its source and catalog
+approval remain valid. Repeating an identical edit is idempotent.
+
+Editing never records final human approval. The new page still needs an explicit
+`review ... approved --reviewer Sunny` decision before export.

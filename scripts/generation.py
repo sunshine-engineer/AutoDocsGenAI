@@ -17,8 +17,15 @@ from database.models import (
     PageReviewRecord,
     PageValidationRecord,
 )
+from generation.contracts import PageDraft
 from generation.export import export_catalog
-from generation.persistence import GenerationError, enqueue_page, review_page, run_page
+from generation.persistence import (
+    GenerationError,
+    edit_page,
+    enqueue_page,
+    review_page,
+    run_page,
+)
 from scripts.catalog_cli import uuid_argument
 
 
@@ -49,6 +56,8 @@ def inspect_job(factory, identifier):
                     "page_id": str(page.id),
                     "revision": page.revision,
                     "content_hash": page.content_hash,
+                    "origin": page.model_metadata.get("origin", "model"),
+                    "editor": page.model_metadata.get("editor"),
                     "passed": check.passed if check else False,
                     "issues": check.issues if check else ["missing validation"],
                     "review": review.decision if review else "pending",
@@ -85,11 +94,20 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     inspect = commands.add_parser("inspect")
     inspect.add_argument("job_id", type=uuid_argument)
+    page = commands.add_parser(
+        "page", help="Print a saved PageDraft JSON for inspection or editing"
+    )
+    page.add_argument("page_id", type=uuid_argument)
     review = commands.add_parser("review")
     review.add_argument("page_id", type=uuid_argument)
     review.add_argument("decision", choices=("approved", "rejected"))
     review.add_argument("--reviewer", required=True)
     review.add_argument("--feedback")
+    edit = commands.add_parser("edit")
+    edit.add_argument("page_id", type=uuid_argument)
+    edit.add_argument("--draft", required=True, type=Path)
+    edit.add_argument("--editor", required=True)
+    edit.add_argument("--feedback", required=True)
     export = commands.add_parser("export")
     export.add_argument("catalog_id", type=uuid_argument)
     export.add_argument("--output", required=True, type=Path)
@@ -117,6 +135,12 @@ def main(argv: list[str] | None = None) -> int:
             result = inspect_job(factory, args.job_id)
         elif args.command == "inspect":
             result = inspect_job(factory, args.job_id)
+        elif args.command == "page":
+            with factory() as session:
+                saved = session.get(GeneratedPageRecord, args.page_id)
+                if saved is None:
+                    raise GenerationError("page revision does not exist")
+                result = dict(saved.payload)
         elif args.command == "review":
             result = {
                 "review_id": review_page(
@@ -126,6 +150,26 @@ def main(argv: list[str] | None = None) -> int:
                     reviewer=args.reviewer,
                     feedback=args.feedback,
                 )
+            }
+        elif args.command == "edit":
+            identifier = edit_page(
+                factory,
+                str(args.page_id),
+                PageDraft.model_validate_json(args.draft.read_text(encoding="utf-8")),
+                editor=args.editor,
+                feedback=args.feedback,
+            )
+            with factory() as session:
+                saved_review = session.scalar(
+                    select(PageReviewRecord).where(
+                        PageReviewRecord.page_id == identifier
+                    )
+                )
+                approval = saved_review.decision if saved_review else "pending"
+            result = {
+                "page_id": identifier,
+                "origin": "editorial",
+                "approval": approval,
             }
         else:
             result = {

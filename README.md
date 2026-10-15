@@ -2,8 +2,8 @@
 
 AutoDocsGenAI is a source-grounded documentation pipeline. Given a Python
 package and version, it discovers official documentation, plans a crawl,
-downloads and cleans the selected pages, and will eventually produce validated,
-traceable Markdown learning material.
+downloads and cleans the selected pages, and includes a standalone workflow for
+source-cited, human-reviewed Markdown.
 
 This is a portfolio project focused on production-style Generative AI
 engineering. It is a documentation pipeline, not a general-purpose chatbot.
@@ -25,13 +25,21 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Embeddings and vector index | Prototype | Small CPU ONNX model and pgvector |
 | Retrieval | Working prototype | Filtered cosine search and API-aware reranking |
 | Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
-| Grounded writing pilot | Experimental | Docker Ollama structured drafts and citation integrity checks |
+| Grounded writing pilot | Experimental | Docker Ollama drafts, citation checks, and explicit editorial corrections |
 | Persistent generation/review/export | Implemented for review | Bounded jobs, immutable revisions, citation checks, explicit page review, complete Markdown export |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
 are implemented alongside a standalone persistent generation workflow. Catalog
 approval never starts generation. See [the workflow guide](docs/persistent-generation.md).
+
+The bounded interview demo targets **LangChain 1.4.6**: five source-cited,
+editor-corrected pages and an independently executed offline API example.
+See the [content review pack](docs/demo/langchain-1.4.6/README.md),
+[validation report](docs/closure-final-demo-validation.md), and
+[interview runbook](docs/interview-demo.md). Sunny approved all five final revisions, and the real exporter published
+[the approved five-page output](docs/generated/langchain/1.4.6/README.md).
+This completes the bounded interview demo; broader roadmap work remains.
 
 ## Pipeline
 

@@ -1,0 +1,736 @@
+{
+  "status": "review_required",
+  "catalog_id": "0d34e66c-4bdd-40ef-a340-4b84c98927f5",
+  "source_commit": "84ba23c414eca6bf6f6ebd1394a3006378113540",
+  "source_files": [
+    {
+      "bytes": 5886,
+      "path": "libs/langchain_v1/pyproject.toml",
+      "sha256": "2468faa5c6f1031b234f8326a93f1aada64c0f9775e21818b4e887bcc2fea7ea",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/pyproject.toml"
+    },
+    {
+      "bytes": 3185,
+      "path": "libs/langchain_v1/README.md",
+      "sha256": "21aa3f971ec38e4424df7461974da00798a679f2171e0d898dd6d4e30eff122a",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/README.md"
+    },
+    {
+      "bytes": 285,
+      "path": "libs/langchain_v1/langchain/agents/__init__.py",
+      "sha256": "c5233363f3d7cca99f39454f9262fc25c5da388ab9e71b4fd830de6ffb034a82",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/langchain/agents/__init__.py"
+    },
+    {
+      "bytes": 87471,
+      "path": "libs/langchain_v1/langchain/agents/factory.py",
+      "sha256": "cc4a7d9a620224558c4eddd4e13edc988a9ac9e328b7a67deeb71ed2c5ec5174",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/langchain/agents/factory.py"
+    },
+    {
+      "bytes": 80410,
+      "path": "libs/langchain_v1/langchain/agents/middleware/types.py",
+      "sha256": "56688206dce0334e7ca82125d7b809c23427890c234dfd69123dad038a387f31",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/langchain/agents/middleware/types.py"
+    }
+  ],
+  "snapshot_hash": "0e1e48067149848a31609393b4b122434e7605407307b3926a90901926193b71",
+  "selected_pages": [
+    {
+      "topic": "langchain.agents",
+      "page_id": "489e44c6-999d-47d0-ac13-099844b57217",
+      "job_id": "f4951128-2e9d-4da6-b9aa-c2fce57cb95e",
+      "revision": 1,
+      "content_hash": "b9fc12883868b362f9c9657961c9c4dcf8eabb33f6c6edf06a995f0abbe77a0a",
+      "preview_sha256": "44e4768326b2e4611aba6e6955cdc366d18399c6bec535a9723b6bc128ae8f27",
+      "job_identity_hash": "1d3b58266b59e8738d6d5b5cf38ed34e807bd5380971f223b1091eb7a0476344",
+      "writer_contract_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+      "regeneration_note": "Revise module draft cba171a6-8c50-432b-895c-5f8bf81f9d20. Exactly three sections and one claim per section: Purpose (entrypoint to building agents); Public exports (BOTH AgentState and create_agent, cite the short exact tokens AgentState and create_agent as two quotations); Import origin (create_agent comes from langchain.agents.factory, quote exactly: from langchain.agents.factory import create_agent). Do not label an export claim as an import-origin explanation. Copy those quotations from evidence without adding punctuation inside them.",
+      "output_path": "modules/agents/README.md",
+      "model_metadata": {
+        "editor": "Codex",
+        "origin": "editorial",
+        "feedback": "Source-checked editorial completion for the bounded five-page interview demo. Correct exact quotations, scope, parameter labels, and version bounds. Final human approval remains pending.",
+        "parent_page_id": "ca2280b7-7b39-4cd5-b307-d0d1e0d1d1da",
+        "model_call_performed": false,
+        "source_model_metadata": {
+          "model": "qwen3:1.7b",
+          "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+          "request_hash": "b30aadc1205f6599efa7f5fd0a6d3412b46336b35d74e36e585c301408f0124b",
+          "output_tokens": 316,
+          "prompt_tokens": 666,
+          "prompt_version": "grounded-page-v6",
+          "elapsed_seconds": 35.093
+        }
+      },
+      "origin": "editorial",
+      "sections": 3,
+      "claims": 3,
+      "approval": "pending"
+    },
+    {
+      "topic": "langchain.agents.factory.create_agent",
+      "page_id": "19c2f780-69bb-4016-a1d4-96e51bae49b9",
+      "job_id": "5ec51896-1310-4ebf-9de6-a6a1d21247f5",
+      "revision": 1,
+      "content_hash": "442d01780e93486cad730266c97b69ffddb73164054def5653c7163791590370",
+      "preview_sha256": "2e9cfd8c2e3bb6a0a2b2de630027a78e9535b58a45295f44c53ca283f500df30",
+      "job_identity_hash": "bfa014a0f375d067ff19928ed8de82a34f7b2dd4191447f64239e2002c2db3fe",
+      "writer_contract_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+      "regeneration_note": "Revise failed drafts b7ab532f-d291-432c-9f0b-bb8472708887 and 88e5fbb7-d08f-440e-a7fc-1a04ac3b9fd2: you paraphrased quotations. Write four sections with ONE claim each. 1) Purpose and result: creates a tool-calling agent graph, returns a compiled graph. Quotes: Creates an agent graph that calls tools in a loop until a stopping condition is met. AND A compiled `StateGraph` that can be used for chat interactions. 2) Key inputs: model selects the language model, tools lists tools, system_prompt supplies an optional system prompt. Three separate exact quotes: The language model for the agent. AND A list of tools, `dict`, or `Callable`. AND An optional system prompt for the LLM. 3) Tool loop: the model/tool cycle ends when no further tool_calls are present. Quote exactly: until no more `tool_calls` are present 4) Persistence: a checkpointer persists state for one conversation thread; a store persists data across multiple threads. Quote exactly: single thread AND across multiple threads. These mean conversation threads, not CPU threading. Use only these short exact quotations from e1; do not combine separate source fragments into one quotation.",
+      "output_path": "modules/agents/functions/create-agent.md",
+      "model_metadata": {
+        "editor": "Codex",
+        "origin": "editorial",
+        "feedback": "Use the complete source sentence supporting ToolMessage responses, preserving exact source newlines.",
+        "parent_page_id": "54954306-919c-41cd-9524-85724241bbe0",
+        "model_call_performed": false,
+        "source_model_metadata": {
+          "editor": "Codex",
+          "origin": "editorial",
+          "feedback": "Source-checked editorial completion for the bounded five-page interview demo. Correct exact quotations, scope, parameter labels, and version bounds. Final human approval remains pending.",
+          "parent_page_id": "aed9dbf2-c501-444b-a8cc-1a945b9fea5d",
+          "model_call_performed": false,
+          "source_model_metadata": {
+            "model": "qwen3:1.7b",
+            "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+            "request_hash": "3363fad2b7f99c4b101c399d1d33c9d5e4a7c72599d8d835f83e596387427714",
+            "output_tokens": 478,
+            "prompt_tokens": 2222,
+            "prompt_version": "grounded-page-v6",
+            "elapsed_seconds": 46.171
+          }
+        }
+      },
+      "origin": "editorial",
+      "sections": 4,
+      "claims": 4,
+      "approval": "pending"
+    },
+    {
+      "topic": "langchain.agents.middleware.types.AgentMiddleware",
+      "page_id": "0f5721b8-acb9-452c-ab70-0dc17540cfca",
+      "job_id": "ee312231-cf40-49f6-9ea8-1de90210a2c2",
+      "revision": 1,
+      "content_hash": "d969cf0c9e463854f274c2a6a3639b98dec3b1cf59efabda9c0d8aea81e26924",
+      "preview_sha256": "7e90b0fdb9466a2758a9050a7126147637339365f4c94a32f60f3c0c774ef629",
+      "job_identity_hash": "3d8f32f2f9bdd4d4098d2abef048798603aa10842f42c27e56055d44c39434ee",
+      "writer_contract_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+      "regeneration_note": "Revise the middleware draft d3ed0514-8554-454c-9ed6-6b1eb45c2246. It combined source lines into invented quotations and added unsupported caching. Write exactly four sections with one claim each, using these SHORT quotations copied literally from e1. 1) Purpose: base middleware to subclass for custom behavior between loop steps. Quotes: Base middleware class for an agent. AND between steps in the main agent loop. 2) Agent hooks: before_agent runs before agent execution and after_agent runs after completion. Quotes: Logic to run before the agent execution starts. AND Logic to run after the agent execution completes. 3) Model hooks: before_model and after_model run before and after a model call. Quotes: Logic to run before the model is called. AND Logic to run after the model is called. 4) Wrappers: wrap_model_call intercepts model execution via its handler; wrap_tool_call intercepts tool execution for retries, monitoring, or changes. Quotes: Intercept and control model execution via handler callback. AND Intercept tool execution for retries, monitoring, or modification. Do not copy Args blocks, newlines, signatures, examples, or long paragraphs into quotations. Do not claim caching or automatic retries.",
+      "output_path": "modules/agents/classes/agent-middleware.md",
+      "model_metadata": {
+        "editor": "Codex",
+        "origin": "editorial",
+        "feedback": "Source-checked editorial completion for the bounded five-page interview demo. Correct exact quotations, scope, parameter labels, and version bounds. Final human approval remains pending.",
+        "parent_page_id": "7ca89562-71d7-4942-8531-c5f9d02d8c03",
+        "model_call_performed": false,
+        "source_model_metadata": {
+          "model": "qwen3:1.7b",
+          "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+          "request_hash": "e3c41819c94655680674c2cb7b086a1234d78f401edaa3d3482056b5cd0216a4",
+          "output_tokens": 564,
+          "prompt_tokens": 2093,
+          "prompt_version": "grounded-page-v6",
+          "elapsed_seconds": 111.035
+        }
+      },
+      "origin": "editorial",
+      "sections": 4,
+      "claims": 4,
+      "approval": "pending"
+    },
+    {
+      "topic": "langchain.concepts.agent_architecture",
+      "page_id": "a80db3b2-6be0-4c3c-ac42-68211d8e1a30",
+      "job_id": "b573502b-7727-4d82-bddd-d927fb2494bb",
+      "revision": 1,
+      "content_hash": "64b3f9795eb77dbe6e3fa8ed6d237c592507e87833a81222bf068c19b0593cf4",
+      "preview_sha256": "4eaffabe772b0e83b26ab1cbdef3524fa7d596dae5ed5db74e0f1d3d2d06583a",
+      "job_identity_hash": "10137ab939165b6943efe57550b59aa646304cfaf8b879251c727c85829b2dc9",
+      "writer_contract_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+      "regeneration_note": null,
+      "output_path": "concepts/agent-architecture.md",
+      "model_metadata": {
+        "editor": "Codex",
+        "origin": "editorial",
+        "feedback": "Source-checked editorial completion for the bounded five-page interview demo. Correct exact quotations, scope, parameter labels, and version bounds. Final human approval remains pending.",
+        "parent_page_id": "ed32c663-e83f-475f-94cd-22c1da1fbe44",
+        "model_call_performed": false,
+        "source_model_metadata": {
+          "model": "qwen3:1.7b",
+          "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+          "request_hash": "9aab6bf4b785142ad7c6ed8bf4d6d881419501f8f44c182b29b3d8e5891317b9",
+          "output_tokens": 492,
+          "prompt_tokens": 629,
+          "prompt_version": "grounded-page-v6",
+          "elapsed_seconds": 55.64
+        }
+      },
+      "origin": "editorial",
+      "sections": 3,
+      "claims": 3,
+      "approval": "pending"
+    },
+    {
+      "topic": "langchain.guides.installation",
+      "page_id": "94489b95-b281-43d7-9bae-ff3a68909f00",
+      "job_id": "41fea61e-59c7-418a-8f5f-d476f4328155",
+      "revision": 1,
+      "content_hash": "694f4fb7256c8252badbbba2fb5a1df952c7e35b70bd2a417057015003ddf37e",
+      "preview_sha256": "b4afdfc04ad678164f095e9b2dc5039b4e0eebb5ac45d9989281cf18c2b9d71d",
+      "job_identity_hash": "137527debcc859e3ffc858c3bfe10b7ab41203b24b86311c06a25088183bad82",
+      "writer_contract_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+      "regeneration_note": null,
+      "output_path": "guides/installation.md",
+      "model_metadata": {
+        "editor": "Codex",
+        "origin": "editorial",
+        "feedback": "Source-checked editorial completion for the bounded five-page interview demo. Correct exact quotations, scope, parameter labels, and version bounds. Final human approval remains pending.",
+        "parent_page_id": "16310011-c614-4ba2-8de8-0b7e4dace3b2",
+        "model_call_performed": false,
+        "source_model_metadata": {
+          "model": "qwen3:1.7b",
+          "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+          "request_hash": "d947e67f96255d92c5e866bbd7f6b0d0cbdea5b7320fab0221f1cb5735dadaec",
+          "output_tokens": 469,
+          "prompt_tokens": 850,
+          "prompt_version": "grounded-page-v6",
+          "elapsed_seconds": 37.971
+        }
+      },
+      "origin": "editorial",
+      "sections": 4,
+      "claims": 4,
+      "approval": "pending"
+    }
+  ],
+  "job_history": [
+    {
+      "job_id": "b839769f-41c4-461e-8edb-5993aaa90e97",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "8656467e32b7f3d14d8bf3e247bff39f600e5028f11134c6fb672096deb5baed",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "992f27ab-21fe-4038-9022-8a2a8f27b16d",
+          "revision": 1,
+          "content_hash": "9345cd04e4b6c21dc2f5cedbc5df22a1ac0c24824b6b66269fd3a45aa062eb25",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v4"
+    },
+    {
+      "job_id": "a14d7842-febc-49a8-938b-4932dc061fe4",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "7d8e21fe60cb2aa43180480df5f0d77e24e07ba7dfe6294554f8ab9a29344e0c",
+      "error_summary": "citation validation or abstention failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "0130bb27-a1b5-4285-9571-5d40f3d02f0f",
+          "revision": 1,
+          "content_hash": "123364ea2d6ea10f392f746f1e229bf4de78793230db88c98eed80c859a577c1",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        },
+        {
+          "page_id": "23d28a44-250b-4908-bbdc-f987a18a6294",
+          "revision": 2,
+          "content_hash": "edb798a308ce55c4b453f59bafa832d5afe7e63c87bf59132069291e02e1c1f6",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation references unknown evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v5"
+    },
+    {
+      "job_id": "2f285b8a-30b5-4b38-952d-71eca54d5aef",
+      "status": "failed",
+      "attempts": 1,
+      "max_attempts": 2,
+      "identity_hash": "13cb5271a1711969e97d4c80307795d657029df06de730c44b0d40ecb0f5567a",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v5"
+    },
+    {
+      "job_id": "993ade96-fb61-4316-be5e-e23fe0817c04",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 2,
+      "identity_hash": "15f6598e6bbc25110a779d676cfd32a2550b9e8758ee730da5bce5ccf68f7623",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "cba171a6-8c50-432b-895c-5f8bf81f9d20",
+          "revision": 1,
+          "content_hash": "8e718665a397dff768e5ca0d0722260e6b4c60a939737dfdae86f89dc5643710",
+          "origin": "model",
+          "editor": null,
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "d0ef28ef-10bb-4e49-a23d-28c55e3f2101",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "71e1d874cea4b7d25d79f9b60713a03456066d8198d6622079563714a74152af",
+      "error_summary": "citation validation or abstention failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "b7ab532f-d291-432c-9f0b-bb8472708887",
+          "revision": 1,
+          "content_hash": "77f547c32eaceff507673c3c3342ed17805364d0500dc87fb33ebbfa2bb5f4c9",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        },
+        {
+          "page_id": "88e5fbb7-d08f-440e-a7fc-1a04ac3b9fd2",
+          "revision": 2,
+          "content_hash": "61208fc5d96b7d960dbce717bc3471ff59151244d5794fc7d3d5db25a8d2cfe5",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "f92748b3-d78e-4df2-ab73-f915b35a4dbf",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "0d01b9cbe739ebd78dfead3e2c058ec0853e68e181e353c93647341bb0b9cd02",
+      "error_summary": "citation validation or abstention failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "d3ed0514-8554-454c-9ed6-6b1eb45c2246",
+          "revision": 1,
+          "content_hash": "6420e9790240ea467148066aa5f376bbbdc943f4280b11d1030bfed7275887bf",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        },
+        {
+          "page_id": "e649d8c9-2d0c-4b7d-a8a6-775c44abcf2f",
+          "revision": 2,
+          "content_hash": "a3b2910fbe81dbf6d578f86c976f3f650590cf070dec34de3d7cf5560f97aa10",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "AgentMiddleware",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "b933e689-daee-416c-87ce-b14011e929e7",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 2,
+      "identity_hash": "e67b23d4850934cf8898949d19f9af9cb2d1c06606d662e5c85b3db60b6db3fe",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "ed32c663-e83f-475f-94cd-22c1da1fbe44",
+          "revision": 1,
+          "content_hash": "c7a71ba44aa55f934acde927facfd1f03457d364a582bb180a525220814574cb",
+          "origin": "model",
+          "editor": null,
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "LangChain agents and LangGraph",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "9a678b4a-a295-443a-9e4f-91497b39fef8",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "0e0b7aa0facaaefbd90851820340ea4923633fc3f0f3afa8aadc45068d2bd3fc",
+      "error_summary": "citation validation or abstention failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "3072a332-b1d9-4dcf-8081-5a96dcb1f26d",
+          "revision": 1,
+          "content_hash": "a0b7ea542475fdc22c22df4030dfc1661eddaaf23f731ef3bfb1491ea29b1ba7",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        },
+        {
+          "page_id": "16310011-c614-4ba2-8de8-0b7e4dace3b2",
+          "revision": 2,
+          "content_hash": "a0b7ea542475fdc22c22df4030dfc1661eddaaf23f731ef3bfb1491ea29b1ba7",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "Installation",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "bb9eb074-6ace-49b8-abe2-ebdf2568c73a",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 2,
+      "identity_hash": "9eb81de5849e2be12acc8208acfcfc986e9655049e237ffde7684bbff85ae14f",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "ca2280b7-7b39-4cd5-b307-d0d1e0d1d1da",
+          "revision": 1,
+          "content_hash": "8e24abb1773a39c96f428dd8fe92892a46a3e17876483f93504946985e39b644",
+          "origin": "model",
+          "editor": null,
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "efc84c6e-c96f-46f4-842a-f90d6edd2b1b",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "8aa6ce5e91f363bc2b0cbfd1035cb2e9cc22deff326e76fef5620d2ba36c8054",
+      "error_summary": "citation validation or abstention failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "50e53e6f-169e-466c-aa49-e59d9d1bfe2c",
+          "revision": 1,
+          "content_hash": "dea7633af950d5a1d086136584bcd9c532815206a3c498481962dabe68582626",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        },
+        {
+          "page_id": "aed9dbf2-c501-444b-a8cc-1a945b9fea5d",
+          "revision": 2,
+          "content_hash": "dea7633af950d5a1d086136584bcd9c532815206a3c498481962dabe68582626",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "a2da10cc-e2fa-4ad6-9569-d5e6f427b01a",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "03c69c2cc1e44d5fdfa24e897c1e9990438046925d2afb25fbf5328e4ba9823e",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "7ca89562-71d7-4942-8531-c5f9d02d8c03",
+          "revision": 1,
+          "content_hash": "7dd1b0df23d2d827580d14664f3981df7818e972f9869d4d486a9d8db58c2ebf",
+          "origin": "model",
+          "editor": null,
+          "passed": false,
+          "issues": [
+            "citation quotation does not occur in source evidence"
+          ],
+          "review": "pending"
+        }
+      ],
+      "title": "AgentMiddleware",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "db7e82ef-d118-4c42-9b53-8a486062ec68",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "b8a8e31a986ca76d1ec72d9aec4692dd4048c83fce2d3327536a5fa7184b2afa",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "67fb272b-662d-45bb-92fb-f1386a57ca9f",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "6a77fc730cc7e704bb02076fc3080cf3054f16588ab42522f4daa6fbf12fdefd",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "604a6815-27bd-475a-b27d-1a1297265c8c",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "2c2a808ecf1e79fff25db7273e9515059b915b73ffd05320ebd6d9fa81c5e37f",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [],
+      "title": "AgentMiddleware",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "9462490a-23bf-4753-b4b8-1798071e3eac",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 2,
+      "identity_hash": "c4bed79e579954e7778480f0b096b9fa01c11b2e19815f3caba375ed02719b3b",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "69cff9fe-576f-48b1-b022-ed7d0b26882e",
+          "revision": 1,
+          "content_hash": "d6c934f2793b3c62f3ce50fc91d341bfde50582c0132ffa7d4c0cd127b33b070",
+          "origin": "model",
+          "editor": null,
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "LangChain agents and LangGraph",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "bc734be5-41d8-4758-a217-71ebeaa8c3d7",
+      "status": "failed",
+      "attempts": 2,
+      "max_attempts": 2,
+      "identity_hash": "6804173808bde4d299be7e5ce13d781a2844f237e38148bad20c9deb2d6d5bf9",
+      "error_summary": "model request or structured output failed",
+      "lease_expires_at": null,
+      "pages": [],
+      "title": "Installation",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "f4951128-2e9d-4da6-b9aa-c2fce57cb95e",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "1d3b58266b59e8738d6d5b5cf38ed34e807bd5380971f223b1091eb7a0476344",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "489e44c6-999d-47d0-ac13-099844b57217",
+          "revision": 1,
+          "content_hash": "b9fc12883868b362f9c9657961c9c4dcf8eabb33f6c6edf06a995f0abbe77a0a",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "langchain.agents",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "7f56513c-65b3-455b-b608-8c1f6534fd8f",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "26d50d805c2c243b725a95d3ca3a9ce142cdff60de38b69d794e8a20f55b537a",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "54954306-919c-41cd-9524-85724241bbe0",
+          "revision": 1,
+          "content_hash": "57b3d4f3ef50ef410a335695b032f7ce186f9d80d69fa48e83c6e97139cae62f",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "ee312231-cf40-49f6-9ea8-1de90210a2c2",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "3d8f32f2f9bdd4d4098d2abef048798603aa10842f42c27e56055d44c39434ee",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "0f5721b8-acb9-452c-ab70-0dc17540cfca",
+          "revision": 1,
+          "content_hash": "d969cf0c9e463854f274c2a6a3639b98dec3b1cf59efabda9c0d8aea81e26924",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "AgentMiddleware",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "b573502b-7727-4d82-bddd-d927fb2494bb",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "10137ab939165b6943efe57550b59aa646304cfaf8b879251c727c85829b2dc9",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "a80db3b2-6be0-4c3c-ac42-68211d8e1a30",
+          "revision": 1,
+          "content_hash": "64b3f9795eb77dbe6e3fa8ed6d237c592507e87833a81222bf068c19b0593cf4",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "LangChain agents and LangGraph",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "41fea61e-59c7-418a-8f5f-d476f4328155",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "137527debcc859e3ffc858c3bfe10b7ab41203b24b86311c06a25088183bad82",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "94489b95-b281-43d7-9bae-ff3a68909f00",
+          "revision": 1,
+          "content_hash": "694f4fb7256c8252badbbba2fb5a1df952c7e35b70bd2a417057015003ddf37e",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "Installation",
+      "prompt_version": "grounded-page-v6"
+    },
+    {
+      "job_id": "5ec51896-1310-4ebf-9de6-a6a1d21247f5",
+      "status": "completed",
+      "attempts": 1,
+      "max_attempts": 1,
+      "identity_hash": "bfa014a0f375d067ff19928ed8de82a34f7b2dd4191447f64239e2002c2db3fe",
+      "error_summary": null,
+      "lease_expires_at": null,
+      "pages": [
+        {
+          "page_id": "19c2f780-69bb-4016-a1d4-96e51bae49b9",
+          "revision": 1,
+          "content_hash": "442d01780e93486cad730266c97b69ffddb73164054def5653c7163791590370",
+          "origin": "editorial",
+          "editor": "Codex",
+          "passed": true,
+          "issues": [],
+          "review": "pending"
+        }
+      ],
+      "title": "create_agent",
+      "prompt_version": "grounded-page-v6"
+    }
+  ],
+  "citation_validation": "exact quotations and actual chunk IDs; semantic support requires review",
+  "example": "author-written, independently executed against langchain==1.4.6; fixture model, in-memory checkpointer; no paid API calls"
+}

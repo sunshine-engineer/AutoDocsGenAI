@@ -24,7 +24,7 @@ from database.models import (
     TopicCatalogRecord,
     TopicRecord,
 )
-from generation.contracts import EvidenceChunk, validate_citations
+from generation.contracts import EvidenceChunk, PageDraft, validate_citations
 from generation.ollama import (
     PROMPT_VERSION,
     WritingResult,
@@ -175,7 +175,9 @@ def enqueue_page(
         return str(job.id)
 
 
-def _assert_ready(session: Session, job: GenerationJobRecord) -> dict[str, Any]:
+def _assert_ready(
+    session: Session, job: GenerationJobRecord, *, require_writer: bool = True
+) -> dict[str, Any]:
     payload = cast(dict[str, Any], job.input_snapshot)
     if sha256_identity(payload) != job.identity_hash:
         raise GenerationError("stored job inputs do not reproduce their identity")
@@ -193,7 +195,7 @@ def _assert_ready(session: Session, job: GenerationJobRecord) -> dict[str, Any]:
         or catalog.input_snapshot_hash != payload["snapshot_hash"]
     ):
         raise GenerationError("job snapshot identity changed")
-    if (
+    if require_writer and (
         payload["prompt_version"] != PROMPT_VERSION
         or payload["writer_contract_hash"] != writer_contract_hash()
     ):
@@ -292,19 +294,14 @@ def finish_page(
             raise GenerationError(
                 "model or prompt identity differs from the planned job"
             )
-        evidence = [EvidenceChunk.model_validate(item) for item in payload["evidence"]]
-        issues = validate_citations(
-            result.draft, evidence, str(payload["package"]), str(payload["version"])
-        )
-        if result.draft.abstained:
-            issues.append("model abstained; insufficient evidence")
-        draft = result.draft.model_dump(mode="json")
-        page = GeneratedPageRecord(
-            job_id=job.id,
-            revision=claim.attempt,
-            content_hash=sha256_identity(draft),
-            payload=draft,
-            model_metadata={
+        return _store_revision(
+            session,
+            job,
+            payload,
+            result.draft,
+            claim.attempt,
+            {
+                "origin": "model",
                 "model": result.model,
                 "digest": result.model_digest,
                 "prompt_version": result.prompt_version,
@@ -314,36 +311,140 @@ def finish_page(
                 "output_tokens": result.output_tokens,
             },
         )
-        session.add(page)
-        session.flush()
-        allowed = {item.chunk_id for item in evidence}
-        for si, section in enumerate(result.draft.sections):
-            for ci, item in enumerate(section.claims):
-                for ei, citation in enumerate(item.citations):
-                    if citation.chunk_id in allowed:
-                        session.add(
-                            PageCitationRecord(
-                                page_id=page.id,
-                                chunk_id=citation.chunk_id,
-                                locator=f"section:{si}/claim:{ci}/citation:{ei}",
-                                quote=citation.quote,
-                            )
+
+
+def _store_revision(
+    session: Session,
+    job: GenerationJobRecord,
+    payload: dict[str, Any],
+    draft_value: PageDraft,
+    revision: int,
+    metadata: dict[str, Any],
+) -> str:
+    evidence = [EvidenceChunk.model_validate(item) for item in payload["evidence"]]
+    issues = validate_citations(
+        draft_value, evidence, str(payload["package"]), str(payload["version"])
+    )
+    if draft_value.abstained:
+        issues.append("model abstained; insufficient evidence")
+    draft = draft_value.model_dump(mode="json")
+    page = GeneratedPageRecord(
+        job_id=job.id,
+        revision=revision,
+        content_hash=sha256_identity(draft),
+        payload=draft,
+        model_metadata=metadata,
+    )
+    session.add(page)
+    session.flush()
+    allowed = {item.chunk_id for item in evidence}
+    for si, section in enumerate(draft_value.sections):
+        for ci, item in enumerate(section.claims):
+            for ei, citation in enumerate(item.citations):
+                if citation.chunk_id in allowed:
+                    session.add(
+                        PageCitationRecord(
+                            page_id=page.id,
+                            chunk_id=citation.chunk_id,
+                            locator=f"section:{si}/claim:{ci}/citation:{ei}",
+                            quote=citation.quote,
                         )
-        session.add(
-            PageValidationRecord(
-                page_id=page.id,
-                validator_version=VALIDATOR_VERSION,
-                passed=not issues,
-                issues=issues,
+                    )
+    session.add(
+        PageValidationRecord(
+            page_id=page.id,
+            validator_version=VALIDATOR_VERSION,
+            passed=not issues,
+            issues=issues,
+        )
+    )
+    job.status = "completed" if not issues else "failed"
+    job.error_summary = "citation validation or abstention failed" if issues else None
+    job.lease_token, job.lease_expires_at = None, None
+    job.updated_at = datetime.now(UTC)
+    return str(page.id)
+
+
+def edit_page(
+    factory: sessionmaker[Session],
+    page_id: str,
+    draft: PageDraft,
+    *,
+    editor: str,
+    feedback: str,
+) -> str:
+    """Create a validated editorial revision; never impersonate a model or approve it."""
+    editor_value = review_text(editor, "editor", 200, required=True)
+    note = review_text(feedback, "editorial feedback", 4000, required=True)
+    with factory.begin() as session:
+        parent = session.get(GeneratedPageRecord, UUID(page_id))
+        if parent is None:
+            raise GenerationError("parent page revision does not exist")
+        if sha256_identity(parent.payload) != parent.content_hash:
+            raise GenerationError("parent page identity is corrupt")
+        parent_job = session.get(GenerationJobRecord, parent.job_id)
+        assert parent_job is not None
+        lock_catalog(session, str(parent_job.input_snapshot["catalog_id"]))
+        payload = dict(_assert_ready(session, parent_job, require_writer=False))
+        evidence = [EvidenceChunk.model_validate(item) for item in payload["evidence"]]
+        if (
+            draft.title != payload["title"]
+            or draft.abstained
+            or validate_citations(
+                draft, evidence, payload["package"], payload["version"]
+            )
+        ):
+            raise GenerationError(
+                "editorial revision requires the topic title and valid source citations"
+            )
+        payload["editorial"] = {
+            "contract": "source-bound-edit-v1",
+            "parent_page_id": str(parent.id),
+            "editor": editor_value,
+            "feedback": note,
+            "content_hash": sha256_identity(draft.model_dump(mode="json")),
+        }
+        identity = sha256_identity(payload)
+        existing = session.scalar(
+            select(GenerationJobRecord).where(
+                GenerationJobRecord.topic_id == parent_job.topic_id,
+                GenerationJobRecord.identity_hash == identity,
             )
         )
-        job.status = "completed" if not issues else "failed"
-        job.error_summary = (
-            "citation validation or abstention failed" if issues else None
+        if existing is not None:
+            page = session.scalar(
+                select(GeneratedPageRecord).where(
+                    GeneratedPageRecord.job_id == existing.id
+                )
+            )
+            if page is None:
+                raise GenerationError("editorial job has no saved revision")
+            return str(page.id)
+        job = GenerationJobRecord(
+            topic_id=parent_job.topic_id,
+            identity_hash=identity,
+            input_snapshot=payload,
+            status="completed",
+            attempts=1,
+            max_attempts=1,
         )
-        job.lease_token, job.lease_expires_at = None, None
-        job.updated_at = datetime.now(UTC)
-        return str(page.id)
+        session.add(job)
+        session.flush()
+        return _store_revision(
+            session,
+            job,
+            payload,
+            draft,
+            1,
+            {
+                "origin": "editorial",
+                "editor": editor_value,
+                "feedback": note,
+                "parent_page_id": str(parent.id),
+                "model_call_performed": False,
+                "source_model_metadata": dict(parent.model_metadata),
+            },
+        )
 
 
 def run_page(

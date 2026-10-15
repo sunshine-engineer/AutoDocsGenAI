@@ -42,10 +42,10 @@ production documentation service.”
 ## Smallest honest closure scope
 
 - [ ] Merge the reviewed implementation PRs in dependency order with green CI.
-- [ ] Review five real pilot pages, reject weak content with actionable feedback,
-      and explicitly approve satisfactory revisions.
-- [ ] Export that approved catalog and inspect the table of contents, citations,
-      and links as a reader.
+- [x] Review five real pilot pages and explicitly approve corrected revisions
+      (Sunny approved the five exact editorial revisions on 2026-10-15).
+- [x] Export the approved catalog and validate its table of contents, citations,
+      module navigation, and backlinks.
 - [ ] Record a three-to-five-minute local demonstration, including one failure.
 - [ ] Add the measured outcomes and limitations to the project README/portfolio.
 
@@ -70,3 +70,23 @@ hook order, and retained thread state. It needs no provider credentials.
 It does not test live model quality, tool calls, or disk-backed checkpoints.
 Its LangGraph in-memory saver belongs to the example agent; AutoDocsGenAI's own
 resumption mechanism remains PostgreSQL generation jobs and leases.
+
+
+## Completed demo evidence
+
+- [Approved five-page output](generated/langchain/1.4.6/README.md).
+- [Actual review decisions](generated/langchain/1.4.6/approval-record.json).
+- [Build provenance](generated/langchain/1.4.6/build-manifest.json).
+- [Historical review pack](demo/langchain-1.4.6/README.md), including failed attempts.
+
+For a three-minute interview walkthrough, show create_agent's source citations,
+then the approved build manifest, then run the offline example above. Explain
+that the small local model's initial drafts needed editorial corrections; the
+system preserves both the model drafts and the explicitly attributed edits.
+Show one rejected quotation from the historical manifest and explain how leases
+and idempotent jobs prevent duplicate work after failures.
+
+The delivered scope is a five-page local workflow with human approval. Main
+pipeline adapters, arbitrary-package generation, and native LangGraph checkpoint
+integration remain future work. PR review/merges and an optional video recording
+can follow without adding features to this demonstration.
