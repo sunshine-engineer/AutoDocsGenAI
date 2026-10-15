@@ -106,6 +106,19 @@ verification, and build-only commands. Static output: `.site-work/site/`.
 
 ## Supplied VM deployment
 
+After cloning the reviewed release on the VM, preview or run the first-time setup:
+
+```bash
+bash deploy/setup-vm.sh --plan
+sudo bash deploy/setup-vm.sh
+```
+
+Prompts default to a website-only HTTP preview. Use `--domain` and `--email` for
+HTTPS, `--install-deps` for missing Docker/Compose on supported Ubuntu/Debian,
+and `--yes` for unattended operation. Existing configuration is retained unless
+`--reconfigure` is explicitly selected. See the runbook for host prerequisites.
+
+
 The separate deployment bundle is in [`deploy/`](deploy/). It builds a static
 website image with Caddy and optional private PostgreSQL/Ollama/one-shot worker
 services. Hostname, certificate contact and release SHA are configured in an

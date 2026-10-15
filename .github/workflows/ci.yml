@@ -186,7 +186,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Validate shell syntax
-        run: bash -n deploy/init-vm.sh deploy/ops.sh
+        run: bash -n deploy/init-vm.sh deploy/ops.sh deploy/setup-vm.sh
       - name: Build and smoke-test VM containers
         run: python -m scripts.check_vm_deployment --build
       - name: Preserve sanitized deployment report

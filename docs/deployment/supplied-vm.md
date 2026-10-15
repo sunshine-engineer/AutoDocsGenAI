@@ -4,6 +4,74 @@ Prepared 2026-10-16 (Asia/Calcutta). Sunny will provide the VM; this bundle does
 
 The default service is the static website. PostgreSQL, the batch worker and Docker Ollama are opt-in. Readers never start jobs, access a database or call a model.
 
+## First-run setup script
+
+After merging the reviewed integration PR, clone and select the reviewed release
+on your supplied VM. Git and Python 3 must already be installed. On an intended
+Ubuntu 24.04 / Debian 12 x86-64 systemd host:
+
+```bash
+git clone https://github.com/sunshine-engineer/AutoDocsGenAI.git
+cd AutoDocsGenAI
+bash deploy/setup-vm.sh --plan
+sudo bash deploy/setup-vm.sh
+```
+
+The interactive script defaults to an explicitly HTTP-only, website-only preview.
+Press Enter to accept displayed defaults. It asks whether missing Docker/Compose
+should be installed and shows a final apply prompt before host setup. Set HTTP-only
+to `false` to enter a real DNS hostname and certificate contact email.
+
+For an unattended first HTTP preview, explicitly allow dependency installation:
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --http --install-deps
+```
+
+For public HTTPS, set your values before running the command:
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --install-deps --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+`AUTODOCS_DOMAIN`, `AUTODOCS_ACME_EMAIL` and `AUTODOCS_HTTP_ONLY` are optional
+input defaults. Pass them through `sudo env` if your sudo configuration removes
+environment variables. Values are validated as data, never sourced as shell code.
+A hostname is required only for HTTPS; preview uses `http://VM_EXTERNAL_IP:80/`.
+DNS and VM/firewall port rules must be configured by the operator.
+
+A clean clone outside `/opt/autodocs` is copied there using an independent local
+Git clone, pinned to its current commit. An existing `/opt/autodocs` is never
+overwritten: run subsequent setup from that checkout. Existing configuration is
+reused when its release matches; changing settings requires `--reconfigure`, which
+retains a timestamped configuration backup. For example, after preparing DNS:
+
+```bash
+cd /opt/autodocs
+sudo bash deploy/setup-vm.sh --reconfigure --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+Existing release images are reused rather than rebuilt. The setup starts only the
+website, enables Docker and the reader boot service, and checks local HTTP health
+in preview mode. It does not start the database/model, run migrations, provision
+cloud resources, attach/format disks, change firewall rules, or establish final
+public HTTPS/reboot verification. Mount your intended persistent state filesystem
+before applying setup.
+
+`--plan` validates settings and prints the intended actions without applying host
+changes; it can also inspect a saved config with `--plan --config PATH`. A plan
+is not proof that host prerequisites, Docker installation or public DNS work.
+Automatic Docker installation supports Ubuntu 24.04 and Debian 12 using the
+[official Ubuntu](https://docs.docker.com/engine/install/ubuntu/) /
+[Debian](https://docs.docker.com/engine/install/debian/) apt procedure. Conflicting
+distribution Docker packages are reported for manual migration, never removed.
+On other hosts, install prerequisites yourself and use the detailed steps below.
+
+Shell/input/config-preservation tests exercise planning in isolated clean clones.
+Actual root-level installation and systemd startup remain unverified on the
+supplied VM. If setup fails, retain its error output, fix the reported prerequisite,
+and rerun from the installed checkout; no broad automatic reset is performed.
+
 ## Prerequisites
 
 A supplied x86-64 Linux VM with systemd, Bash, Python 3, Git, GNU coreutils, Docker Engine and the Docker Compose v2+ plugin. Ubuntu 24.04 or Debian 12 is the intended host family; local image tests used Linux/amd64 Docker Desktop, not a GCP guest. See [Docker's Ubuntu installation instructions](https://docs.docker.com/engine/install/ubuntu/).
