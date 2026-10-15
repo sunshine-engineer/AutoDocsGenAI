@@ -1230,6 +1230,7 @@
     "Inherited methods, dynamic exports, conditional definitions and import resolution are not exhaustively documented or checked.",
     "Docstring examples are preserved, not automatically executed.",
     "The package list is bounded; this is not every third-party integration or a full authored learning curriculum.",
-    "Runtime matrix tests core contracts, not all 89 release environments."
+    "Runtime matrix tests core contracts, not all 89 release environments.",
+    "Upstream relative links and cross-references in preserved docstrings are not exhaustively validated."
   ]
 }

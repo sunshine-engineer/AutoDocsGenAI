@@ -4,7 +4,7 @@ This batch produces a source-derived reference for a bounded ecosystem of 30 pac
 
 The local reference starts at `data/generated_docs/ecosystem-2026-10-15/README.md`. Each version has module pages, source docstrings, signatures, source line numbers, imported-name inventories, licenses and a provenance manifest. The full `report.json` records additions, removals and signature differences. Downloaded source is parsed, never imported by the documentation builder.
 
-The reference is separate from the five approved, model-drafted LangChain pages in `docs/generated/langchain/1.4.6`. This batch has no final human approval and does not claim equivalent editorial review. It is a source reference, not a complete authored tutorial collection. Inherited APIs, dynamic exports, conditional definitions, resolved re-exports and the entire third-party ecosystem remain coverage gaps. Examples copied from upstream docstrings are not automatically executed.
+The reference is separate from the five approved, model-drafted LangChain pages in `docs/generated/langchain/1.4.6`. This batch has no final human approval and does not claim equivalent editorial review. It is a source reference, not a complete authored tutorial collection. Inherited APIs, dynamic exports, conditional definitions, resolved re-exports and the entire third-party ecosystem remain coverage gaps. Examples copied from upstream docstrings are not automatically executed. Relative links and cross-references in those docstrings can require upstream documentation context; they have not been exhaustively validated.
 
 ## Executed version checks
 
@@ -17,7 +17,7 @@ Python 3.12.15; fresh isolated environments; exact resolved dependencies are rec
 | 1.3.18 | 1.2.15 | Pass | Pass | Pass | Pass | Fails: missing runtime config |
 | 1.4.6 | 1.2.15 | Pass | Pass | Pass | Pass | Fails: missing runtime config |
 
-An additional installation check deliberately combines LangChain 1.3.18 with LangGraph 1.1.10: resolution fails because LangChain requires LangGraph >=1.2.11,<1.3.0. This is a dependency incompatibility, not a documentation parser failure. [Resolver evidence](evidence/incompatible-install.log).
+An additional installation check deliberately combines LangChain 1.3.18 with LangGraph 1.1.10: resolution fails because LangChain requires LangGraph >=1.2.11,<1.3.0. This is a dependency incompatibility, not a documentation parser failure. [Resolver evidence](evidence/incompatible-install.txt).
 
 Two migration findings are demonstrated: modern `langchain.agents.create_agent` is absent from the tested 0.3 release; direct ToolNode invocation needs adaptation on the tested 1.x graph versions. Executing ToolNode inside a compiled StateGraph passes across all tested pairs. Static declaration changes are review candidates, not independently proven public API breakages.
 
