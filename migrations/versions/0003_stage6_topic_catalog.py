@@ -31,12 +31,22 @@ def upgrade() -> None:
         sa.Column(
             "source_pipeline_run_id", postgresql.UUID(as_uuid=True), nullable=False
         ),
+        sa.Column(
+            "embedding_version_id", postgresql.UUID(as_uuid=True), nullable=False
+        ),
+        sa.Column("input_snapshot_hash", sa.Text(), nullable=False),
         sa.Column("config_hash", sa.Text(), nullable=False),
+        sa.Column(
+            "config_snapshot",
+            postgresql.JSONB(astext_type=sa.Text()),
+            nullable=False,
+        ),
         sa.Column(
             "status", sa.Text(), server_default=sa.text("'draft'"), nullable=False
         ),
         sa.Column("approved_by", sa.Text(), nullable=True),
         sa.Column("approved_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("review_feedback", sa.Text(), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -55,11 +65,24 @@ def upgrade() -> None:
             name=op.f("ck_topic_catalogs_valid_status"),
         ),
         sa.CheckConstraint(
-            "(status = 'approved' AND approved_by IS NOT NULL AND "
-            "approved_at IS NOT NULL) OR "
-            "(status <> 'approved' AND approved_by IS NULL AND "
-            "approved_at IS NULL)",
-            name=op.f("ck_topic_catalogs_valid_approval"),
+            "((status IN ('approved', 'superseded') AND "
+            "approved_by IS NOT NULL AND btrim(approved_by) <> '' AND "
+            "approved_at IS NOT NULL AND review_feedback IS NULL) OR "
+            "(status = 'rejected' AND approved_by IS NULL AND "
+            "approved_at IS NULL AND review_feedback IS NOT NULL AND "
+            "btrim(review_feedback) <> '') OR "
+            "(status IN ('draft', 'awaiting_approval') AND "
+            "approved_by IS NULL AND approved_at IS NULL AND "
+            "review_feedback IS NULL))",
+            name=op.f("ck_topic_catalogs_valid_review_state"),
+        ),
+        sa.CheckConstraint(
+            "input_snapshot_hash ~ '^[0-9a-f]{64}$'",
+            name=op.f("ck_topic_catalogs_valid_input_snapshot_hash"),
+        ),
+        sa.CheckConstraint(
+            "config_hash ~ '^[0-9a-f]{64}$'",
+            name=op.f("ck_topic_catalogs_valid_config_hash"),
         ),
         sa.ForeignKeyConstraint(
             ["documentation_version_id"],
@@ -73,12 +96,25 @@ def upgrade() -> None:
             name=op.f("fk_topic_catalogs_source_pipeline_run_id"),
             ondelete="RESTRICT",
         ),
+        sa.ForeignKeyConstraint(
+            ["embedding_version_id"],
+            ["embedding_versions.id"],
+            name=op.f("fk_topic_catalogs_embedding_version_id"),
+            ondelete="RESTRICT",
+        ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_topic_catalogs")),
         sa.UniqueConstraint(
             "documentation_version_id",
             "config_hash",
             name="uq_topic_catalogs_documentation_version_config_hash",
         ),
+    )
+    op.create_index(
+        "uq_topic_catalogs_approved_documentation_version",
+        "topic_catalogs",
+        ["documentation_version_id"],
+        unique=True,
+        postgresql_where=sa.text("status = 'approved'"),
     )
     op.create_table(
         "topics",

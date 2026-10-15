@@ -2,7 +2,12 @@ from uuid import uuid4
 
 import pytest
 
-from catalog.identity import CatalogIdentityConfig, catalog_config_hash
+from catalog.identity import (
+    CatalogIdentityConfig,
+    catalog_config_hash,
+    catalog_config_snapshot,
+    validate_catalog_config_snapshot,
+)
 from catalog.snapshot import SnapshotChunk, input_snapshot_hash
 from models.config import EmbeddingConfig
 from models.topic import TopicKind
@@ -97,6 +102,60 @@ def test_catalog_config_hash_is_order_stable_and_excludes_runtime_settings():
     )
 
     assert first == second
+
+
+def test_canonical_config_snapshot_round_trips_to_its_hash():
+    config = CatalogIdentityConfig(
+        embedding=embedding_config(),
+        namespace_allow_list=("/python/langchain",),
+    )
+    run_id = str(uuid4())
+    snapshot = catalog_config_snapshot(
+        package="LangChain",
+        version="0.3",
+        source_pipeline_run_id=run_id,
+        input_snapshot_hash="a" * 64,
+        config=config,
+    )
+    expected_hash = catalog_config_hash(
+        package="LangChain",
+        version="0.3",
+        source_pipeline_run_id=run_id,
+        input_snapshot_hash="a" * 64,
+        config=config,
+    )
+
+    validate_catalog_config_snapshot(snapshot, expected_hash)
+    assert "cache_directory" not in str(snapshot)
+    assert "batch_size" not in str(snapshot)
+
+
+def test_config_snapshot_validation_rejects_changed_content():
+    config = CatalogIdentityConfig(
+        embedding=embedding_config(),
+        namespace_allow_list=("/python/langchain",),
+    )
+    run_id = str(uuid4())
+    snapshot = catalog_config_snapshot(
+        package="langchain",
+        version="0.3",
+        source_pipeline_run_id=run_id,
+        input_snapshot_hash="b" * 64,
+        config=config,
+    )
+    snapshot["package_version"] = "changed"
+
+    with pytest.raises(ValueError, match="does not reproduce"):
+        validate_catalog_config_snapshot(
+            snapshot,
+            catalog_config_hash(
+                package="langchain",
+                version="0.3",
+                source_pipeline_run_id=run_id,
+                input_snapshot_hash="b" * 64,
+                config=config,
+            ),
+        )
 
 
 def test_catalog_config_hash_changes_with_output_affecting_settings():

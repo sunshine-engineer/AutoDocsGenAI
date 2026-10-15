@@ -17,6 +17,7 @@ from database.models import (
     SourceDocumentRecord,
     SourceRecord,
 )
+from models.chunk import Chunk
 from models.config import EmbeddingConfig
 from services.chunk_importer import normalize_package_name
 
@@ -48,6 +49,59 @@ class CatalogSnapshot:
     @property
     def chunk_ids(self) -> tuple[str, ...]:
         return tuple(chunk.id for chunk in self.chunks)
+
+
+def load_snapshot_chunks(session: Session, snapshot: CatalogSnapshot) -> list[Chunk]:
+    """Load and revalidate the exact persisted chunks captured by a snapshot."""
+
+    expected_hashes = {chunk.id: chunk.content_hash for chunk in snapshot.chunks}
+    records = list(
+        session.scalars(
+            select(ChunkRecord)
+            .where(ChunkRecord.id.in_(snapshot.chunk_ids))
+            .order_by(ChunkRecord.id)
+        )
+    )
+    loaded_ids = {record.id for record in records}
+    missing_ids = sorted(set(snapshot.chunk_ids) - loaded_ids)
+    if missing_ids:
+        raise CatalogSnapshotError(
+            f"snapshot is missing {len(missing_ids)} persisted chunk(s)"
+        )
+    changed_ids = sorted(
+        record.id
+        for record in records
+        if record.content_hash != expected_hashes[record.id]
+    )
+    if changed_ids:
+        raise CatalogSnapshotError(
+            f"snapshot contains {len(changed_ids)} changed chunk(s)"
+        )
+    mismatched_ids = sorted(
+        record.id
+        for record in records
+        if record.package_name != snapshot.package
+        or record.package_version != snapshot.package_version
+    )
+    if mismatched_ids:
+        raise CatalogSnapshotError(
+            f"snapshot contains {len(mismatched_ids)} mixed package/version chunk(s)"
+        )
+    return [
+        Chunk(
+            id=record.id,
+            content=record.content,
+            package=record.package_name,
+            version=record.package_version,
+            source_url=record.source_url,
+            page_title=record.page_title,
+            header_path=record.header_path,
+            chunk_index=record.chunk_index,
+            content_hash=record.content_hash,
+            character_count=record.character_count,
+        )
+        for record in records
+    ]
 
 
 def input_snapshot_hash(

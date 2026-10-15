@@ -10,7 +10,8 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
 ## Current status
 
-The project currently runs through ingestion:
+The main pipeline runs through chunk persistence and embedding indexing.
+Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 
 | Stage | Status | Result |
 | --- | --- | --- |
@@ -20,13 +21,16 @@ The project currently runs through ingestion:
 | Fetching and extraction | Working MVP | HTTP/Playwright fetch and main-content extraction |
 | Markdown normalization | Working MVP | Cleaned files under `data/cleaned/` |
 | Structure-aware chunking | Working MVP | Deterministic chunks and JSONL persistence |
-| PostgreSQL/pgvector foundation | Review stop B | Schema prepared, not applied |
+| PostgreSQL lineage | Implemented | Versioned documents, chunks, and idempotent imports |
 | Embeddings and vector index | Prototype | Small CPU ONNX model and pgvector |
-| Retrieval | Placeholder | Not implemented |
+| Retrieval | Working prototype | Filtered cosine search and API-aware reranking |
+| Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
 | Generation, validation, review | Placeholder | Not implemented |
 
-The pipeline continuing past ingestion does not mean those later stages are
-complete: their current functions return the state unchanged.
+The pipeline adapters for retrieval, generation, validation, and final page
+review still return the state unchanged. Standalone search and catalog commands
+are implemented; generated documentation and export are not. Catalog approval
+never starts generation.
 
 ## Pipeline
 
@@ -178,6 +182,38 @@ data/cleaned/{package}/{version}/
 
 Runtime data, environments, logs, and secrets are ignored by Git.
 
+## Topic catalog workflow (Stage 6 B3)
+
+Run these commands only against a database that has the reviewed Stage 6 schema.
+Use a disposable database for B3 validation. Do not apply migration `0003` to the
+reusable database until the separate B4 review and migration decision.
+
+```bash
+python -m scripts.build_topic_catalog PACKAGE VERSION --pipeline-run RUN_UUID
+python -m scripts.inspect_topic_catalog CATALOG_UUID
+python -m scripts.inspect_topic_catalog CATALOG_UUID --repair
+python -m scripts.review_topic_catalog CATALOG_UUID submit
+python -m scripts.review_topic_catalog CATALOG_UUID approve --reviewer "Your name"
+# Alternative decision; rejected catalogs cannot then be approved:
+python -m scripts.review_topic_catalog CATALOG_UUID reject --feedback "Missing evidence"
+```
+
+Build is draft-only and defaults to preserving existing rows. Use `--reconcile`
+only when deliberately removing stale draft topics. Repeating an unchanged build
+reuses row identities and reports zero mutations. Approval and rejection update
+catalog and topic states atomically; approval requires a supplied human identity.
+
+Commands emit JSON with status/counts and artifact information. Artifacts live in
+`data/catalogs/PACKAGE/VERSION/CATALOG_UUID/{catalog.json,coverage.md}`. `--output`
+sets an alternative artifact root; supply the same root on subsequent commands.
+Submission and approval require artifacts matching persisted state. `--repair`
+regenerates them from historical lineage, including after source supersession.
+If an artifact write fails after a committed build/review, the command returns a
+non-zero code and a partial-success result. Repair artifacts before proceeding;
+do not assume the database operation rolled back.
+
+See [B3 validation and limitations](docs/stage-6-stop-b3-validation.md).
+
 ## CI Environment Setup 
 
 Create and use this environment to run tests in disposable containers
@@ -291,7 +327,7 @@ roadmap and approved architecture decisions are in
 behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md). The
 approved next phase is detailed in
 [`docs/stage-4-postgres-pgvector-plan.md`](docs/stage-4-postgres-pgvector-plan.md).
-The proposed lineage schema for the current review stop is in
+The original Stage 4 lineage schema review is in
 [`docs/stage-4-schema-review.md`](docs/stage-4-schema-review.md).
 
 ## Roadmap

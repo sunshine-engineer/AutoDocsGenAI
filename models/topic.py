@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from pathlib import PurePosixPath
 from typing import Self
+from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
+
+from models.identity import sha256_identity
 
 
 class TopicKind(StrEnum):
@@ -19,6 +23,14 @@ class TopicStatus(StrEnum):
     PROPOSED = "proposed"
     APPROVED = "approved"
     REJECTED = "rejected"
+
+
+class CatalogStatus(StrEnum):
+    DRAFT = "draft"
+    AWAITING_APPROVAL = "awaiting_approval"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    SUPERSEDED = "superseded"
 
 
 class EvidenceRole(StrEnum):
@@ -75,7 +87,7 @@ class TopicCandidate(BaseModel):
 class TopicCatalogProposal(BaseModel):
     package: str = Field(min_length=1)
     version: str = Field(min_length=1)
-    config_hash: str = Field(min_length=1)
+    config_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     topics: list[TopicCandidate] = Field(min_length=1)
 
     @model_validator(mode="after")
@@ -111,4 +123,53 @@ class TopicCatalogProposal(BaseModel):
                     raise ValueError("topic parent relationships must be acyclic")
                 visited.add(current)
                 current = parents[current]
+        return self
+
+
+class TopicCatalogIdentity(BaseModel):
+    """Reproducible identity and review state for one persisted catalog."""
+
+    documentation_version_id: UUID
+    source_pipeline_run_id: UUID
+    embedding_version_id: UUID
+    input_snapshot_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    config_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    config_snapshot: dict[str, object]
+    status: CatalogStatus = CatalogStatus.DRAFT
+    approved_by: str | None = None
+    approved_at: datetime | None = None
+    review_feedback: str | None = None
+
+    @model_validator(mode="after")
+    def validate_review_state(self) -> Self:
+        if not self.config_snapshot:
+            raise ValueError("catalog configuration snapshot must not be empty")
+        if sha256_identity(self.config_snapshot) != self.config_hash:
+            raise ValueError(
+                "catalog configuration snapshot does not reproduce config_hash"
+            )
+        approved_by = (self.approved_by or "").strip() or None
+        feedback = (self.review_feedback or "").strip() or None
+        if self.status in {CatalogStatus.APPROVED, CatalogStatus.SUPERSEDED}:
+            if approved_by is None or self.approved_at is None or feedback is not None:
+                raise ValueError(
+                    "approved and superseded catalogs require approval metadata only"
+                )
+        elif self.status == CatalogStatus.REJECTED:
+            if (
+                approved_by is not None
+                or self.approved_at is not None
+                or feedback is None
+            ):
+                raise ValueError(
+                    "rejected catalogs require non-blank feedback and no approval metadata"
+                )
+        elif any(
+            value is not None for value in (approved_by, self.approved_at, feedback)
+        ):
+            raise ValueError(
+                "draft and awaiting-approval catalogs cannot have review metadata"
+            )
+        self.approved_by = approved_by
+        self.review_feedback = feedback
         return self
