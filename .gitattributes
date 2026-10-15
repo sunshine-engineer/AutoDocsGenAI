@@ -1,3 +1,17 @@
-# Approved publication inputs have byte-level hashes. Preserve LF on Windows too.
-/docs/generated/** text eol=lf
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Keep byte-hashed publication inputs stable across Windows checkouts.
+/docs/generated/**/*.md text eol=lf
+/docs/generated/**/*.json text eol=lf
 /website/publication.json text eol=lf
