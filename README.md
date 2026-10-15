@@ -8,7 +8,21 @@ source-cited, human-reviewed Markdown.
 This is a portfolio project focused on production-style Generative AI
 engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
+## Start here
+
+- [Approved LangChain 1.4.6 documentation](docs/generated/langchain/1.4.6/README.md): five reviewed pages.
+- [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
+- [Current findings and closure checklist](docs/closure-tracker.md): website MVP, GCP VM delivery and acceptance criteria.
+- [Interview runbook](docs/interview-demo.md): the bounded demonstration and evidence.
+
 ## Current status
+
+Updated **2026-10-16 (Asia/Calcutta)** on the review branch. Changes in PRs
+[#30](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/30),
+[#31](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/31),
+[#32](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/32) and
+[#33](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/33) are still open;
+this branch's capabilities must not be assumed to exist on `main`.
 
 The main pipeline runs through chunk persistence and embedding indexing.
 Standalone commands provide retrieval and the Stage 6 catalog review workflow:
@@ -27,6 +41,10 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
 | Grounded writing pilot | Experimental | Docker Ollama drafts, citation checks, and explicit editorial corrections |
 | Persistent generation/review/export | Implemented for review | Bounded jobs, immutable revisions, citation checks, explicit page review, complete Markdown export |
+| Ecosystem source references | Generated for bounded scope | 30 packages / 89 releases / 8,432 modules; static declarations and upstream docstrings |
+| Cross-version checks | Executed; CI passing | Four compatible core pairs, one rejected dependency pair, six offline integration checks |
+| Reader website | Planned | Package/version navigation, search, provenance and review-status labels |
+| GCP VM deployment | Planned | No live deployment, production Compose definition or measured VM sizing yet |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
@@ -52,7 +70,7 @@ official-source discovery -> crawl plan -> fetch HTML -> extract main content
       -> generate -> validate -> human review -> export
 ```
 
-Every future generated section must be supported by official source material
+Every generated section must be supported by official source material
 and traceable back to its page and chunk metadata. If the source does not
 support a claim, the system must not invent it.
 
@@ -125,7 +143,7 @@ intend to erase the local database.
 Python 3.12 and `uv` are required.
 
 ```bash
-uv sync --all-groups
+uv sync --all-groups --frozen
 source .venv/bin/activate
 python -m playwright install chromium
 ```
@@ -232,8 +250,8 @@ supported: human support review remains required.
 
 `python -m scripts.generate_pilot --help` describes the review-only pilot CLI.
 It requires a recorded source/outline approval artifact and an empty output
-directory. These experimental records do not implement the PostgreSQL-backed
-page revision/checkpoint/review/export product workflow. Failed or abstained
+directory. The JSON pilot is separate from the implemented PostgreSQL-backed
+[revision/review/export workflow](docs/persistent-generation.md). Failed or abstained
 pages must not be counted as completed documentation. No draft is final output.
 
 ## Topic catalog workflow (Stage 6 B3)
@@ -375,26 +393,69 @@ utils/        configuration, HTTP, and logging utilities
 ```
 
 For system boundaries and design decisions, read
-[`docs/architecture.md`](docs/architecture.md). The authoritative delivery
+[`docs/architecture.md`](docs/architecture.md). The original delivery
 roadmap and approved architecture decisions are in
 [`docs/project-completion-plan.md`](docs/project-completion-plan.md). Chunking
 behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md). The
-approved next phase is detailed in
+historical Stage 4 plan is detailed in
 [`docs/stage-4-postgres-pgvector-plan.md`](docs/stage-4-postgres-pgvector-plan.md).
 The original Stage 4 lineage schema review is in
 [`docs/stage-4-schema-review.md`](docs/stage-4-schema-review.md).
+Current delivery priorities and verified findings are tracked in
+[`docs/closure-tracker.md`](docs/closure-tracker.md).
 
 ## Roadmap
 
-1. Expand retrieval evaluation beyond the initial six prototype queries.
-2. Generate topic-scoped Markdown from retrieved evidence.
-3. Validate citations and unsupported claims.
-4. Add explicit human approval before export.
+1. Review/integrate the existing PR stack in dependency order; keep CI green.
+2. Build a read-only documentation website with package/version navigation,
+   search, provenance, review labels and the compatibility findings.
+3. Package content reproducibly, then prepare a private batch worker and static
+   web server for one GCP Compute Engine VM.
+4. Verify HTTPS, persistence across reboot, backup/restore and publication rollback.
+5. Publish the live URL and a short interview walkthrough; then expand provider
+   inference tests and API/example coverage.
+
+The next implementation task is the **local website MVP**, starting from the
+five approved pages. The target is a central Python-package documentation reader;
+coverage currently remains limited to the recorded LangChain/LangGraph ecosystem.
+Use [the closure tracker](docs/closure-tracker.md) for acceptance criteria and
+pending deployment inputs. Existing `compose.yaml` is a development environment,
+not a production worker/server deployment.
+
+## Ecosystem documentation and compatibility
+
+The [ecosystem report](docs/ecosystem/README.md) records source references for
+30 packages across 89 pinned releases: 8,432 modules and 34,452 declarations.
+These include implementation modules and are not a count of verified public APIs.
+
+Tested core versions: LangChain 0.3.30 / 1.2.18 / 1.3.18 / 1.4.6 and LangGraph
+0.6.11 / 1.1.10 / 1.2.15. Compatible pairs pass prompt-chain and graph-based tool,
+checkpoint and streaming contracts. Modern `create_agent` is absent in tested
+LangChain 0.3.30; direct ToolNode invocation needs adaptation on tested newer
+graph versions. LangChain 1.3.18 with LangGraph 1.1.10 cannot resolve.
+
+The full reference lives in ignored local output at
+`data/generated_docs/ecosystem-2026-10-15/README.md`; the sibling ZIP is also local.
+A fresh clone does not contain these artifacts. Rebuild the exact batch with:
+
+```bash
+uv run python -m scripts.ecosystem_docs \
+  --release-plan docs/ecosystem/release-plan.json \
+  --output data/generated_docs/ecosystem-replay
+```
+
+The [release/hash inventory](docs/ecosystem/coverage.json) and
+[reproduction instructions](docs/ecosystem/README.md#reproduce) are tracked.
+Inherited APIs, dynamic exports, re-export resolution, upstream docstring links
+and exhaustive example execution remain gaps. Provider client/schema checks do
+not verify hosted inference. The broad reference has not received the final-page
+approval recorded for the five-page demo.
+
+Local validation recorded 156 passing offline tests and 198 collected tests.
+[PR #33's CI](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806)
+passed quality/unit, PostgreSQL integration and ecosystem compatibility checks.
+These checks do not establish website or cloud deployment readiness.
 
 ## License
 
 This project is licensed under the terms in [LICENSE](LICENSE).
-
-## Ecosystem documentation and compatibility
-
-The [ecosystem report](docs/ecosystem/README.md) records source references for 30 packages across 89 pinned releases, plus executable core-version and offline integration checks. It distinguishes static declarations, demonstrated migration failures and provider inference that remains untested.
