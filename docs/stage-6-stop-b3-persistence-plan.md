@@ -1,5 +1,8 @@
 # Stage 6 Stop B3: catalog persistence and review workflow plan
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 Status: B3.1 snapshot identity, the Issue #20 schema contract, Issue #21
 read-only proposal assembly, and Issue #22 transactional persistence are
 implemented; reconciliation, artifacts, and review commands remain pending.

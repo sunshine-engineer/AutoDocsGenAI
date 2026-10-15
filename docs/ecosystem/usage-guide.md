@@ -25,3 +25,13 @@ Use `langchain_core.tools.tool` to derive the tool schema. Register a `ToolNode`
 Integration packages are versioned separately. The offline integration probe verifies tool-schema binding for four chat integrations and a local text splitter. The Qdrant example uses a deterministic fake embedding and an in-memory vector store, then checks exact-text nearest-neighbor retrieval. This verifies local adapter behavior; it does not measure semantic retrieval quality or server operations. Source references include `langchain_openai`, `langchain_anthropic`, `langchain_groq`, `langchain_ollama`, `langchain_text_splitters`, and `langchain_qdrant`, each under its pinned distribution directory.
 
 Use `docs/ecosystem/evidence/*.json` for executed outcomes and `data/generated_docs/ecosystem-2026-10-15/report.json` for source changes. A renamed internal declaration, signature change, passing schema binding, and successful provider inference are different kinds of evidence.
+
+## Complete executable teaching recipes
+
+The [four LangChain 1.4.6 recipes](../learning/langchain-1.4.6/README.md)
+provide exact dependencies, complete code, expected output and assertions for
+invocation, synchronous middleware, conversation isolation and a real local tool.
+The tool example also checks invalid integer arguments without running the tool.
+Model responses are scripted: these examples do not verify provider reasoning or
+tool selection. Their explanations remain pending final Sunny review; the website
+shows placeholders until reviewed publication is explicitly approved.

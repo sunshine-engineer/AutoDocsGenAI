@@ -58,9 +58,12 @@ page content. Source-file checksums and the derived-excerpt recipe are preserved
 
 ## Closure boundary
 
-The automated fixture demonstrates all five topics through approved export.
-Fixture reviewers and generated text are test data. Real model pages still need
-Sunny's content review, deeper API examples, and an interview demonstration.
+The fixture demonstrates workflow mechanics and must remain labelled as test data.
+Separately, real Docker Ollama drafts received attributed editorial corrections;
+Sunny approved five exact revisions and the exporter published them. See the
+[approved export](generated/langchain/1.4.6/README.md) and [demo validation](closure-final-demo-validation.md).
+Four newer [learning recipes](learning/langchain-1.4.6/README.md) have execution
+evidence but still require final human content approval.
 Durable job leases provide attempt recovery; native LangGraph checkpointing and
 a background worker service are not implemented.
 
@@ -82,3 +85,5 @@ approval remain valid. Repeating an identical edit is idempotent.
 
 Editing never records final human approval. The new page still needs an explicit
 `review ... approved --reviewer Sunny` decision before export.
+
+On the supplied VM, run commands through the bounded [worker operations](deployment/supplied-vm.md#4-optional-private-pipeline-services). Inside that worker, use `--ollama-url http://ollama:11434` rather than localhost.

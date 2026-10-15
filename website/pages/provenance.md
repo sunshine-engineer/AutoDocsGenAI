@@ -20,6 +20,14 @@ Offline runtime contracts exercise selected chains, graph state/checkpoints/stre
 
 See the [compatibility report](compatibility.md) for working combinations and demonstrated migration failures.
 
+## Learning drafts awaiting review
+
+[Learning placeholders](learning.md) identify four new teaching pages awaiting
+human review. Their fixed-response examples have execution records, including a
+real local tool call; this does not establish provider reasoning or tool selection.
+Unresolved explanations and model-comparison drafts are not published here.
+Queue resolutions alone never grant final publication approval.
+
 ## Publication boundary
 
 This is a read-only static reader. Visiting a page does not run a model, modify a database, create jobs, or approve drafts. Source confirmation, outline review and final-page review remain operator workflows outside the website.

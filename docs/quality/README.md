@@ -45,7 +45,7 @@ covered by the accompanying MIT license. No model output is used as source.
 Run against Docker Ollama with both models installed:
 
 ```bash
-uv run --frozen python -m scripts.compare_doc_models --models qwen3:1.7b qwen3:4b --output docs/quality/comparison-run-01.json
+uv run --frozen python -m scripts.compare_doc_models --models qwen3:1.7b qwen3:4b --output .site-work/comparison-new.json
 ```
 
 The runner uses the existing production pilot writer's identical prompt/schema

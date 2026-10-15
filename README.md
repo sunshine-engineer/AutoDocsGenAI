@@ -106,30 +106,138 @@ verification, and build-only commands. Static output: `.site-work/site/`.
 
 ## Supplied VM deployment
 
-After cloning the reviewed release on the VM, preview or run the first-time setup:
+### Deployment outline
+
+1. Merge the reviewed integration PR and clone the reviewed release on your VM.
+2. Preview the setup, then choose HTTP preview or public HTTPS.
+3. Apply setup and verify website health, navigation, search and reboot recovery.
+4. Retain release images and configuration backups for rollback.
+
+You supply the VM; this project does not provision cloud resources. Project ID,
+region and budget settings are not required. The default serves the static
+website only, independently of PostgreSQL and Ollama.
+
+### Prerequisites and first run
+
+Use an x86-64 Linux VM with systemd, Bash, Git and Python 3. Automatic Docker
+installation supports **Ubuntu 24.04 or Debian 12**. Existing Docker Engine,
+Compose v2+ and curl can be used instead. Mount the intended persistent state
+filesystem before setup. Public HTTPS also requires a DNS hostname pointing to
+the VM and reachable TCP 80/443; configure DNS, SSH access and cloud/host firewall
+rules separately.
+
+After the reviewed changes have reached `main`:
 
 ```bash
+git clone https://github.com/sunshine-engineer/AutoDocsGenAI.git
+cd AutoDocsGenAI
+# Check out your reviewed release commit before applying setup.
 bash deploy/setup-vm.sh --plan
 sudo bash deploy/setup-vm.sh
 ```
 
-Prompts default to a website-only HTTP preview. Use `--domain` and `--email` for
-HTTPS, `--install-deps` for missing Docker/Compose on supported Ubuntu/Debian,
-and `--yes` for unattended operation. Existing configuration is retained unless
-`--reconfigure` is explicitly selected. See the runbook for host prerequisites.
+Press Enter to accept displayed defaults. Interactive setup asks whether to
+install missing Docker/Compose/curl and asks before applying host changes.
+`--plan` validates settings and prints the plan without applying host setup;
+it does not prove the VM, network or public certificates work.
 
+| Setting | First-run default |
+| --- | --- |
+| Site mode | Explicit HTTP-only preview, no domain required |
+| Release | Full SHA of the current clean Git checkout |
+| Installed checkout | `/opt/autodocs`; an existing checkout is never overwritten |
+| Runtime configuration | `/etc/autodocs/runtime.env` |
+| Persistent state | `/srv/autodocs` |
+| HTTP / HTTPS ports | 80 / 443 |
+| Database and model | Not started |
 
-The separate deployment bundle is in [`deploy/`](deploy/). It builds a static
-website image with Caddy and optional private PostgreSQL/Ollama/one-shot worker
-services. Hostname, certificate contact and release SHA are configured in an
-external runtime env file. No project, region or budget configuration is needed:
-you provide the existing VM.
+A clone elsewhere is copied into `/opt/autodocs` as an independent local clone
+at the selected commit. Subsequent setup should run from `/opt/autodocs`.
+Uncommitted changes are rejected. A selected commit still needs operator review;
+SHA pinning itself is not an approval.
 
-Start with [the supplied-VM runbook](docs/deployment/supplied-vm.md).
-Container tests verified reader/search responses, secret-based database access,
-explicit migrations, offline worker Chromium, backup/restore and restart persistence.
-Public HTTPS, guest startup/reboot, model inference and workload sizing still need
-validation on the supplied host. No VM resources have been created or deployed.
+### Unattended HTTP preview
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --http --install-deps
+```
+
+Open `http://VM_EXTERNAL_IP:80/` after allowing TCP 80. This is a preview, not an
+HTTPS deployment. Git and Python 3 must already exist; `--install-deps` installs
+missing Docker/Compose/curl using the supported apt procedure. Conflicting Docker
+packages are reported for manual migration rather than removed automatically.
+
+### Public HTTPS and environment inputs
+
+Replace these values with your hostname and certificate contact:
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --install-deps --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+Alternatively, pass environment defaults explicitly through sudo:
+
+```bash
+sudo env AUTODOCS_DOMAIN=docs.yourdomain.tld AUTODOCS_ACME_EMAIL=operator@yourdomain.tld AUTODOCS_HTTP_ONLY=false bash deploy/setup-vm.sh --yes --install-deps
+```
+
+Without `--yes`, set the HTTP-only prompt to `false` and enter the domain/email.
+Runtime values are validated as data, never executed as shell expressions.
+Caddy handles certificates after DNS and port requirements are met. Successful
+container startup alone does not establish trusted public HTTPS.
+
+### Options, reruns and configuration changes
+
+| Option | Behavior |
+| --- | --- |
+| `--plan` | Preview validated settings without applying setup |
+| `--yes` | Accept selected defaults without interactive prompts |
+| `--http` | Select HTTP preview explicitly |
+| `--domain HOST --email EMAIL` | Select public HTTPS settings |
+| `--install-deps` | Allow supported dependency installation if needed |
+| `--reconfigure` | Explicitly replace runtime configuration and retain a timestamped backup |
+| `--plan --config PATH` | Inspect a saved configuration without deploying it |
+| `--help` | Show all options and prerequisites |
+
+Existing configuration is retained by default. A different release requires a
+reviewed upgrade/configuration decision rather than silently changing the SHA.
+Existing release images are reused. To switch an HTTP preview to HTTPS later:
+
+```bash
+cd /opt/autodocs
+sudo bash deploy/setup-vm.sh --reconfigure --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+Existing host configuration is root-only; use sudo when inspecting it. Private
+secrets remain outside Git and are not mounted into the website container.
+
+### Verify, recover and enable optional jobs
+
+```bash
+cd /opt/autodocs
+sudo bash deploy/ops.sh status
+sudo systemctl status autodocs.service
+# HTTP preview only:
+curl --fail http://127.0.0.1/healthz
+# Public HTTPS only; replace the hostname:
+curl --fail --head https://docs.yourdomain.tld/
+curl --fail https://docs.yourdomain.tld/search/search_index.json
+```
+
+Check navigation and search in a browser. Perform a planned reboot and repeat
+checks. Retain the prior reviewed release image; for rollback, set `RELEASE_ID`
+back to its full SHA in `/etc/autodocs/runtime.env` and run
+`sudo bash deploy/ops.sh web-up`. This does not roll back a database schema.
+
+The [full VM runbook](docs/deployment/supplied-vm.md) covers prerequisites,
+manual setup, optional private workers/PostgreSQL/Ollama, explicit migrations,
+backup/restore and rollback. Those services are not needed to serve the website.
+The development `compose.yaml` is separate from `deploy/compose.vm.yml`.
+
+Container builds, reader responses, database backup/restore and restart behavior
+passed in disposable tests. Ten setup planning/input/config-retention tests and
+a real repository `--plan` run passed. Actual root-level apt/systemd setup,
+public HTTPS and guest reboot validation remain pending on the supplied VM.
 
 ## Development setup
 
@@ -434,17 +542,21 @@ uv run pytest --strict-markers --collect-only -q  ## Validate test collection
 ## Repository map
 
 ```text
-agents/       generation, validation, and review stages
+agents/       pass-through main-pipeline writing/review adapters
+catalog/      snapshot-bound topic persistence and review
+database/     SQLAlchemy models and PostgreSQL access
 config/       YAML configuration and typed settings
 deploy/       supplied-VM images, Compose, systemd and operator helpers
 discovery/    official documentation source discovery
 docs/         focused architecture and stage documentation
+examples/     pinned offline examples and executable teaching recipes
+generation/   durable standalone writing, editorial revision and export
 indexing/     chunking, embedding, and vector-index stages
 ingestion/    fetching, extraction, normalization, and storage
 models/       Pydantic pipeline contracts
-pipeline/     end-to-end orchestration
+pipeline/     ingestion/indexing orchestration; later adapters unfinished
 planner/      documentation link discovery and crawl planning
-retrieval/    relevant-chunk retrieval
+retrieval/    main adapter placeholder; retrieval evaluation contracts
 scripts/      operator CLIs and documentation reader build/browser checks
 services/     shared domain services
 tests/        automated tests
@@ -466,7 +578,7 @@ Current delivery priorities and verified findings are tracked in
 
 ## Roadmap
 
-1. Review/integrate the existing PR stack in dependency order; keep CI green.
+1. Review and merge consolidated [PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36) into `main`; keep CI green.
 2. Review the implemented local reader and its browser/publication checks.
 3. Review the prepared [supplied-VM bundle](docs/deployment/supplied-vm.md); deploy
    the website on the supplied Linux VM with runtime hostname settings.
@@ -511,12 +623,15 @@ and exhaustive example execution remain gaps. Provider client/schema checks do
 not verify hosted inference. The broad reference has not received the final-page
 approval recorded for the five-page demo.
 
-The ecosystem batch recorded 156 passing offline tests. With reader regression
-tests, the reader baseline was 162 offline tests passing. With deployment regression checks,
-the current baseline is 168 offline tests passing (210 collected).
-[PR #33's CI](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38788129806)
-passed quality/unit, PostgreSQL integration and ecosystem compatibility checks.
-These checks do not establish website or cloud deployment readiness.
+Current test inventory: **225 collected; 183 offline tests passed**, with 42
+database/model tests deselected in the local offline run. The latest verified
+[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38817222908)
+passed quality/browser/recipe checks, PostgreSQL integration, ecosystem contracts
+and VM container smoke tests. These results do not establish actual VM/public
+HTTPS deployment or exhaustive package coverage.
+
+For current guides, historical stage records and protected approved artifacts,
+use the [documentation index](docs/README.md).
 
 ## License
 

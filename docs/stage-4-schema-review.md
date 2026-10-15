@@ -1,5 +1,8 @@
 # Stage 4 review stop B: lineage schema
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 Status: validated against a disposable PostgreSQL/pgvector database; not applied
 to the persistent development database.
 

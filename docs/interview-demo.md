@@ -124,9 +124,13 @@ can follow without adding features to this demonstration.
    to middleware and persistence, then add measured version migration examples.
    Broader static inventories remain labelled as source references.
 
-The next quality milestone is one teaching-quality page with three distinct,
-executed scenarios and an independent reader review. A larger model can be
-compared later on the same rubric, including correction time and cost.
+Four [teaching recipes](learning/langchain-1.4.6/README.md) now execute invocation,
+middleware, conversation isolation and actual local tool handling. They are
+review drafts; their final Sunny approval is pending. The [two-model comparison](quality/findings.md)
+is recorded, with attributed agent assessments and raw outputs. Independent human
+scores and timed editing remain pending in the [review queue](quality/human-review-queue.json).
+The next quality milestone is human review and a new approved publication revision,
+not relabelling these drafts as already approved.
 
 Approved exports are immutable evidence. Improvements must create new reviewed
 revisions and a new export/publication manifest; do not edit approved article

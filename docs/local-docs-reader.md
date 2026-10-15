@@ -28,6 +28,7 @@ The deployable static directory is `.site-work/site/`; staging content and brows
 - Filter the 30-package / 89-release catalog by package name or exact version, with an explicit empty state.
 - Generated compatibility table using tracked runtime JSON, including dependency and invocation failures.
 - Review/provenance policy and downloadable audit manifests.
+- Four learning placeholders backed by the human-review queue; draft explanations and model output are not rendered as approved prose.
 - Responsive layout with a keyboard-operable mobile menu and Escape-to-close behavior.
 
 The wider reference is inventoried but not published as article pages. Other packages link to upstream PyPI context; their inventory entries do not claim final approval or complete runtime validation. There is no chatbot, generation form or database/model API behind the reader.
@@ -45,11 +46,11 @@ The catalog and compatibility view are assembled from tracked reports. No local 
 ## Verification
 
 - Strict MkDocs build passed, including Markdown link/anchor checks, both in a tracked-files-only clean checkout and a checkout with `core.autocrlf=true`.
-- Rendered HTML check validated **892 local link/asset references**.
+- Rendered HTML check validated all local link/asset references; each run prints its actual count.
 - Chromium desktop at 1440 px: home, package/version filters, no-match state, article navigation, approval banners and search-result navigation passed.
 - Chromium mobile at 390 px: keyboard-operated menu, package filter and horizontal-overflow checks passed.
 - No uncaught JavaScript errors were recorded in the checked browser flow.
-- Six new regression tests cover fresh-input assembly, exclusion of an unapproved extra file, changed approved text, rejected approval consistency, path escape, and rendered link/anchor behavior. These run within the 162 passing offline tests; 42 database/model tests were deselected locally because the change does not modify those layers.
+- Eight reader regression tests cover fresh-input assembly, exclusion of unapproved files, changed approved text, approval consistency, path escape, rendered links/anchors and the placeholder/publication boundary. The current full offline baseline is 183 passing tests (225 collected), with 42 database/model tests deselected locally.
 
 Browser checks are repeatable:
 
@@ -60,4 +61,6 @@ uv run --frozen python -m scripts.check_docs_site_browser
 
 On Linux, missing browser system dependencies may require Playwright's `install --with-deps chromium` setup. CI uses that setup. The check starts its own ephemeral localhost server and shuts it down afterwards. Optional `--url http://127.0.0.1:8000` checks an existing preview. Screenshots and `browser-report.json` are saved under `.site-work/qa/`. External source availability and complete accessibility conformance are not established by these checks.
 
-CI builds the site, runs browser/link checks and uploads the built reader and browser evidence. Public hosting, HTTPS, cloud sizing, VM recovery and database/model deployment remain the next milestone in [the closure tracker](closure-tracker.md).
+CI builds the site, runs browser/link/placeholder and four pinned learning-recipe checks and uploads the built reader and browser evidence. Public hosting, HTTPS, cloud sizing, VM recovery and database/model deployment remain the next milestone in [the closure tracker](closure-tracker.md).
+
+For VM serving, use the [interactive first-run setup and deployment runbook](deployment/supplied-vm.md), not the local preview server. The [documentation index](README.md) distinguishes current guidance from historical reports.

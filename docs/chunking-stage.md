@@ -1,6 +1,8 @@
 # Chunking Stage
 
-Status: MVP implemented.
+Status: MVP implemented. This specification covers the chunking stage only.
+PostgreSQL persistence, embeddings and standalone retrieval are implemented in
+later components; see [current architecture](architecture.md).
 
 ## Goal
 

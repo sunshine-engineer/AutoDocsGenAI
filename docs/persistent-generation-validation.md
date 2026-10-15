@@ -1,5 +1,8 @@
 # Persistent generation validation — 2026-10-15
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 ## Implemented boundary
 
 The standalone approved-catalog workflow now persists bounded generation jobs,

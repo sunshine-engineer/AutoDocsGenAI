@@ -1,5 +1,8 @@
 # Exact-release source and Docker writing pilot
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 Reviewed 2026-10-15. Status: working review-only experiment; the full product is
 not complete. This branch builds on draft catalog PR #30 without merging it or
 migrating the reusable database.
