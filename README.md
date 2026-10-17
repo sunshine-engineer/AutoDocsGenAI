@@ -2,13 +2,40 @@
 
 AutoDocsGenAI is a source-grounded documentation pipeline. Given a Python
 package and version, it discovers official documentation, plans a crawl,
-downloads and cleans the selected pages, and will eventually produce validated,
-traceable Markdown learning material.
+downloads and cleans the selected pages, and includes a standalone workflow for
+source-cited, human-reviewed Markdown.
 
 This is a portfolio project focused on production-style Generative AI
 engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
+## Start here
+
+- [Prepare the supplied VM deployment](docs/deployment/supplied-vm.md): website image, optional private worker, environment configuration and recovery runbook.
+- [Run the local documentation website](docs/local-docs-reader.md): navigation, search, catalog and review labels.
+- [Approved LangChain 1.4.6 documentation](docs/generated/langchain/1.4.6/README.md): five reviewed pages.
+- [Ecosystem coverage and compatibility](docs/ecosystem/README.md): 30 packages, 89 releases, executed version checks and limitations.
+- [Current findings and closure checklist](docs/closure-tracker.md): website MVP, GCP VM delivery and acceptance criteria.
+- [Interview runbook](docs/interview-demo.md): the bounded demonstration and evidence.
+- [Executable learning recipes](docs/learning/langchain-1.4.6/README.md): four author-written teaching drafts with exact dependencies and execution evidence.
+- [Documentation quality evaluation](docs/quality/README.md): recorded model comparison, factual accuracy, clarity and editing-effort protocol.
+- [Human review queue](docs/quality/human-review-queue.json): eight deferred issues; the reader displays safe learning placeholders while review is pending.
+
 ## Current status
+
+**Demo status: interview-ready for the bounded five-page LangChain 1.4.6 portfolio demonstration.**
+The evidence includes Sunny-approved editorial revisions of actual Docker Ollama
+drafts, source provenance, approval-gated export, an executed offline API example,
+and approved-state recovery. This is independent portfolio work; it does not
+establish commercial production use or unattended generation quality.
+
+PRs #30–#35 were merged, but their stacked targets left later changes outside
+`main`. [Integration PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36)
+consolidates the implementation into `main`; all four CI checks passed at this
+assessment. Release integration remains pending until that PR is merged.
+Actual VM deployment remains separate from interview readiness.
+
+See the [interview runbook](docs/interview-demo.md) for the demonstration scope
+and prioritized documentation-quality improvements.
 
 The main pipeline runs through chunk persistence and embedding indexing.
 Standalone commands provide retrieval and the Stage 6 catalog review workflow:
@@ -25,12 +52,25 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Embeddings and vector index | Prototype | Small CPU ONNX model and pgvector |
 | Retrieval | Working prototype | Filtered cosine search and API-aware reranking |
 | Topic catalog | B3 implementation for review | Snapshot-bound persistence, artifacts, review transitions, and CLI |
-| Generation, validation, review | Placeholder | Not implemented |
+| Grounded writing pilot | Experimental | Docker Ollama drafts, citation checks, and explicit editorial corrections |
+| Persistent generation/review/export | Implemented for review | Bounded jobs, immutable revisions, citation checks, explicit page review, complete Markdown export |
+| Ecosystem source references | Generated for bounded scope | 30 packages / 89 releases / 8,432 modules; static declarations and upstream docstrings |
+| Cross-version checks | Executed; CI passing | Four compatible core pairs, one rejected dependency pair, six offline integration checks |
+| Reader website | Local MVP implemented for review | Five approved articles, searchable reader, package/version catalog, provenance and compatibility |
+| VM deployment bundle | Prepared and container-tested | Static Caddy image, private opt-in pipeline, mounted secrets, systemd and recovery runbook; supplied VM not deployed yet |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
-are implemented; generated documentation and export are not. Catalog approval
-never starts generation.
+are implemented alongside a standalone persistent generation workflow. Catalog
+approval never starts generation. See [the workflow guide](docs/persistent-generation.md).
+
+The bounded interview demo targets **LangChain 1.4.6**: five source-cited,
+editor-corrected pages and an independently executed offline API example.
+See the [content review pack](docs/demo/langchain-1.4.6/README.md),
+[validation report](docs/closure-final-demo-validation.md), and
+[interview runbook](docs/interview-demo.md). Sunny approved all five final revisions, and the real exporter published
+[the approved five-page output](docs/generated/langchain/1.4.6/README.md).
+This completes the bounded interview demo; broader roadmap work remains.
 
 ## Pipeline
 
@@ -43,9 +83,161 @@ official-source discovery -> crawl plan -> fetch HTML -> extract main content
       -> generate -> validate -> human review -> export
 ```
 
-Every future generated section must be supported by official source material
+Every generated section must be supported by official source material
 and traceable back to its page and chunk metadata. If the source does not
 support a claim, the system must not invent it.
+
+## Local documentation website
+
+```bash
+uv run --frozen --group site python -m scripts.build_docs_site --serve
+```
+
+Open **http://127.0.0.1:8000/**. The command builds the static site and serves it
+locally until Ctrl+C; use `--port 8001` if needed. It works from the repository
+root in PowerShell or Bash with Python 3.12 and uv installed.
+
+The first reader includes the five approved LangChain pages, search, a filterable
+30-package/version catalog, the compatibility report, and provenance/review labels.
+PostgreSQL and Ollama are not required for reading or building it. Broader source
+references are visibly marked as not published, rather than shown as approved
+articles. See [the reader guide](docs/local-docs-reader.md) for publication checks,
+verification, and build-only commands. Static output: `.site-work/site/`.
+
+## Supplied VM deployment
+
+### Deployment outline
+
+1. Merge the reviewed integration PR and clone the reviewed release on your VM.
+2. Preview the setup, then choose HTTP preview or public HTTPS.
+3. Apply setup and verify website health, navigation, search and reboot recovery.
+4. Retain release images and configuration backups for rollback.
+
+You supply the VM; this project does not provision cloud resources. Project ID,
+region and budget settings are not required. The default serves the static
+website only, independently of PostgreSQL and Ollama.
+
+### Prerequisites and first run
+
+Use an x86-64 Linux VM with systemd, Bash, Git and Python 3. Automatic Docker
+installation supports **Ubuntu 24.04 or Debian 12**. Existing Docker Engine,
+Compose v2+ and curl can be used instead. Mount the intended persistent state
+filesystem before setup. Public HTTPS also requires a DNS hostname pointing to
+the VM and reachable TCP 80/443; configure DNS, SSH access and cloud/host firewall
+rules separately.
+
+After the reviewed changes have reached `main`:
+
+```bash
+git clone https://github.com/sunshine-engineer/AutoDocsGenAI.git
+cd AutoDocsGenAI
+# Check out your reviewed release commit before applying setup.
+bash deploy/setup-vm.sh --plan
+sudo bash deploy/setup-vm.sh
+```
+
+Press Enter to accept displayed defaults. Interactive setup asks whether to
+install missing Docker/Compose/curl and asks before applying host changes.
+`--plan` validates settings and prints the plan without applying host setup;
+it does not prove the VM, network or public certificates work.
+
+| Setting | First-run default |
+| --- | --- |
+| Site mode | Explicit HTTP-only preview, no domain required |
+| Release | Full SHA of the current clean Git checkout |
+| Installed checkout | `/opt/autodocs`; an existing checkout is never overwritten |
+| Runtime configuration | `/etc/autodocs/runtime.env` |
+| Persistent state | `/srv/autodocs` |
+| HTTP / HTTPS ports | 80 / 443 |
+| Database and model | Not started |
+
+A clone elsewhere is copied into `/opt/autodocs` as an independent local clone
+at the selected commit. Subsequent setup should run from `/opt/autodocs`.
+Uncommitted changes are rejected. A selected commit still needs operator review;
+SHA pinning itself is not an approval.
+
+### Unattended HTTP preview
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --http --install-deps
+```
+
+Open `http://VM_EXTERNAL_IP:80/` after allowing TCP 80. This is a preview, not an
+HTTPS deployment. Git and Python 3 must already exist; `--install-deps` installs
+missing Docker/Compose/curl using the supported apt procedure. Conflicting Docker
+packages are reported for manual migration rather than removed automatically.
+
+### Public HTTPS and environment inputs
+
+Replace these values with your hostname and certificate contact:
+
+```bash
+sudo bash deploy/setup-vm.sh --yes --install-deps --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+Alternatively, pass environment defaults explicitly through sudo:
+
+```bash
+sudo env AUTODOCS_DOMAIN=docs.yourdomain.tld AUTODOCS_ACME_EMAIL=operator@yourdomain.tld AUTODOCS_HTTP_ONLY=false bash deploy/setup-vm.sh --yes --install-deps
+```
+
+Without `--yes`, set the HTTP-only prompt to `false` and enter the domain/email.
+Runtime values are validated as data, never executed as shell expressions.
+Caddy handles certificates after DNS and port requirements are met. Successful
+container startup alone does not establish trusted public HTTPS.
+
+### Options, reruns and configuration changes
+
+| Option | Behavior |
+| --- | --- |
+| `--plan` | Preview validated settings without applying setup |
+| `--yes` | Accept selected defaults without interactive prompts |
+| `--http` | Select HTTP preview explicitly |
+| `--domain HOST --email EMAIL` | Select public HTTPS settings |
+| `--install-deps` | Allow supported dependency installation if needed |
+| `--reconfigure` | Explicitly replace runtime configuration and retain a timestamped backup |
+| `--plan --config PATH` | Inspect a saved configuration without deploying it |
+| `--help` | Show all options and prerequisites |
+
+Existing configuration is retained by default. A different release requires a
+reviewed upgrade/configuration decision rather than silently changing the SHA.
+Existing release images are reused. To switch an HTTP preview to HTTPS later:
+
+```bash
+cd /opt/autodocs
+sudo bash deploy/setup-vm.sh --reconfigure --domain docs.yourdomain.tld --email operator@yourdomain.tld
+```
+
+Existing host configuration is root-only; use sudo when inspecting it. Private
+secrets remain outside Git and are not mounted into the website container.
+
+### Verify, recover and enable optional jobs
+
+```bash
+cd /opt/autodocs
+sudo bash deploy/ops.sh status
+sudo systemctl status autodocs.service
+# HTTP preview only:
+curl --fail http://127.0.0.1/healthz
+# Public HTTPS only; replace the hostname:
+curl --fail --head https://docs.yourdomain.tld/
+curl --fail https://docs.yourdomain.tld/search/search_index.json
+```
+
+Check navigation and search in a browser. Perform a planned reboot and repeat
+checks. Retain the prior reviewed release image; for rollback, set `RELEASE_ID`
+back to its full SHA in `/etc/autodocs/runtime.env` and run
+`sudo bash deploy/ops.sh web-up`. This does not roll back a database schema.
+
+The [full VM runbook](docs/deployment/supplied-vm.md) covers prerequisites,
+manual setup, optional private workers/PostgreSQL/Ollama, explicit migrations,
+backup/restore and rollback. Those services are not needed to serve the website.
+The development `compose.yaml` is separate from `deploy/compose.vm.yml`.
+
+Container builds, reader responses, database backup/restore and restart behavior
+passed in disposable tests. Ten setup planning/input/config-retention tests and
+a real repository `--plan` run passed. Actual root-level apt/systemd setup,
+public HTTPS and guest reboot validation remain pending on the supplied VM.
 
 ## Development setup
 
@@ -116,7 +308,7 @@ intend to erase the local database.
 Python 3.12 and `uv` are required.
 
 ```bash
-uv sync --all-groups
+uv sync --all-groups --frozen
 source .venv/bin/activate
 python -m playwright install chromium
 ```
@@ -129,11 +321,18 @@ On Windows PowerShell, activate with:
 
 ## Running the project
 
-The package and version are currently defined in `main.py`.
+The ingestion CLI requires an exact package version and an explicitly confirmed
+source selection. HTTP success alone never counts as version confirmation.
 
 ```bash
-python main.py
+python main.py PACKAGE EXACT_VERSION --source-selection source-selection.json
 ```
+
+Imports without source confirmation remain permitted for historical/test data,
+but their sources are stored as pending rather than falsely attributed to a
+human reviewer. Crawling requires confirmation and stays within the approved
+URL path boundary. Configured crawl limits are enforced; HTTP fetch metadata
+records the actual fetch method and timestamp.
 
 The implemented pipeline now persists package, version, run, source, document,
 and chunk lineage after chunking. To import an existing chunk artifact directly:
@@ -181,6 +380,44 @@ data/cleaned/{package}/{version}/
 ```
 
 Runtime data, environments, logs, and secrets are ignored by Git.
+
+## Exact-release writing pilot (experimental)
+
+The current pilot targets `langchain==1.4.6` at official commit
+`84ba23c414eca6bf6f6ebd1394a3006378113540`. It uses source docstrings/README
+from that immutable release, rather than assuming live docs match the patch.
+See [the reviewed source and outline](docs/pilot-langchain-1.4.6-review.md) and
+[measured pilot results and remaining work](docs/closure-pilot-validation.md).
+
+Prepare/check the release source without importing or executing downloaded code:
+
+```bash
+python -m scripts.prepare_release_snapshot 1.4.6
+```
+
+Run the local model in Docker independently of the database:
+
+```bash
+docker compose -p autodocs-model -f compose.ollama.yaml up -d
+docker exec autodocs-ollama ollama pull qwen3:1.7b
+```
+
+The API binds to localhost, with a separate persistent model cache. The compose
+file uses a pinned available Ollama image and a 4 GB memory cap. If a manually
+started `autodocs-ollama` container already exists, use it directly; do not start
+a second container on the same port/name. `docker stop autodocs-ollama` stops it
+without erasing the model cache.
+
+The generation adapter uses structured outputs, records model digest and prompt
+version, and rejects unknown citations, wrong versions, and unmatched source
+quotations. An exact quotation is not proof that a paraphrase is semantically
+supported: human support review remains required.
+
+`python -m scripts.generate_pilot --help` describes the review-only pilot CLI.
+It requires a recorded source/outline approval artifact and an empty output
+directory. The JSON pilot is separate from the implemented PostgreSQL-backed
+[revision/review/export workflow](docs/persistent-generation.md). Failed or abstained
+pages must not be counted as completed documentation. No draft is final output.
 
 ## Topic catalog workflow (Stage 6 B3)
 
@@ -270,7 +507,7 @@ Run the repository-wide quality baseline from the development container:
 uv run pytest --strict-markers --collect-only -q
 uv run mypy .  ## To ensure correct datatypes are passed across pipeline
 uv run ruff check .  ## To catch basic code quality issues
-uv run ruff --fix .  ## To fix all basic code quality issue
+uv run ruff check --fix .  ## To fix all basic code quality issue
 uv run black --check .  ## To keep the code consistently formatted
 uv run black .  ## Fix all formatting related issues
 uv run pytest -q  ## Run all the test cases
@@ -305,37 +542,96 @@ uv run pytest --strict-markers --collect-only -q  ## Validate test collection
 ## Repository map
 
 ```text
-agents/       generation, validation, and review stages
+agents/       pass-through main-pipeline writing/review adapters
+catalog/      snapshot-bound topic persistence and review
+database/     SQLAlchemy models and PostgreSQL access
 config/       YAML configuration and typed settings
+deploy/       supplied-VM images, Compose, systemd and operator helpers
 discovery/    official documentation source discovery
 docs/         focused architecture and stage documentation
+examples/     pinned offline examples and executable teaching recipes
+generation/   durable standalone writing, editorial revision and export
 indexing/     chunking, embedding, and vector-index stages
 ingestion/    fetching, extraction, normalization, and storage
 models/       Pydantic pipeline contracts
-pipeline/     end-to-end orchestration
+pipeline/     ingestion/indexing orchestration; later adapters unfinished
 planner/      documentation link discovery and crawl planning
-retrieval/    relevant-chunk retrieval
+retrieval/    main adapter placeholder; retrieval evaluation contracts
+scripts/      operator CLIs and documentation reader build/browser checks
 services/     shared domain services
 tests/        automated tests
 utils/        configuration, HTTP, and logging utilities
+website/      reader templates, styling, catalog behavior, publication allowlist
 ```
 
 For system boundaries and design decisions, read
-[`docs/architecture.md`](docs/architecture.md). The authoritative delivery
+[`docs/architecture.md`](docs/architecture.md). The original delivery
 roadmap and approved architecture decisions are in
 [`docs/project-completion-plan.md`](docs/project-completion-plan.md). Chunking
 behavior is specified in [`docs/chunking-stage.md`](docs/chunking-stage.md). The
-approved next phase is detailed in
+historical Stage 4 plan is detailed in
 [`docs/stage-4-postgres-pgvector-plan.md`](docs/stage-4-postgres-pgvector-plan.md).
 The original Stage 4 lineage schema review is in
 [`docs/stage-4-schema-review.md`](docs/stage-4-schema-review.md).
+Current delivery priorities and verified findings are tracked in
+[`docs/closure-tracker.md`](docs/closure-tracker.md).
 
 ## Roadmap
 
-1. Expand retrieval evaluation beyond the initial six prototype queries.
-2. Generate topic-scoped Markdown from retrieved evidence.
-3. Validate citations and unsupported claims.
-4. Add explicit human approval before export.
+1. Review and merge consolidated [PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36) into `main`; keep CI green.
+2. Review the implemented local reader and its browser/publication checks.
+3. Review the prepared [supplied-VM bundle](docs/deployment/supplied-vm.md); deploy
+   the website on the supplied Linux VM with runtime hostname settings.
+4. Verify HTTPS, persistence across reboot, backup/restore and publication rollback.
+5. Publish the live URL and a short interview walkthrough; then expand provider
+   inference tests and API/example coverage.
+
+The local website MVP is implemented for review. The VM deployment definition is also prepared
+and locally smoke-tested. The next task is to **deploy and verify it on the
+supplied Linux VM**, then enable private batch services only if needed. The target is a central Python-package documentation reader;
+coverage currently remains limited to the recorded LangChain/LangGraph ecosystem.
+Use [the closure tracker](docs/closure-tracker.md) for acceptance criteria and
+pending deployment inputs. Existing `compose.yaml` is a development environment,
+not a production worker/server deployment; use `deploy/compose.vm.yml` instead.
+
+## Ecosystem documentation and compatibility
+
+The [ecosystem report](docs/ecosystem/README.md) records source references for
+30 packages across 89 pinned releases: 8,432 modules and 34,452 declarations.
+These include implementation modules and are not a count of verified public APIs.
+
+Tested core versions: LangChain 0.3.30 / 1.2.18 / 1.3.18 / 1.4.6 and LangGraph
+0.6.11 / 1.1.10 / 1.2.15. Compatible pairs pass prompt-chain and graph-based tool,
+checkpoint and streaming contracts. Modern `create_agent` is absent in tested
+LangChain 0.3.30; direct ToolNode invocation needs adaptation on tested newer
+graph versions. LangChain 1.3.18 with LangGraph 1.1.10 cannot resolve.
+
+The full reference lives in ignored local output at
+`data/generated_docs/ecosystem-2026-10-15/README.md`; the sibling ZIP is also local.
+A fresh clone does not contain these artifacts. Rebuild the exact batch with:
+
+```bash
+uv run python -m scripts.ecosystem_docs \
+  --release-plan docs/ecosystem/release-plan.json \
+  --output data/generated_docs/ecosystem-replay
+```
+
+The [release/hash inventory](docs/ecosystem/coverage.json) and
+[reproduction instructions](docs/ecosystem/README.md#reproduce) are tracked.
+Inherited APIs, dynamic exports, re-export resolution, upstream docstring links
+and exhaustive example execution remain gaps. Provider client/schema checks do
+not verify hosted inference. The broad reference has not received the final-page
+approval recorded for the five-page demo.
+
+Current test inventory: **225 collected; 183 offline tests passed**, with 42
+database/model tests deselected in the local offline run. The latest verified
+[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38817222908)
+passed quality/browser/recipe checks, PostgreSQL integration, ecosystem contracts
+and VM container smoke tests. These results do not establish actual VM/public
+HTTPS deployment or exhaustive package coverage.
+
+For current guides, historical stage records and protected approved artifacts,
+use the [documentation index](docs/README.md).
 
 ## License
 

@@ -1,0 +1,83 @@
+{
+  "schema_version": "human-review-v1",
+  "publication_policy": "All outputs remain pending. Deterministic checks do not establish semantic correctness or authorize publication.",
+  "items": [
+    {
+      "id": "MODEL-01",
+      "surface": "internal",
+      "topic": "qwen3:1.7b / create_agent",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/0/draft",
+      "detected_issues": [
+        "Non-abstaining draft has a reason contrary to writer instructions",
+        "Quotation exceeds the writer's 160-character instruction",
+        "citation quotation does not occur in source evidence"
+      ],
+      "required_action": "Review semantic support, task coverage and clarity even if citation matching passed. Record human scores and actual timed editing separately. No automatic publication.",
+      "human_scores": {
+        "factual_accuracy": null,
+        "clarity": null,
+        "editing_seconds": null
+      },
+      "resolution": null
+    },
+    {
+      "id": "MODEL-02",
+      "surface": "internal",
+      "topic": "qwen3:1.7b / AgentMiddleware",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/1/draft",
+      "detected_issues": [
+        "Non-abstaining draft has a reason contrary to writer instructions"
+      ],
+      "required_action": "Review semantic support, task coverage and clarity even if citation matching passed. Record human scores and actual timed editing separately. No automatic publication.",
+      "human_scores": {
+        "factual_accuracy": null,
+        "clarity": null,
+        "editing_seconds": null
+      },
+      "resolution": null
+    },
+    {
+      "id": "MODEL-03",
+      "surface": "internal",
+      "topic": "qwen3:4b / create_agent",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/2/draft",
+      "detected_issues": [
+        "Quotation exceeds the writer's 160-character instruction",
+        "citation quotation does not occur in source evidence"
+      ],
+      "required_action": "Review semantic support, task coverage and clarity even if citation matching passed. Record human scores and actual timed editing separately. No automatic publication.",
+      "human_scores": {
+        "factual_accuracy": null,
+        "clarity": null,
+        "editing_seconds": null
+      },
+      "resolution": null
+    },
+    {
+      "id": "MODEL-04",
+      "surface": "internal",
+      "topic": "qwen3:4b / AgentMiddleware",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/3/draft",
+      "detected_issues": [],
+      "required_action": "Review semantic support, task coverage and clarity even if citation matching passed. Record human scores and actual timed editing separately. No automatic publication.",
+      "human_scores": {
+        "factual_accuracy": null,
+        "clarity": null,
+        "editing_seconds": null
+      },
+      "resolution": null
+    }
+  ]
+}

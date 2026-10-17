@@ -1,0 +1,36 @@
+[
+  {
+    "label": "legacy",
+    "langchain": "0.3.30",
+    "langgraph": "0.6.11",
+    "install_exit": 0,
+    "probe_exit": 0
+  },
+  {
+    "label": "previous",
+    "langchain": "1.2.18",
+    "langgraph": "1.1.10",
+    "install_exit": 0,
+    "probe_exit": 0
+  },
+  {
+    "label": "intermediate",
+    "langchain": "1.3.18",
+    "langgraph": "1.2.15",
+    "install_exit": 0,
+    "probe_exit": 0
+  },
+  {
+    "label": "current",
+    "langchain": "1.4.6",
+    "langgraph": "1.2.15",
+    "install_exit": 0,
+    "probe_exit": 0
+  },
+  {
+    "label": "incompatible",
+    "langchain": "1.3.18",
+    "langgraph": "1.1.10",
+    "install_exit": 1
+  }
+]

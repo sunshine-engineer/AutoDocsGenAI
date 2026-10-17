@@ -1,0 +1,30 @@
+{
+  "source_commit": "84ba23c414eca6bf6f6ebd1394a3006378113540",
+  "tasks": [
+    {
+      "title": "create_agent",
+      "evidence": [
+        {
+          "chunk_id": "582d2157c6137a536427ea4de7da087de745e507f5074f6a693d2c4dd682b358",
+          "package": "langchain",
+          "version": "1.4.6",
+          "source_url": "https://github.com/langchain-ai/langchain/blob/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/langchain/agents/factory.py#L892-L1925",
+          "content": "Creates an agent graph that calls tools in a loop until a stopping condition is met.\n\nmodel: The language model for the agent.\n\ntools: A list of tools, `dict`, or `Callable`.\n\nsystem_prompt: An optional system prompt for the LLM.\n\ncheckpointer: An optional checkpoint saver object.\n\n        Used for persisting the state of the graph (e.g., as chat memory) for a\n        single thread (e.g., a single conversation).\n    store: An optional store object.\n\n        Used for persisting data across multiple threads (e.g., multiple\n        conversations / users).\n\nReturns:\n    A compiled `StateGraph` that can be used for chat interactions.\n\nRaises:\n    AssertionError: If duplicate middleware instances are provided.\n\nThe agent node calls the language model with the messages list (after applying\nthe system prompt). If the resulting [`AIMessage`][langchain.messages.AIMessage]\ncontains `tool_calls`, the graph will then call the tools. The tools node executes\nthe tools and adds the responses to the messages list as\n[`ToolMessage`][langchain.messages.ToolMessage] objects. The agent node then calls\nthe language model again. The process repeats until no more `tool_calls` are present\nin the response. The agent then returns the full list of messages."
+        }
+      ]
+    },
+    {
+      "title": "AgentMiddleware",
+      "evidence": [
+        {
+          "chunk_id": "bf0875f7da31e2ec6927e47cf3197c84c97ce7a935dbf314adfde0e795c23168",
+          "package": "langchain",
+          "version": "1.4.6",
+          "source_url": "https://github.com/langchain-ai/langchain/blob/84ba23c414eca6bf6f6ebd1394a3006378113540/libs/langchain_v1/langchain/agents/middleware/types.py#L385-L823",
+          "content": "Base middleware class for an agent.\n\nbefore_agent\nLogic to run before the agent execution starts.\n\nafter_agent\nLogic to run after the agent execution completes.\n\nbefore_model\nLogic to run before the model is called.\n\nafter_model\nLogic to run after the model is called.\n\nwrap_model_call\nIntercept and control model execution via handler callback.\n\nwrap_tool_call\nIntercept tool execution for retries, monitoring, or modification."
+        }
+      ]
+    }
+  ],
+  "selection": "Focused verbatim source excerpts; method names are labels. Compare only with this input hash."
+}

@@ -115,8 +115,25 @@ def _belongs_to_package_namespace(source_url: str, package: str) -> bool:
     return path == prefix or path.startswith(f"{prefix}/")
 
 
-def eligible_chunk_ids(chunks: list[Chunk], package: str) -> set[str]:
+def eligible_chunk_ids(
+    chunks: list[Chunk],
+    package: str,
+    namespace_allow_list: tuple[str, ...] | None = None,
+) -> set[str]:
     normalized_package = normalize_package_name(package)
+    if namespace_allow_list and all(
+        root.startswith("https://") for root in namespace_allow_list
+    ):
+        from discovery.source_selection import source_contains
+
+        return {
+            chunk.id
+            for chunk in chunks
+            if normalize_package_name(chunk.package) == normalized_package
+            and any(
+                source_contains(root, chunk.source_url) for root in namespace_allow_list
+            )
+        }
     return {
         chunk.id
         for chunk in chunks

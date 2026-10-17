@@ -25,3 +25,13 @@ data/embeddings/
 data/vectorstore/
 data/generated_docs/
 data/catalogs/
+data/source_snapshots/
+data/pilot_runs/
+
+# Local documentation website build
+.site-work/
+
+# Disposable deployment validation state / secrets
+.deploy-test/
+deploy/.env*
+deploy/runtime.env

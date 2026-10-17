@@ -1,0 +1,49 @@
+{
+  "approval_source": "Explicit user chat reply: Approve all five final pages as Sunny",
+  "catalog_id": "0d34e66c-4bdd-40ef-a340-4b84c98927f5",
+  "review_manifest_sha256": "cf4354c343e982b24adda2c1969f94b29b30d077d32ed4662ee1df1d6f0fadaf",
+  "reviews": [
+    {
+      "page_id": "489e44c6-999d-47d0-ac13-099844b57217",
+      "content_hash": "b9fc12883868b362f9c9657961c9c4dcf8eabb33f6c6edf06a995f0abbe77a0a",
+      "review_id": "a57f1307-e6fa-4596-a0b7-5e265c5365f0",
+      "reviewer": "Sunny",
+      "decision": "approved",
+      "reviewed_at": "2026-10-15T18:15:48.578010+00:00"
+    },
+    {
+      "page_id": "19c2f780-69bb-4016-a1d4-96e51bae49b9",
+      "content_hash": "442d01780e93486cad730266c97b69ffddb73164054def5653c7163791590370",
+      "review_id": "33ded2b2-94a4-4a5a-a940-71a47b7a7c4c",
+      "reviewer": "Sunny",
+      "decision": "approved",
+      "reviewed_at": "2026-10-15T18:15:48.591526+00:00"
+    },
+    {
+      "page_id": "0f5721b8-acb9-452c-ab70-0dc17540cfca",
+      "content_hash": "d969cf0c9e463854f274c2a6a3639b98dec3b1cf59efabda9c0d8aea81e26924",
+      "review_id": "52bd2982-f490-4a02-b181-bdeafb487459",
+      "reviewer": "Sunny",
+      "decision": "approved",
+      "reviewed_at": "2026-10-15T18:15:48.598480+00:00"
+    },
+    {
+      "page_id": "a80db3b2-6be0-4c3c-ac42-68211d8e1a30",
+      "content_hash": "64b3f9795eb77dbe6e3fa8ed6d237c592507e87833a81222bf068c19b0593cf4",
+      "review_id": "0c187a2b-1706-46b0-b746-1d3620c3b193",
+      "reviewer": "Sunny",
+      "decision": "approved",
+      "reviewed_at": "2026-10-15T18:15:48.605118+00:00"
+    },
+    {
+      "page_id": "94489b95-b281-43d7-9bae-ff3a68909f00",
+      "content_hash": "694f4fb7256c8252badbbba2fb5a1df952c7e35b70bd2a417057015003ddf37e",
+      "review_id": "a9291187-d325-46d0-8bc6-ddae8d006680",
+      "reviewer": "Sunny",
+      "decision": "approved",
+      "reviewed_at": "2026-10-15T18:15:48.611885+00:00"
+    }
+  ],
+  "export_path": "docs/generated/langchain/1.4.6",
+  "export_manifest_sha256": "f70cdc1b05f02338420cfacf7eefda1845038a1edb594a7fe9e57e2d90e6e14e"
+}

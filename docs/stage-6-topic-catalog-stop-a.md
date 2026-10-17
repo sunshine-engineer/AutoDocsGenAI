@@ -1,5 +1,8 @@
 # Stage 6 Stop A: topic catalog foundation
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 Status: implementation review stop; generation remains out of scope.
 
 ## Scope

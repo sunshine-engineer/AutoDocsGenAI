@@ -1,0 +1,14 @@
+# Standalone local model service; does not start or migrate PostgreSQL.
+services:
+  ollama:
+    image: ollama/ollama:0.11.11
+    container_name: autodocs-ollama
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    cpus: 4
+    mem_limit: 4g
+volumes:
+  ollama_models:
+    name: autodocs_ollama_models

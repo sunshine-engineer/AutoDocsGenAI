@@ -21,6 +21,7 @@ from database.models import (
     SourceDocumentRecord,
     SourceRecord,
 )
+from discovery.source_selection import confirmed_source_metadata
 from models.chunk import Chunk
 from models.clean_document import CleanDocument
 from models.state import PipelineState
@@ -114,6 +115,12 @@ def persist_pipeline_state(
 
     if not state.cleaned_documents or not state.chunks:
         raise ValueError("persistence requires cleaned documents and chunks")
+    if state.source_selection is not None:
+        state.source_selection.require_confirmed(state.package, state.version)
+        for document in state.cleaned_documents:
+            confirmed_source_metadata(state.source_selection, document.url)
+        for chunk in state.chunks:
+            confirmed_source_metadata(state.source_selection, chunk.source_url)
 
     owned_engine = engine is None
     database_engine = engine or create_database_engine()
@@ -204,14 +211,26 @@ def _persist(session: Session, state: PipelineState) -> ImportResult:
                 source_type="documentation",
                 url=document.url,
                 canonical_url=canonical_url,
-                confirmation_status="verified",
-                confirmed_by="pipeline",
-                confirmed_at=now,
+                confirmation_status="verified" if state.source_selection else "pending",
+                confirmed_by=(
+                    state.source_selection.confirmed_by
+                    if state.source_selection
+                    else None
+                ),
+                confirmed_at=(
+                    state.source_selection.confirmed_at
+                    if state.source_selection
+                    else None
+                ),
             )
             session.add(source)
             session.flush()
             result.sources_inserted += 1
         else:
+            if state.source_selection is not None:
+                source.confirmation_status = "verified"
+                source.confirmed_by = state.source_selection.confirmed_by
+                source.confirmed_at = state.source_selection.confirmed_at
             result.sources_reused += 1
 
         normalized_hash = _sha256(document.markdown)
@@ -237,6 +256,9 @@ def _persist(session: Session, state: PipelineState) -> ImportResult:
             raw_document = raw_by_url.get(document.url)
             raw_content = raw_document.html if raw_document else document.markdown
             metadata = dict(document.metadata)
+            metadata.update(
+                confirmed_source_metadata(state.source_selection, document.url)
+            )
             if raw_document:
                 metadata.update(raw_document.metadata)
             else:

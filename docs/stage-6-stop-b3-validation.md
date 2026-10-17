@@ -1,5 +1,8 @@
 # Stage 6 B3: catalog workflow validation
 
+> Historical stage/validation record. Status statements and test counts below describe that batch. For current implementation and deployment guidance, use the [documentation index](README.md) and [closure tracker](closure-tracker.md).
+
+
 Status: implemented and validated locally for human review, 2026-10-15.
 This batch completes the code path for tasks #23–#26 on the existing demo branch.
 It does not authorize B4, approve a real outline, or implement page generation.

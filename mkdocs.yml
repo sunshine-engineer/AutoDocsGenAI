@@ -1,0 +1,47 @@
+site_name: AutoDocs · Python reference
+site_description: Versioned Python documentation with visible provenance and compatibility evidence.
+docs_dir: .site-work/docs
+site_dir: .site-work/site
+use_directory_urls: true
+theme:
+  name: readthedocs
+  custom_dir: website/overrides
+  highlightjs: false
+  navigation_depth: 4
+  collapse_navigation: false
+plugins:
+  - search
+markdown_extensions:
+  - admonition
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true
+extra_css:
+  - assets/reader.css
+extra_javascript:
+  - assets/catalog.js
+nav:
+  - Start here: index.md
+  - Package & version catalog: packages/index.md
+  - LangChain:
+      - Overview: packages/langchain/index.md
+      - '1.4.6 · Approved pages':
+          - Version overview: packages/langchain/1.4.6/README.md
+          - Installation: packages/langchain/1.4.6/guides/installation.md
+          - Agents module: packages/langchain/1.4.6/modules/agents/README.md
+          - create_agent: packages/langchain/1.4.6/modules/agents/functions/create-agent.md
+          - AgentMiddleware: packages/langchain/1.4.6/modules/agents/classes/agent-middleware.md
+          - Agent architecture: packages/langchain/1.4.6/concepts/agent-architecture.md
+  - LangGraph: packages/langgraph/index.md
+  - Learning · review pending: learning.md
+  - Compatibility: compatibility.md
+  - Sources & review policy: provenance.md
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    anchors: warn
+    unrecognized_links: warn

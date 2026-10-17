@@ -1,0 +1,98 @@
+{
+  "schema_version": "human-review-v1",
+  "publication_policy": "Pending/reviewed queue items never authorize publication; use explicit final revision approval.",
+  "items": [
+    {
+      "id": "MODEL-01",
+      "surface": "internal",
+      "topic": "qwen3:1.7b / create_agent",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/0/draft",
+      "issue": "Claims are supported, but combined quotations change whitespace and the return-type requirement is omitted. Inputs are listed rather than explained; conversation thread terminology needs clarification.",
+      "required_action": "Check each claim and quotation against pinned source, edit an attributed revision, and record timed human review. No automatic publication.",
+      "resolution": null
+    },
+    {
+      "id": "MODEL-02",
+      "surface": "internal",
+      "topic": "qwen3:1.7b / AgentMiddleware",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/1/draft",
+      "issue": "Individual statements match source, but before/after headings describe only before hooks. Method identifiers, after hooks, tool wrapping and useful explanation are missing. Non-abstaining reason also violates the prompt instruction.",
+      "required_action": "Check each claim and quotation against pinned source, edit an attributed revision, and record timed human review. No automatic publication.",
+      "resolution": null
+    },
+    {
+      "id": "MODEL-03",
+      "surface": "internal",
+      "topic": "qwen3:4b / create_agent",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/2/draft",
+      "issue": "Conversation meaning is clearer. Tools phrasing suggests a dictionary/callable can be passed directly, while the full pinned signature expects a sequence. Quotations change whitespace and exceed the requested length; return type remains vague. Focused evidence omits the full signature, so source selection must improve too.",
+      "required_action": "Check each claim and quotation against pinned source, edit an attributed revision, and record timed human review. No automatic publication.",
+      "resolution": null
+    },
+    {
+      "id": "MODEL-04",
+      "surface": "internal",
+      "topic": "qwen3:4b / AgentMiddleware",
+      "status": "pending",
+      "artifact": "docs/quality/comparison-run-02.json",
+      "artifact_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+      "pointer": "/runs/3/draft",
+      "issue": "Before/after pairs are clearer, but several quotations support only the before half of a claim. The subclassing claim cites only the base-class label and tool wrapping is omitted. Exact quote presence is not full semantic support.",
+      "required_action": "Check each claim and quotation against pinned source, edit an attributed revision, and record timed human review. No automatic publication.",
+      "resolution": null
+    },
+    {
+      "id": "LEARN-01",
+      "surface": "reader",
+      "topic": "Call an agent",
+      "status": "pending",
+      "artifact": "docs/learning/langchain-1.4.6/01_minimal_agent.md",
+      "artifact_sha256": "e32787a71e76ee047f5f2876ce3f29ca36240ea194535a843bb8c1dd60f22d4a",
+      "issue": "Example executed; teaching explanation needs final Sunny review.",
+      "required_action": "Review explanation, source mapping and expected output; request changes or approve a new publication revision explicitly.",
+      "resolution": null
+    },
+    {
+      "id": "LEARN-02",
+      "surface": "reader",
+      "topic": "Observe model middleware",
+      "status": "pending",
+      "artifact": "docs/learning/langchain-1.4.6/02_middleware.md",
+      "artifact_sha256": "147d60a730190a79cf7cea8374166f39d8caee954544b8865beeb38170fe994a",
+      "issue": "Example executed; teaching explanation needs final Sunny review.",
+      "required_action": "Review explanation, source mapping and expected output; request changes or approve a new publication revision explicitly.",
+      "resolution": null
+    },
+    {
+      "id": "LEARN-03",
+      "surface": "reader",
+      "topic": "Retain a conversation",
+      "status": "pending",
+      "artifact": "docs/learning/langchain-1.4.6/03_conversation_state.md",
+      "artifact_sha256": "6f99411f092d4cd5611be0b459deee33cee045d8b30969011bc23a8110ec65bf",
+      "issue": "Example executed; teaching explanation needs final Sunny review.",
+      "required_action": "Review explanation, source mapping and expected output; request changes or approve a new publication revision explicitly.",
+      "resolution": null
+    },
+    {
+      "id": "LEARN-04",
+      "surface": "reader",
+      "topic": "Execute a local tool",
+      "status": "pending",
+      "artifact": "docs/learning/langchain-1.4.6/04_tool_call.md",
+      "artifact_sha256": "cf12ee272370a4bbc7d5d29f1182e337d16a05a22436080bb7cf7d27d9245502",
+      "issue": "Local execution and invalid-argument rejection verified; explanation needs final Sunny review.",
+      "required_action": "Review fixture limitations, tool-result assertions and failure guidance; request changes or explicitly approve a new publication revision.",
+      "resolution": null
+    }
+  ]
+}

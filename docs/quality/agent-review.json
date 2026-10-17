@@ -1,0 +1,42 @@
+{
+  "reviewer": "Codex",
+  "review_kind": "agent assessment; not blind, not human approval",
+  "reviewed_at": "2026-10-15T22:01:44.199233+00:00",
+  "raw_run_sha256": "8d0d6256871628b4b6f677b1f982267db4e53269b7d0ab34b36c3e517e0b17b9",
+  "rubric": "docs/quality/README.md",
+  "limitations": "Two tasks, one attempt each. Subjective agent scores are exploratory. Human scores and actual editing time remain unmeasured.",
+  "reviews": [
+    {
+      "model": "qwen3:1.7b",
+      "title": "create_agent",
+      "factual_accuracy_0_to_4": 4,
+      "clarity_0_to_4": 2,
+      "editing_seconds": null,
+      "notes": "Claims are supported, but combined quotations change whitespace and the return-type requirement is omitted. Inputs are listed rather than explained; conversation thread terminology needs clarification."
+    },
+    {
+      "model": "qwen3:1.7b",
+      "title": "AgentMiddleware",
+      "factual_accuracy_0_to_4": 4,
+      "clarity_0_to_4": 2,
+      "editing_seconds": null,
+      "notes": "Individual statements match source, but before/after headings describe only before hooks. Method identifiers, after hooks, tool wrapping and useful explanation are missing. Non-abstaining reason also violates the prompt instruction."
+    },
+    {
+      "model": "qwen3:4b",
+      "title": "create_agent",
+      "factual_accuracy_0_to_4": 2,
+      "clarity_0_to_4": 3,
+      "editing_seconds": null,
+      "notes": "Conversation meaning is clearer. Tools phrasing suggests a dictionary/callable can be passed directly, while the full pinned signature expects a sequence. Quotations change whitespace and exceed the requested length; return type remains vague. Focused evidence omits the full signature, so source selection must improve too."
+    },
+    {
+      "model": "qwen3:4b",
+      "title": "AgentMiddleware",
+      "factual_accuracy_0_to_4": 3,
+      "clarity_0_to_4": 3,
+      "editing_seconds": null,
+      "notes": "Before/after pairs are clearer, but several quotations support only the before half of a claim. The subclassing claim cites only the base-class label and tool wrapping is omitted. Exact quote presence is not full semantic support."
+    }
+  ]
+}

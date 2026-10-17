@@ -417,3 +417,135 @@ class TopicEvidenceRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
     )
+
+
+class GenerationJobRecord(TimestampMixin, Base):
+    __tablename__ = "generation_jobs"
+    __table_args__ = (
+        UniqueConstraint(
+            "topic_id", "identity_hash", name="uq_generation_jobs_topic_identity"
+        ),
+        CheckConstraint(
+            "status IN ('pending', 'running', 'completed', 'failed')",
+            name="valid_status",
+        ),
+        CheckConstraint(
+            "attempts >= 0 AND max_attempts BETWEEN 1 AND 5 AND attempts <= max_attempts",
+            name="bounded_attempts",
+        ),
+        CheckConstraint("identity_hash ~ '^[0-9a-f]{64}$'", name="valid_identity_hash"),
+        CheckConstraint(
+            "(status = 'running' AND lease_token IS NOT NULL AND lease_expires_at IS NOT NULL) OR (status <> 'running' AND lease_token IS NULL AND lease_expires_at IS NULL)",
+            name="valid_lease",
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    topic_id: Mapped[UUID] = mapped_column(ForeignKey("topics.id", ondelete="RESTRICT"))
+    identity_hash: Mapped[str] = mapped_column(Text)
+    input_snapshot: Mapped[dict[str, object]] = mapped_column(JSONB)
+    status: Mapped[str] = mapped_column(Text, server_default=text("'pending'"))
+    attempts: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    max_attempts: Mapped[int] = mapped_column(Integer, server_default=text("2"))
+    lease_token: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    error_summary: Mapped[str | None] = mapped_column(Text)
+
+
+class GeneratedPageRecord(Base):
+    __tablename__ = "generated_pages"
+    __table_args__ = (
+        UniqueConstraint("job_id", "revision", name="uq_generated_pages_job_revision"),
+        CheckConstraint("revision >= 1", name="positive_revision"),
+        CheckConstraint("content_hash ~ '^[0-9a-f]{64}$'", name="valid_content_hash"),
+    )
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    job_id: Mapped[UUID] = mapped_column(
+        ForeignKey("generation_jobs.id", ondelete="RESTRICT")
+    )
+    revision: Mapped[int] = mapped_column(Integer)
+    content_hash: Mapped[str] = mapped_column(Text)
+    payload: Mapped[dict[str, object]] = mapped_column(JSONB)
+    model_metadata: Mapped[dict[str, object]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )
+
+
+class PageCitationRecord(Base):
+    __tablename__ = "page_citations"
+    __table_args__ = (
+        UniqueConstraint(
+            "page_id", "locator", "chunk_id", name="uq_page_citations_locator_chunk"
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    page_id: Mapped[UUID] = mapped_column(
+        ForeignKey("generated_pages.id", ondelete="RESTRICT")
+    )
+    chunk_id: Mapped[str] = mapped_column(ForeignKey("chunks.id", ondelete="RESTRICT"))
+    locator: Mapped[str] = mapped_column(Text)
+    quote: Mapped[str] = mapped_column(Text)
+
+
+class PageValidationRecord(Base):
+    __tablename__ = "validation_results"
+    __table_args__ = (
+        UniqueConstraint(
+            "page_id", "validator_version", name="uq_validation_results_page_version"
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    page_id: Mapped[UUID] = mapped_column(
+        ForeignKey("generated_pages.id", ondelete="RESTRICT")
+    )
+    validator_version: Mapped[str] = mapped_column(Text)
+    passed: Mapped[bool] = mapped_column(Boolean)
+    issues: Mapped[list[str]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )
+
+
+class PageReviewRecord(Base):
+    __tablename__ = "review_decisions"
+    __table_args__ = (
+        UniqueConstraint("page_id", name="uq_review_decisions_page"),
+        CheckConstraint("decision IN ('approved', 'rejected')", name="valid_decision"),
+        CheckConstraint(
+            "length(trim(reviewer)) BETWEEN 1 AND 200", name="valid_reviewer"
+        ),
+        CheckConstraint(
+            "decision <> 'rejected' OR (feedback IS NOT NULL AND length(trim(feedback)) > 0)",
+            name="rejection_feedback",
+        ),
+    )
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
+    page_id: Mapped[UUID] = mapped_column(
+        ForeignKey("generated_pages.id", ondelete="RESTRICT")
+    )
+    decision: Mapped[str] = mapped_column(Text)
+    reviewer: Mapped[str] = mapped_column(Text)
+    feedback: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )

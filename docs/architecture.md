@@ -1,71 +1,79 @@
 # Architecture and project boundaries
 
-## Purpose
+Updated: 2026-10-16 (Asia/Calcutta). This describes the current implementation;
+[the original completion plan](project-completion-plan.md) retains earlier decisions.
 
-AutoDocsGenAI turns official package documentation into structured,
-source-grounded learning material. Reliability and traceability take priority
-over conversational behavior or broad web search.
+## Outline
 
-## Rules
+1. Product purpose and approval rules.
+2. Implemented components and workflow boundaries.
+3. Data lifecycle and website serving.
+4. Current limitations and next work.
 
-1. Use official documentation, API references, release notes, examples, and
-   official repositories as sources.
-2. Do not make claims that retrieved evidence does not support.
-3. Preserve package, version, URL, page title, heading path, and chunk identity.
-4. Generate one topic or section at a time.
-5. Require human approval before final export.
+## Purpose and rules
+
+AutoDocsGenAI is an independent portfolio project for source-grounded package
+documentation. Use official sources, preserve exact package/version/provenance,
+reject unsupported claims, and require explicit final-page approval before export.
+Citation matching checks integrity; it does not prove semantic claim support.
 
 ## Component boundaries
 
-| Component | Responsibility | Current state |
-| --- | --- | --- |
-| `discovery/` | Find and validate official sources | MVP implemented |
-| `planner/` | Select documentation URLs to ingest | MVP implemented |
-| `ingestion/` | Fetch HTML, extract content, normalize and save Markdown | MVP implemented |
-| `indexing/` | Chunk, embed, and persist searchable content | Chunking MVP implemented |
-| `retrieval/` | Return relevant evidence with metadata | Placeholder |
-| `agents/` | Write, validate, and review grounded output | Placeholder |
-| `pipeline/` | Coordinate state transitions | Scaffolded |
+| Component | Responsibility and current state |
+| --- | --- |
+| `discovery/`, `planner/` | PyPI/source discovery, explicit source confirmation and crawl planning MVP |
+| `ingestion/` | HTTP ingestion currently selected; Playwright fetcher also available; extraction and Markdown normalization |
+| `indexing/`, `database/`, `services/chunk_importer.py` | Deterministic chunks, PostgreSQL lineage, FastEmbed CPU embeddings and pgvector indexing |
+| `scripts/search_chunks.py`, `scripts/evaluate_retrieval.py` | Standalone filtered retrieval and evaluation; the main retrieval adapter is still a pass-through |
+| `catalog/`, catalog scripts | Snapshot-bound topic proposals, persistence, artifacts, reconciliation and explicit catalog review |
+| `generation/`, `scripts/generation.py` | Standalone bounded Ollama jobs, immutable revisions, exact citations, editorial corrections, human page review and export |
+| `pipeline/workflow.py`, `agents/`, `retrieval/retriever.py` | Main ingestion/indexing orchestration; retrieval/writing/validation/page-review adapters still return the state unchanged |
+| `scripts/ecosystem_docs.py` | Hash-verified wheel source extraction for a bounded ecosystem; not exhaustive runtime API verification |
+| Learning and model-quality scripts | Four executed teaching recipes; model comparison and automatic pending-review handoffs |
+| `scripts/build_docs_site.py`, `website/` | Approval-checked static reader with search, package/version inventory and safe review placeholders |
+| `deploy/` | Container-tested website and optional private batch deployment, first-run setup and systemd/operations helpers; actual VM deployment pending |
 
-The pipeline communicates through Pydantic models in `models/`. Runtime behavior
-is configured in `config/config.yaml`; secrets belong in the ignored `.env`
-file.
+`main.py` accepts a package, exact version and confirmed source-selection file.
+It runs through persisted chunks and vector indexing, then reports that generation
+and export have not run. Operator commands bridge the later stages; this is not
+an unattended integrated documentation service.
 
 ## Data lifecycle
 
 ```text
-DocumentationManifest
-    -> CrawlPlan
-    -> RawDocument[]
-    -> CleanDocument[]
-    -> Chunk[]
-    -> embeddings/vector index
-    -> RetrievalResult[]
-    -> GeneratedSection[]
-    -> ValidationReport[]
-    -> approved Markdown
+confirmed package/source -> crawl -> fetch/clean -> chunks -> PostgreSQL + vectors
+
+operator retrieval/catalog review -> frozen evidence + model digest
+  -> bounded draft job -> citation checks -> attributed corrections
+  -> human final-page approval -> export + manifest -> reader image
+
+readers -> static website
+operators -> optional private PostgreSQL / worker / Docker Ollama
 ```
 
-Intermediate artifacts are written below `data/` and are intentionally ignored
-by Git. Reprocessing should become deterministic and idempotent: the same source
-content and configuration should produce the same chunk identities.
+Runtime artifacts under `data/` are mostly ignored. Five approved LangChain
+articles and their export/approval records are tracked under `docs/generated/`.
+`website/publication.json` pins exact approved inputs; builders never rewrite them.
+Four new learning drafts remain outside that selection, with execution evidence
+and human-review placeholders. A queue resolution never authorizes publication.
 
-## Current limitations
+The website needs neither a running database nor a model. VM configuration and
+secrets live outside Git under `/etc/autodocs`; persistent state is `/srv/autodocs`.
+The website-only setup is separate from the development Compose environment.
 
-- The package and version are still hard-coded in `main.py`.
-- Discovery relies on PyPI metadata and simple URL validation.
-- Playwright is always selected by the current ingestion orchestrator.
-- Framework-specific extractors are mostly placeholders; generic extraction is
-  the working fallback.
-- Embeddings, vector indexing, retrieval, generation, and validation are not
-  implemented yet.
-- There is no command-line interface or human-approval interface yet.
+## Current limitations and next work
 
-## Near-term technical decisions
+- Broad extraction supports portable pure-Python wheels and static declarations;
+  inherited APIs, dynamic exports, compiled APIs and resolved re-exports remain gaps.
+- Standard-library packages require a Python-version source adapter; arbitrary
+  pandas/NumPy documentation is not implemented by the current LangChain pilot.
+- Four learning recipes use fixed model responses. Local tool code actually runs,
+  but provider inference and model-selected tools are not verified by those recipes.
+- Two-model comparison results are exploratory; human scores and timed editing
+  remain pending. Exact quotations alone cannot approve a draft.
+- Main pipeline adapters, broader retrieval evaluation and public VM validation
+  remain unfinished. The durable job/lease mechanism is not native LangGraph checkpointing.
 
-- Evaluate heading-aware chunks before adding embeddings.
-- Persist chunks as inspectable JSONL before storing vectors.
-- Keep local-first infrastructure and free-tier tooling where practical.
-- Add evaluation fixtures before tuning chunk sizes or retrieval parameters.
-- Introduce Ollama and ChromaDB only when their stages are implemented; do not
-  add infrastructure merely because it appears in the long-term design.
+See [current findings](closure-tracker.md), [generation operation](persistent-generation.md),
+[reader guide](local-docs-reader.md), [VM runbook](deployment/supplied-vm.md) and
+[documentation index](README.md) for the corresponding evidence and commands.

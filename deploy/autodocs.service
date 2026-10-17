@@ -1,0 +1,19 @@
+[Unit]
+Description=AutoDocs static documentation reader
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+RequiresMountsFor=/srv/autodocs
+ConditionPathExists=/etc/autodocs/runtime.env
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/autodocs
+ExecStart=/usr/bin/docker compose --env-file /etc/autodocs/runtime.env -f deploy/compose.vm.yml up -d --no-build --wait web
+ExecStop=/usr/bin/docker compose --env-file /etc/autodocs/runtime.env -f deploy/compose.vm.yml stop web
+TimeoutStartSec=180
+TimeoutStopSec=120
+
+[Install]
+WantedBy=multi-user.target
