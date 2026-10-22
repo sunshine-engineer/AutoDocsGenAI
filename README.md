@@ -10,6 +10,7 @@ engineering. It is a documentation pipeline, not a general-purpose chatbot.
 
 ## Start here
 
+- [Handover checklist](docs/handover.md): release identity, ownership, runbooks, evidence and pending acceptance.
 - [Prepare the supplied VM deployment](docs/deployment/supplied-vm.md): website image, optional private worker, environment configuration and recovery runbook.
 - [Run the local documentation website](docs/local-docs-reader.md): navigation, search, catalog and review labels.
 - [Approved LangChain 1.4.6 documentation](docs/generated/langchain/1.4.6/README.md): five reviewed pages.
@@ -28,11 +29,15 @@ drafts, source provenance, approval-gated export, an executed offline API exampl
 and approved-state recovery. This is independent portfolio work; it does not
 establish commercial production use or unattended generation quality.
 
-PRs #30–#35 were merged, but their stacked targets left later changes outside
-`main`. [Integration PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36)
-consolidates the implementation into `main`; all four CI checks passed at this
-assessment. Release integration remains pending until that PR is merged.
-Actual VM deployment remains separate from interview readiness.
+Last documentation review: **2026-10-22 (Asia/Calcutta)**.
+[Integration PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36)
+merged on 2026-10-17. The reviewed implementation is on `main` at
+`bf0aa5418a0d69a0dd097c2df1aad9f4a14f582e`; all four
+[main CI jobs](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/39034463000)
+passed. Actual VM status remains unverified by this review.
+
+Start a transfer with the [handover checklist](docs/handover.md). It separates
+repository/documentation readiness from pending owner, access and VM acceptance.
 
 See the [interview runbook](docs/interview-demo.md) for the demonstration scope
 and prioritized documentation-quality improvements.
@@ -57,7 +62,7 @@ Standalone commands provide retrieval and the Stage 6 catalog review workflow:
 | Ecosystem source references | Generated for bounded scope | 30 packages / 89 releases / 8,432 modules; static declarations and upstream docstrings |
 | Cross-version checks | Executed; CI passing | Four compatible core pairs, one rejected dependency pair, six offline integration checks |
 | Reader website | Local MVP implemented for review | Five approved articles, searchable reader, package/version catalog, provenance and compatibility |
-| VM deployment bundle | Prepared and container-tested | Static Caddy image, private opt-in pipeline, mounted secrets, systemd and recovery runbook; supplied VM not deployed yet |
+| VM deployment bundle | Prepared and container-tested | Static Caddy image, private opt-in pipeline, mounted secrets, systemd and recovery runbook; supplied VM deployment unverified |
 
 The pipeline adapters for retrieval, generation, validation, and final page
 review still return the state unchanged. Standalone search and catalog commands
@@ -108,7 +113,7 @@ verification, and build-only commands. Static output: `.site-work/site/`.
 
 ### Deployment outline
 
-1. Merge the reviewed integration PR and clone the reviewed release on your VM.
+1. Clone `main` and check out the reviewed release commit on your VM.
 2. Preview the setup, then choose HTTP preview or public HTTPS.
 3. Apply setup and verify website health, navigation, search and reboot recovery.
 4. Retain release images and configuration backups for rollback.
@@ -126,12 +131,13 @@ filesystem before setup. Public HTTPS also requires a DNS hostname pointing to
 the VM and reachable TCP 80/443; configure DNS, SSH access and cloud/host firewall
 rules separately.
 
-After the reviewed changes have reached `main`:
+The reviewed implementation is merged into `main`. Clone it, then select the release:
 
 ```bash
 git clone https://github.com/sunshine-engineer/AutoDocsGenAI.git
 cd AutoDocsGenAI
-# Check out your reviewed release commit before applying setup.
+git checkout --detach bf0aa5418a0d69a0dd097c2df1aad9f4a14f582e
+# This pins the audited implementation; select a later reviewed SHA for future releases.
 bash deploy/setup-vm.sh --plan
 sudo bash deploy/setup-vm.sh
 ```
@@ -578,7 +584,7 @@ Current delivery priorities and verified findings are tracked in
 
 ## Roadmap
 
-1. Review and merge consolidated [PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36) into `main`; keep CI green.
+1. Complete the [handover checklist](docs/handover.md); integration PR #36 is merged and `main` CI is green.
 2. Review the implemented local reader and its browser/publication checks.
 3. Review the prepared [supplied-VM bundle](docs/deployment/supplied-vm.md); deploy
    the website on the supplied Linux VM with runtime hostname settings.
@@ -625,7 +631,7 @@ approval recorded for the five-page demo.
 
 Current test inventory: **225 collected; 183 offline tests passed**, with 42
 database/model tests deselected in the local offline run. The latest verified
-[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38817222908)
+[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/39034463000)
 passed quality/browser/recipe checks, PostgreSQL integration, ecosystem contracts
 and VM container smoke tests. These results do not establish actual VM/public
 HTTPS deployment or exhaustive package coverage.

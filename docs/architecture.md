@@ -1,6 +1,6 @@
 # Architecture and project boundaries
 
-Updated: 2026-10-16 (Asia/Calcutta). This describes the current implementation;
+Reviewed against main `bf0aa54`: 2026-10-22 (Asia/Calcutta). This describes the current implementation;
 [the original completion plan](project-completion-plan.md) retains earlier decisions.
 
 ## Outline
