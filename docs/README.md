@@ -1,6 +1,6 @@
 # Documentation index
 
-Updated: 2026-10-16 (Asia/Calcutta).
+Updated: 2026-10-22 (Asia/Calcutta).
 
 ## Outline
 
@@ -13,6 +13,7 @@ Updated: 2026-10-16 (Asia/Calcutta).
 
 | Need | Read |
 | --- | --- |
+| Ownership, release identity, acceptance and troubleshooting | [Handover checklist](handover.md) |
 | Overview, current scope and complete VM quick start | [Project README](../README.md) |
 | Implemented components and unfinished adapters | [Architecture](architecture.md) |
 | Closure priorities, findings and deployment gaps | [Closure tracker](closure-tracker.md) |
@@ -28,8 +29,8 @@ Updated: 2026-10-16 (Asia/Calcutta).
 The current recorded inventory is 225 collected tests and 183 passing offline
 tests; 42 database/model tests were excluded from the local offline run. CI also
 checks PostgreSQL integration, ecosystem contracts, browser behavior and VM
-containers. These checks do not prove actual public VM deployment. No supplied
-VM has been deployed by this work.
+containers. These checks do not prove actual public VM deployment. This review has not connected to the supplied VM; no VM acceptance record is
+checked in. PR #36 is merged and main CI passed; operational handover remains pending.
 
 ## Approved content and human review
 

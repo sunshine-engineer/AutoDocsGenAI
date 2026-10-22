@@ -1,14 +1,14 @@
 # Closure tracker and deployment priorities
 
-Updated: 2026-10-16 (Asia/Calcutta). This is the current findings register and next-work checklist. Update task status and evidence here as work lands; do not treat this plan as deployment evidence.
+Updated: 2026-10-22 (Asia/Calcutta). This is the current findings register and next-work checklist. Update task status and evidence here as work lands; do not treat this plan as deployment evidence.
 
 ## Interview readiness
 
 The bounded five-page LangChain 1.4.6 local portfolio demo is **interview-ready**
 on its recorded approval, export, API execution, recovery and CI evidence.
 See [the interview runbook](interview-demo.md) for presentation boundaries and
-prioritized documentation improvements. This does not mark C01 or VM deployment
-complete: integration PR #36 is still open at assessment, with four green checks.
+prioritized documentation improvements. Integration C01 is complete: PR #36 merged on 2026-10-17 and all four main CI
+jobs passed. VM operational acceptance remains pending evidence.
 A local rehearsal is required before presenting on an interview machine.
 
 ## Documentation quality increment
@@ -45,7 +45,7 @@ Sunny requested the GCP VM and central documentation website direction on 2026-1
 
 Current inventory is **225 tests collected; 183 offline tests passed**, with 42
 database/model tests deselected locally. The latest verified
-[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/38817222908)
+[CI run](https://github.com/sunshine-engineer/AutoDocsGenAI/actions/runs/39034463000)
 passed quality/browser/recipe checks, PostgreSQL integration, ecosystem contracts
 and VM container smoke tests. Setup has ten isolated shell planning/input/config
 retention tests; its real root-level apt/systemd path remains untested on a VM.
@@ -58,7 +58,7 @@ All tasks below are pending unless marked otherwise. Favor these milestones over
 
 | Task | Priority | Deliverable | Completion evidence |
 | --- | --- | --- | --- |
-| C01 | P0 | Integrate `ci/project-closure-integration` into `main` through one reviewed PR. PRs #30–#35 were merged, but #31–#35 targeted predecessor feature branches; only #30 reached `main`. This branch consolidates the final contents of the complete stack onto current `main`. | Consolidated PR #36 targets `main` and passes all four CI jobs; review and merge it once. This checklist alone does not authorize merging. |
+| C01 | Complete | PR #36 merged into `main` on 2026-10-17; reviewed implementation commit `bf0aa5418a0d69a0dd097c2df1aad9f4a14f582e`. | All four main CI jobs passed; see the handover checklist. |
 | C02 | Implemented locally | Local MkDocs reader built from an explicit publication manifest. | Home -> package -> exact version -> module/class/function page works; search finds a known symbol; mobile navigation works; build and internal-link checks pass. |
 | C03 | Implemented locally | Provenance/review labels and compatibility view added. | Every published page identifies package/version, origin and approval state; the three version findings are visible; no unreviewed reference is silently presented as an approved article. |
 | C04 | Initial site implemented; wider artifact pending | Approved reader builds from tracked inputs; durable broader-reference packaging remains pending when selected for publication. | Fresh clone builds the initial five-page site; full reference is either rebuilt from exact pins with recorded hash comparison or fetched from a checksummed release artifact with licenses. No dependency on a developer's ignored directories. |
@@ -69,7 +69,7 @@ All tasks below are pending unless marked otherwise. Favor these milestones over
 | C09 | P1 | Validate a real Docker Ollama call through a pinned integration and selected supported release pairs. | Exact model digest, integration/dependency versions, request result and elapsed time recorded; provider inference distinguished from offline binding. |
 | C10 | P1 | Expand public export/inherited API coverage and execute selected upstream examples. | Bounded example inventory with passed/failed/skipped/credentials-required results; scope and denominator reported. |
 
-C01 now requires only the consolidated integration PR; check all four CI jobs before merging. C02 is implemented locally. C06 depends on C02–C05. If review takes longer, keep the site branch reviewable rather than deploying an unreviewed branch by accident.
+C01 is complete. The [handover checklist](handover.md) now records the operator inputs and acceptance evidence needed next. C02 is implemented locally. C06 depends on C02–C05. If review takes longer, keep the site branch reviewable rather than deploying an unreviewed branch by accident.
 
 ## First website scope
 
