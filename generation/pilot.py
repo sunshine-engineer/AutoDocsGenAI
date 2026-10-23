@@ -1,3 +1,10 @@
+# File: generation/pilot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Generate a fixed five-topic review-only pilot from an explicitly approved source
+snapshot.
+"""
+
 from __future__ import annotations
 
 import ast
@@ -10,6 +17,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
+from config.environment import ollama_base_url
 from discovery.release_snapshot import verify_release_snapshot
 from generation.contracts import EvidenceChunk
 from generation.ollama import PROMPT_VERSION, write_page
@@ -25,18 +33,42 @@ PILOT_OUTLINE = (
 
 
 def outline_hash() -> str:
+    """Hash the fixed pilot outline so source approval cannot silently change scope.
+
+    Returns:
+        SHA-256 digest identifying the fixed five-page pilot outline.
+    """
     return hashlib.sha256(
         json.dumps(PILOT_OUTLINE, separators=(",", ":")).encode()
     ).hexdigest()
 
 
 class PilotApproval(BaseModel):
+    """Human-confirmed exact source and fixed outline approval for review-only drafts.
+
+    Attributes:
+        source (SourceSelection): Explicit human-confirmed exact source selection.
+        outline_hash (str): Outline hash.
+    """
+
     model_config = ConfigDict(extra="forbid")
     source: SourceSelection
     outline_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 def pilot_evidence(snapshot: Path) -> list[dict[str, Any]]:
+    """Extract bounded source-line evidence for each of the five approved pilot topics.
+
+    Args:
+        snapshot: Filesystem path to the pinned official source manifest.
+
+    Returns:
+        Bounded topic requirements and immutable source-line evidence.
+
+    Raises:
+        ValueError: pilot symbol is absent from the pinned release; pilot docstring
+            exceeds the context budget.
+    """
     manifest = verify_release_snapshot(snapshot)
     root = snapshot.parent
     package, version, commit = (
@@ -150,10 +182,29 @@ def generate_pilot(
     output: Path,
     *,
     model: str,
-    base_url: str = "http://127.0.0.1:11434",
+    base_url: str | None = None,
     client: httpx.Client,
     topic: str | None = None,
 ) -> dict[str, Any]:
+    """Generate review-only pilot drafts after validating source and outline approval.
+
+    Args:
+        snapshot: Filesystem path to the pinned official source manifest.
+        approval: Explicit source and outline approval; not final-page approval.
+        output: Destination for newly generated artifacts or reports.
+        model: Installed model name whose exact digest is recorded.
+        base_url: Ollama service URL; no provider credentials are inferred.
+        client: Caller-owned HTTP client with bounded request settings.
+        topic: Topic whose identity or evidence is being processed.
+
+    Returns:
+        Review-only run metadata and generated page results.
+
+    Raises:
+        ValueError: pilot approval does not match the pinned source and outline;
+            approved source URL differs from the snapshot; requested topic is outside
+            the approved outline; pilot output must be empty; use a new run directory.
+    """
     manifest = verify_release_snapshot(snapshot)
     approval.source.require_confirmed(manifest["package"], manifest["version"])
     if (
@@ -187,7 +238,7 @@ def generate_pilot(
         target = output / page["output_path"]
         result = write_page(
             client,
-            base_url=base_url,
+            base_url=base_url if base_url is not None else ollama_base_url(),
             model=model,
             package=manifest["package"],
             version=manifest["version"],

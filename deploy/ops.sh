@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# File: deploy/ops.sh
+# Purpose: Operate immutable reader releases and opt-in private pipeline services.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 set -euo pipefail
 umask 077
 repo_root=$(cd -- "$(dirname -- "$0")/.." && pwd)
@@ -34,6 +38,7 @@ case "$action" in
       echo "AUTODOCS_JOB_TIMEOUT must be 1..86400 seconds" >&2; exit 1
     fi
     job_name="autodocs-job-$(date -u +%Y%m%d%H%M%S)-$$"
+    # Best-effort cleanup of this job only. Args: none. Returns: zero even if already removed.
     cleanup_job() { docker rm -f "$job_name" >/dev/null 2>&1 || true; }
     trap cleanup_job EXIT
     trap 'exit 130' INT

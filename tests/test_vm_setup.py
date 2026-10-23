@@ -1,3 +1,6 @@
+# File: tests/test_vm_setup.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Exercise the real shell entrypoint's non-mutating planning and input paths."""
 
 import os
@@ -13,6 +16,14 @@ pytestmark = pytest.mark.skipif(os.name == "nt", reason="Bash setup runs on Linu
 
 @pytest.fixture
 def cloned_repo(tmp_path):
+    """Prepare the cloned repo test fixture without shared production state.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     repo = tmp_path / "clone"
     (repo / "deploy").mkdir(parents=True)
     for name in ("setup-vm.sh", "runtime_config.py"):
@@ -35,6 +46,16 @@ def cloned_repo(tmp_path):
 
 
 def run_setup(repo, *args, environment=None):
+    """Prepare the run setup test fixture without shared production state.
+
+    Args:
+        repo: Test fixture or parameter controlling the repo scenario.
+        environment: Test fixture or parameter controlling the environment scenario.
+        *args: Additional positional arguments.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     env = {k: v for k, v in os.environ.items() if not k.startswith("AUTODOCS_")}
     env.update(environment or {})
     if "--plan" in args:
@@ -51,6 +72,11 @@ def run_setup(repo, *args, environment=None):
 
 
 def test_default_plan_is_website_only_http_without_host_mutation(cloned_repo):
+    """Verify default plan is website only http without host mutation.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+    """
     result = run_setup(cloned_repo, "--plan")
     assert result.returncode == 0, result.stderr
     assert "HTTP-only: true" in result.stdout
@@ -67,6 +93,11 @@ def test_default_plan_is_website_only_http_without_host_mutation(cloned_repo):
 
 
 def test_https_plan_uses_environment_defaults(cloned_repo):
+    """Verify https plan uses environment defaults.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+    """
     result = run_setup(
         cloned_repo,
         "--plan",
@@ -91,12 +122,23 @@ def test_https_plan_uses_environment_defaults(cloned_repo):
     ],
 )
 def test_invalid_inputs_fail_before_any_host_setup(cloned_repo, args):
+    """Verify invalid inputs fail before any host setup.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+        args: Additional positional arguments.
+    """
     result = run_setup(cloned_repo, "--plan", *args)
     assert result.returncode != 0
     assert "Website started" not in result.stdout
 
 
 def test_dirty_checkout_is_not_deployed(cloned_repo):
+    """Verify dirty checkout is not deployed.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+    """
     (cloned_repo / "uncommitted.txt").write_text("unreviewed")
     result = run_setup(cloned_repo, "--plan")
     assert result.returncode != 0
@@ -104,12 +146,22 @@ def test_dirty_checkout_is_not_deployed(cloned_repo):
 
 
 def test_unattended_execution_requires_explicit_yes(cloned_repo):
+    """Verify unattended execution requires explicit yes.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+    """
     result = run_setup(cloned_repo)
     assert result.returncode != 0
     assert "No interactive terminal" in result.stderr
 
 
 def test_existing_configuration_is_reused_without_rewriting(cloned_repo):
+    """Verify existing configuration is reused without rewriting.
+
+    Args:
+        cloned_repo: Test fixture or parameter controlling the cloned repo scenario.
+    """
     release = subprocess.run(
         ["git", "-C", str(cloned_repo), "rev-parse", "HEAD"],
         capture_output=True,

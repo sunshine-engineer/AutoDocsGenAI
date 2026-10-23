@@ -1,3 +1,6 @@
+# File: examples/langchain_1_4_6_offline.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Author-written smoke example for langchain==1.4.6; no provider or API key.
 
 This tests API wiring with fixed responses, not LLM quality or tool execution.
@@ -15,17 +18,33 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 
 class ObserveModel(AgentMiddleware):
+    """Middleware recording the order of before/after model hooks in an offline example."""
+
     def __init__(self):
+        """Initialize observe model state for subsequent calls."""
         self.events: list[str] = []
 
     def before_model(self, state, runtime):
+        """Record the before-model hook without modifying agent state.
+
+        Args:
+            state: Typed pipeline or agent state consumed by this operation.
+            runtime: LangChain runtime context passed to the middleware hook.
+        """
         self.events.append("before_model")
 
     def after_model(self, state, runtime):
+        """Record the after-model hook without modifying agent state.
+
+        Args:
+            state: Typed pipeline or agent state consumed by this operation.
+            runtime: LangChain runtime context passed to the middleware hook.
+        """
         self.events.append("after_model")
 
 
 def main():
+    """Execute the pinned offline agent, middleware and state demonstration."""
     assert version("langchain") == "1.4.6", "Use the exact pilot release"
     middleware = ObserveModel()
     graph = create_agent(

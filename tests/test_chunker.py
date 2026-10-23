@@ -1,3 +1,8 @@
+# File: tests/test_chunker.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for chunker."""
+
 import json
 
 from config.settings import ChunkingConfig
@@ -11,6 +16,7 @@ from models.state import PipelineState
 
 
 def test_nested_headings_are_preserved_in_chunk_metadata():
+    """Verify nested headings are preserved in chunk metadata."""
     document = CleanDocument(
         title="Guide",
         url="https://example.com/guide",
@@ -37,6 +43,7 @@ def test_nested_headings_are_preserved_in_chunk_metadata():
 
 
 def test_heading_like_code_is_not_treated_as_a_section():
+    """Verify heading like code is not treated as a section."""
     markdown = (
         "# Examples\n\n"
         "```markdown\n# This is code\n## This is also code\n```\n\n"
@@ -53,6 +60,7 @@ def test_heading_like_code_is_not_treated_as_a_section():
 
 
 def test_oversized_prose_is_bounded_and_deterministic():
+    """Verify oversized prose is bounded and deterministic."""
     document = CleanDocument(
         title="Long guide",
         url="https://example.com/long-guide",
@@ -70,6 +78,7 @@ def test_oversized_prose_is_bounded_and_deterministic():
 
 
 def test_oversized_code_fences_remain_balanced():
+    """Verify oversized code fences remain balanced."""
     code = "\n".join(f"print({index})" for index in range(30))
     document = CleanDocument(
         title="Examples",
@@ -87,6 +96,7 @@ def test_oversized_code_fences_remain_balanced():
 
 
 def test_document_without_headings_and_empty_document_are_supported():
+    """Verify document without headings and empty document are supported."""
     plain = CleanDocument(
         title="Plain",
         url="https://example.com/plain",
@@ -108,6 +118,11 @@ def test_document_without_headings_and_empty_document_are_supported():
 
 
 def test_create_chunks_replaces_state_and_writes_jsonl(tmp_path):
+    """Verify create chunks replaces state and writes jsonl.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     document = CleanDocument(
         title="Guide",
         url="https://example.com/guide",

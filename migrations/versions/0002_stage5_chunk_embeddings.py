@@ -1,3 +1,6 @@
+# File: migrations/versions/0002_stage5_chunk_embeddings.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Add versioned chunk embeddings and cosine index.
 
 Revision ID: 0002_stage5_embeddings
@@ -18,6 +21,7 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    """Apply this revision of the database schema using Alembic operations."""
     op.create_table(
         "embedding_versions",
         sa.Column(
@@ -100,5 +104,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    """Remove this revision of the schema; affected tables and data may be dropped."""
     op.drop_table("chunk_embeddings")
     op.drop_table("embedding_versions")

@@ -1,3 +1,8 @@
+# File: catalog/normalization.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Merge candidate identities and assign stable hierarchy, ordering and output paths."""
+
 from __future__ import annotations
 
 import hashlib
@@ -15,6 +20,23 @@ from services.chunk_importer import normalize_package_name
 
 @dataclass
 class NormalizedTopic:
+    """Merged topic identity, hierarchy and collision-resistant publication path.
+
+    Attributes:
+        kind (TopicKind): Kind.
+        qualified_name (str): Qualified name.
+        display_name (str): Human-readable topic or symbol name.
+        canonical_target (str): Canonical target.
+        definition (str | None): Definition.
+        parent_qualified_name (str | None): Parent qualified name.
+        slug (str): Slug.
+        output_path (str): Destination file path for the generated artifact.
+        structural_chunk_ids (list[str]): Structural chunk ids.
+        aliases (list[str]): Aliases.
+        derived (bool): Derived.
+        sort_order (int): Sort order.
+    """
+
     kind: TopicKind
     qualified_name: str
     display_name: str
@@ -31,6 +53,15 @@ class NormalizedTopic:
 
 @dataclass(frozen=True)
 class NormalizationIssue:
+    """Blocking or advisory identity/path normalization finding.
+
+    Attributes:
+        code (str): Code.
+        qualified_name (str): Qualified name.
+        blocking (bool): Blocking.
+        detail (str): Detail.
+    """
+
     code: str
     qualified_name: str
     blocking: bool
@@ -39,6 +70,15 @@ class NormalizationIssue:
 
 @dataclass
 class NormalizationResult:
+    """Normalized topics, issues and duplicate-merge counts.
+
+    Attributes:
+        topics (list[NormalizedTopic]): Topic records in the current extraction,
+            proposal or catalog.
+        issues (list[NormalizationIssue]): Issues.
+        duplicate_records_merged (int): Duplicate records merged.
+    """
+
     topics: list[NormalizedTopic]
     issues: list[NormalizationIssue]
     duplicate_records_merged: int
@@ -47,7 +87,15 @@ class NormalizationResult:
 def normalize_catalog_topics(
     extraction: CatalogExtraction, package: str
 ) -> NormalizationResult:
-    """Merge raw identities and create deterministic hierarchy and paths."""
+    """Merge raw identities and create deterministic hierarchy and paths.
+
+    Args:
+        extraction: Raw extraction including topics, deferred symbols and exclusions.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        Merged topics, identity/path findings and duplicate counts.
+    """
 
     normalized_package = normalize_package_name(package)
     adjusted = [
@@ -113,6 +161,15 @@ def normalize_catalog_topics(
 
 
 def _adjust_curated_identity(item: ExtractedTopic, package: str) -> ExtractedTopic:
+    """Place curated pages under the package concept or guide namespace.
+
+    Args:
+        item: Candidate record being normalized or ranked.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        Original API topic or a curated topic under its dedicated namespace.
+    """
     if item.origin != ExtractionOrigin.CURATED_PAGE:
         return item
     suffix = item.qualified_name.split(".")[-1]
@@ -130,6 +187,15 @@ def _adjust_curated_identity(item: ExtractedTopic, package: str) -> ExtractedTop
 
 
 def _source_preference(item: ExtractedTopic) -> tuple[int, int, str, str]:
+    """Rank duplicate sources by target affinity, definition length and stable
+    tie-breakers.
+
+    Args:
+        item: Candidate record being normalized or ranked.
+
+    Returns:
+        Sort key favoring target affinity and longer definitions with stable ties.
+    """
     source_parts = [part for part in urlsplit(item.source_url).path.split("/") if part]
     target_parts = [part for part in item.canonical_target.split("/") if part]
     common_prefix = 0
@@ -142,6 +208,14 @@ def _source_preference(item: ExtractedTopic) -> tuple[int, int, str, str]:
 
 
 def _parent_name(item: ExtractedTopic) -> str | None:
+    """Derive the direct module parent for an API topic, when one exists.
+
+    Args:
+        item: Candidate record being normalized or ranked.
+
+    Returns:
+        Qualified module parent, or None for a root/curated topic.
+    """
     if item.kind in {TopicKind.CLASS, TopicKind.FUNCTION}:
         return item.qualified_name.rsplit(".", 1)[0]
     if item.kind == TopicKind.MODULE and "." in item.qualified_name:
@@ -153,6 +227,15 @@ def _parent_name(item: ExtractedTopic) -> str | None:
 def _missing_module_ancestors(
     topics: list[NormalizedTopic], package: str
 ) -> list[NormalizedTopic]:
+    """Synthesize absent module ancestors with inherited structural evidence.
+
+    Args:
+        topics: Topic records in the current extraction, proposal or catalog.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        Derived modules needed to complete the topic hierarchy.
+    """
     known = {topic.qualified_name.casefold() for topic in topics}
     evidence_by_module: dict[str, list[str]] = defaultdict(list)
     for topic in topics:
@@ -191,6 +274,14 @@ def _assign_paths(
     package: str,
     issues: list[NormalizationIssue],
 ) -> None:
+    """Assign collision-resistant slugs and paths in place, recording unresolved
+    collisions.
+
+    Args:
+        topics: Topic records in the current extraction, proposal or catalog.
+        package: Distribution name used to scope lineage and results.
+        issues: Mutable normalization findings; unresolved path collisions are appended.
+    """
     used_paths: dict[str, str] = {}
     for topic in sorted(topics, key=_topic_sort_key):
         base_slug = _slugify(topic.display_name)
@@ -219,6 +310,16 @@ def _assign_paths(
 
 
 def _output_path(topic: NormalizedTopic, package: str, slug: str) -> str:
+    """Build the relative Markdown path for the topic kind and namespace.
+
+    Args:
+        topic: Topic whose identity or evidence is being processed.
+        package: Distribution name used to scope lineage and results.
+        slug: Safe normalized filename component for this topic.
+
+    Returns:
+        Relative Markdown output path for the given topic.
+    """
     if topic.kind == TopicKind.GUIDE:
         return f"guides/{slug}.md"
     if topic.kind == TopicKind.CONCEPT:
@@ -234,6 +335,20 @@ def _output_path(topic: NormalizedTopic, package: str, slug: str) -> str:
 
 
 def _slugify(value: str) -> str:
+    """Normalize Unicode text to a safe ASCII slug with a topic fallback.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+
+    Returns:
+        Lowercase ASCII slug, falling back to "topic" if no characters remain.
+
+    Examples:
+        >>> _slugify("Agent Middleware: hooks")
+        'agent-middleware-hooks'
+        >>> _slugify("!!!")
+        'topic'
+    """
     ascii_value = (
         unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
     )
@@ -242,6 +357,14 @@ def _slugify(value: str) -> str:
 
 
 def _unique_strings(values: Iterable[str]) -> list[str]:
+    """Deduplicate strings ignoring case while preserving first-seen spelling and order.
+
+    Args:
+        values: Values to compare, update or deduplicate.
+
+    Returns:
+        First-seen spellings with case-insensitive duplicates removed.
+    """
     seen: set[str] = set()
     result: list[str] = []
     for value in values:
@@ -253,6 +376,14 @@ def _unique_strings(values: Iterable[str]) -> list[str]:
 
 
 def _topic_sort_key(topic: NormalizedTopic) -> tuple[int, str, str]:
+    """Order modules before symbols, then curated pages, with stable name tie-breakers.
+
+    Args:
+        topic: Topic whose identity or evidence is being processed.
+
+    Returns:
+        Kind priority, normalized display name and qualified identity.
+    """
     kind_order = {
         TopicKind.MODULE: 0,
         TopicKind.CLASS: 1,

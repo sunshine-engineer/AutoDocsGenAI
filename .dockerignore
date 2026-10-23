@@ -1,3 +1,7 @@
+# File: .dockerignore
+# Purpose: Exclude local data and secrets from container build contexts.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 .git
 .venv*
 .site-work

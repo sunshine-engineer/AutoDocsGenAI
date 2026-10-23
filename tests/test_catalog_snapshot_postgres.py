@@ -1,3 +1,8 @@
+# File: tests/test_catalog_snapshot_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog snapshot postgres."""
+
 from __future__ import annotations
 
 import os
@@ -27,6 +32,12 @@ pytestmark = pytest.mark.db_integration
 
 
 def embedding_config() -> EmbeddingConfig:
+    """Prepare the embedding config test fixture without shared production state.
+
+    Returns:
+        EmbeddingConfig: Prepare the embedding config test fixture without shared
+            production state.
+    """
     return EmbeddingConfig(
         provider="fastembed",
         model="BAAI/bge-small-en-v1.5",
@@ -37,6 +48,15 @@ def embedding_config() -> EmbeddingConfig:
 
 
 def build_state(package: str) -> PipelineState:
+    """Prepare the build state test fixture without shared production state.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        PipelineState: Prepare the build state test fixture without shared production
+            state.
+    """
     content = f"A fully grounded catalog snapshot chunk for {package}."
     source_url = f"https://example.com/python/{package}/guide"
     document = CleanDocument(title="Guide", url=source_url, markdown=content)
@@ -61,6 +81,7 @@ def build_state(package: str) -> PipelineState:
 
 
 def test_resolve_exact_completed_current_fully_embedded_snapshot():
+    """Verify resolve exact completed current fully embedded snapshot."""
     assert DATABASE_URL is not None
     package = f"snapshot-demo-{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)
@@ -118,6 +139,7 @@ def test_resolve_exact_completed_current_fully_embedded_snapshot():
 
 
 def test_resolver_rejects_incomplete_run_stale_document_and_missing_embedding():
+    """Verify resolver rejects incomplete run stale document and missing embedding."""
     assert DATABASE_URL is not None
     package = f"snapshot-invalid-{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)

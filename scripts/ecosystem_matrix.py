@@ -1,3 +1,6 @@
+# File: scripts/ecosystem_matrix.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Run offline contracts in disposable exact-version environments using uv."""
 
 from __future__ import annotations
@@ -19,6 +22,16 @@ CASES = (
 
 
 def assess(results: list[dict], output: Path) -> list[str]:
+    """Evaluate expected successes and known compatibility failures from probe results.
+
+    Args:
+        results: Recorded compatibility probe results.
+        output: Destination for newly generated artifacts or reports.
+
+    Returns:
+        Unexpected compatibility outcomes requiring operator review; empty means
+        expected contracts held.
+    """
     unexpected = []
     for row in results:
         label = str(row["label"])
@@ -73,6 +86,7 @@ def assess(results: list[dict], output: Path) -> list[str]:
 
 
 def main():
+    """Parse command-line inputs and run the ecosystem matrix operator command."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--env-root", type=Path, required=True)

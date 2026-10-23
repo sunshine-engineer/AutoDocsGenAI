@@ -1,3 +1,8 @@
+# File: tests/test_catalog_service.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog service."""
+
 import json
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -25,6 +30,12 @@ TEST_CONFIG_HASH = "b" * 64
 
 
 def load_chunks() -> list[Chunk]:
+    """Prepare the load chunks test fixture without shared production state.
+
+    Returns:
+        list[Chunk]: Prepare the load chunks test fixture without shared production
+            state.
+    """
     records = json.loads(FIXTURE.read_text(encoding="utf-8"))
     for record in records:
         record["character_count"] = len(record["content"])
@@ -32,6 +43,7 @@ def load_chunks() -> list[Chunk]:
 
 
 def test_in_memory_catalog_is_deterministic_and_has_unique_paths():
+    """Verify in memory catalog is deterministic and has unique paths."""
     chunks = load_chunks()
 
     first = build_in_memory_catalog(chunks, "langchain", "0.3", TEST_CONFIG_HASH)
@@ -49,10 +61,21 @@ def test_in_memory_catalog_is_deterministic_and_has_unique_paths():
 
 
 def test_in_memory_catalog_uses_injected_search_without_persistence():
+    """Verify in memory catalog uses injected search without persistence."""
     chunks = load_chunks()
     extra = chunks[-1]
 
     def search(query: str, limit: int) -> list[SearchHit]:
+        """Prepare the search test fixture without shared production state.
+
+        Args:
+            query: Retrieval query text.
+            limit: Maximum requested records or text size, as used by this operation.
+
+        Returns:
+            list[SearchHit]: Prepare the search test fixture without shared production
+                state.
+        """
         return [
             SearchHit(
                 chunk_id=extra.id,
@@ -76,6 +99,7 @@ def test_in_memory_catalog_uses_injected_search_without_persistence():
 
 
 def test_snapshot_proposal_rejects_blocking_findings():
+    """Verify snapshot proposal rejects blocking findings."""
     run_id = str(uuid4())
     snapshot = CatalogSnapshot(
         package="langchain",

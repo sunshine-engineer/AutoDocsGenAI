@@ -1,3 +1,9 @@
+<!--
+File: docs/learning/langchain-1.4.6/03_conversation_state.md
+Purpose: Retain a conversation and isolate another one.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Retain a conversation and isolate another one
 
 **Content status:** authored by Codex; teaching draft; Sunny final approval pending.
@@ -29,6 +35,9 @@ python examples/learning/langchain_1_4_6/03_conversation_state.py
 This is the complete file, not a fragment requiring hidden helper code:
 
 ```python
+# File: examples/learning/langchain_1_4_6/03_conversation_state.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Check same-thread retention and separate-thread isolation in memory."""
 
 from langchain.agents import create_agent

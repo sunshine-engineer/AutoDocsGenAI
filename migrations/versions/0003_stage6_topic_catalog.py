@@ -1,3 +1,6 @@
+# File: migrations/versions/0003_stage6_topic_catalog.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Add versioned topic catalogs and chunk evidence mappings.
 
 Revision ID: 0003_stage6_topic_catalog
@@ -17,6 +20,7 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    """Apply this revision of the database schema using Alembic operations."""
     op.create_table(
         "topic_catalogs",
         sa.Column(
@@ -276,6 +280,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    """Remove this revision of the schema; affected tables and data may be dropped."""
     op.execute("DROP TRIGGER trg_topics_updated_at ON topics")
     op.execute("DROP TRIGGER trg_topic_catalogs_updated_at ON topic_catalogs")
     op.drop_table("topic_evidence")

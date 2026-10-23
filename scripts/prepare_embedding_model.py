@@ -1,9 +1,19 @@
+# File: scripts/prepare_embedding_model.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the prepare embedding model operator command."""
+
 from fastembed import TextEmbedding
 
 from utils.config_loader import load_config
 
 
 def main() -> None:
+    """Parse command-line inputs and run the prepare embedding model operator command.
+
+    Raises:
+        RuntimeError: embedding model returned no vectors.
+    """
     config = load_config().embedding
     model = TextEmbedding(
         model_name=config.model,

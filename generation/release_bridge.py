@@ -1,3 +1,8 @@
+# File: generation/release_bridge.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Import an approved official source snapshot into persisted pilot lineage and catalogs."""
+
 from __future__ import annotations
 
 import hashlib
@@ -48,7 +53,21 @@ def import_release_pilot(
     approval: PilotApproval,
     embedding: EmbeddingConfig,
 ) -> PersistenceResult:
-    """Import the explicitly approved five-topic outline; never approve the catalog."""
+    """Import the explicitly approved five-topic outline; never approve the catalog.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        engine: Database engine; None uses the configured database where supported.
+        snapshot_path: Path to a verified exact-release source manifest.
+        approval: Explicit source and outline approval; not final-page approval.
+        embedding: Typed embedding model, dimension and cache settings.
+
+    Returns:
+        Persisted pilot catalog identity and mutation counts.
+
+    Raises:
+        GenerationError: source and outline approval do not match the release snapshot.
+    """
     manifest = verify_release_snapshot(snapshot_path)
     approval.source.require_confirmed(manifest["package"], manifest["version"])
     if (

@@ -1,3 +1,7 @@
+# File: compose.ollama.yaml
+# Purpose: Run the optional loopback-only local Ollama service.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 # Standalone local model service; does not start or migrate PostgreSQL.
 services:
   ollama:

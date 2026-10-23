@@ -1,3 +1,8 @@
+# File: tests/test_stage4b_schema.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage4b schema."""
+
 from pathlib import Path
 
 from sqlalchemy.dialects.postgresql import JSONB
@@ -17,10 +22,12 @@ EXPECTED_TABLES = {
 
 
 def test_lineage_metadata_contains_only_stage4_tables():
+    """Verify lineage metadata contains only stage4 tables."""
     assert EXPECTED_TABLES <= set(Base.metadata.tables)
 
 
 def test_chunk_schema_preserves_lineage_without_embedding_column():
+    """Verify chunk schema preserves lineage without embedding column."""
     chunks = Base.metadata.tables["chunks"]
 
     assert chunks.c.id.primary_key
@@ -32,6 +39,7 @@ def test_chunk_schema_preserves_lineage_without_embedding_column():
 
 
 def test_current_document_revision_has_partial_unique_index():
+    """Verify current document revision has partial unique index."""
     source_documents = Base.metadata.tables["source_documents"]
     current_index = next(
         index
@@ -44,6 +52,7 @@ def test_current_document_revision_has_partial_unique_index():
 
 
 def test_all_lineage_foreign_keys_restrict_deletion():
+    """Verify all lineage foreign keys restrict deletion."""
     foreign_keys = {
         foreign_key
         for table in Base.metadata.tables.values()
@@ -55,6 +64,7 @@ def test_all_lineage_foreign_keys_restrict_deletion():
 
 
 def test_initial_migration_defers_embedding_schema_and_retains_extension():
+    """Verify initial migration defers embedding schema and retains extension."""
     migration = (
         PROJECT_ROOT / "migrations" / "versions" / "0001_stage4_lineage_schema.py"
     ).read_text(encoding="utf-8")

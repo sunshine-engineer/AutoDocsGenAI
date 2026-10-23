@@ -1,5 +1,20 @@
+<!--
+File: website/overrides/main.html
+Purpose: Customize the MkDocs layout while retaining its search/navigation behavior.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 {% extends "base.html" %}
 {% block mobile_nav %}
-<button type="button" class="reader-menu-toggle" data-toggle="wy-nav-top" aria-label="Toggle navigation" aria-expanded="false" aria-controls="reader-navigation"><span aria-hidden="true">☰</span></button>
+<button
+  type="button"
+  class="reader-menu-toggle"
+  data-toggle="wy-nav-top"
+  aria-label="Toggle navigation"
+  aria-expanded="false"
+  aria-controls="reader-navigation"
+>
+  <span aria-hidden="true">☰</span>
+</button>
 <a href="{{ nav.homepage.url|url }}">{{ config.site_name }}</a>
 {% endblock %}

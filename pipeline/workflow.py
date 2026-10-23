@@ -1,3 +1,8 @@
+# File: pipeline/workflow.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Execute pipeline stages in dependency order and report stage completion."""
+
 from pathlib import Path
 
 from agents.reviewer import review_documentation
@@ -22,7 +27,19 @@ def run_pipeline(
     state: PipelineState,
     reporter: ProgressReporter | None = None,
 ) -> PipelineState:
-    """Run the pipeline and report completed, implemented stages."""
+    """Run the pipeline and report completed, implemented stages.
+
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+        reporter: Optional progress sink; None creates the default stream reporter.
+
+    Returns:
+        Final pipeline state after the implemented ingestion/indexing stages.
+
+    Raises:
+        RuntimeError: Discovery completed without a documentation manifest; Crawl
+            planning completed without a crawl plan.
+    """
 
     progress = reporter or ProgressReporter()
     config = load_config()

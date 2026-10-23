@@ -1,9 +1,19 @@
+# File: tests/test_progress.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for progress."""
+
 from io import StringIO
 
 from utils.progress import ProgressReporter
 
 
 def test_completed_stage_prints_metadata_and_resolved_artifact(tmp_path):
+    """Verify completed stage prints metadata and resolved artifact.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     output = StringIO()
     reporter = ProgressReporter(output)
     artifact = tmp_path / "chunks.jsonl"
@@ -22,6 +32,7 @@ def test_completed_stage_prints_metadata_and_resolved_artifact(tmp_path):
 
 
 def test_next_stage_does_not_claim_completion():
+    """Verify next stage does not claim completion."""
     output = StringIO()
     reporter = ProgressReporter(output)
 

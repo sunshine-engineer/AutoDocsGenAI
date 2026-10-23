@@ -1,3 +1,6 @@
+# File: migrations/versions/0004_persistent_generation.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Persist bounded generation jobs, immutable page revisions, citations and reviews."""
 
 import sqlalchemy as sa
@@ -11,6 +14,11 @@ depends_on = None
 
 
 def identifier():
+    """Build common UUID identity columns for generation tables.
+
+    Returns:
+        UUID primary-key column used by generation records.
+    """
     return sa.Column(
         "id",
         postgresql.UUID(as_uuid=True),
@@ -20,6 +28,11 @@ def identifier():
 
 
 def created():
+    """Build the timestamp column shared by generation records.
+
+    Returns:
+        Server-default creation timestamp column.
+    """
     return sa.Column(
         "created_at",
         sa.DateTime(timezone=True),
@@ -29,6 +42,7 @@ def created():
 
 
 def upgrade():
+    """Apply this revision of the database schema using Alembic operations."""
     op.create_table(
         "generation_jobs",
         identifier(),
@@ -172,6 +186,7 @@ def upgrade():
 
 
 def downgrade():
+    """Remove this revision of the schema; affected tables and data may be dropped."""
     for table in (
         "review_decisions",
         "validation_results",

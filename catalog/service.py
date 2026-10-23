@@ -1,3 +1,8 @@
+# File: catalog/service.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Assemble and persist deterministic snapshot-bound catalog proposals."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -45,6 +50,16 @@ from models.topic import TopicCandidate, TopicCatalogProposal
 
 @dataclass
 class InMemoryCatalogResult:
+    """Unpersisted proposal, intermediate extraction and coverage evidence.
+
+    Attributes:
+        proposal (TopicCatalogProposal): Proposal.
+        extraction (CatalogExtraction): Raw extraction including topics, deferred
+            symbols and exclusions.
+        coverage (CatalogCoverage): Coverage.
+        issues (list[NormalizationIssue | EvidenceMappingIssue]): Issues.
+    """
+
     proposal: TopicCatalogProposal
     extraction: CatalogExtraction
     coverage: CatalogCoverage
@@ -57,6 +72,21 @@ class CatalogProposalError(ValueError):
 
 @dataclass(frozen=True)
 class SnapshotCatalogProposal:
+    """Catalog proposal bound to exact source, model and configuration identities.
+
+    Attributes:
+        snapshot (CatalogSnapshot): Verified snapshot object or manifest path, as
+            annotated.
+        config_snapshot (dict[str, object]): Canonical non-secret catalog configuration
+            snapshot.
+        config_hash (str): Config hash.
+        proposal (TopicCatalogProposal): Proposal.
+        coverage (CatalogCoverage): Coverage.
+        exclusions (tuple[ExcludedCandidate, ...]): Exclusions.
+        deferred_symbols (tuple[DeferredSymbol, ...]): Deferred symbols.
+        issues (tuple[NormalizationIssue | EvidenceMappingIssue, ...]): Issues.
+    """
+
     snapshot: CatalogSnapshot
     config_snapshot: dict[str, object]
     config_hash: str
@@ -74,7 +104,18 @@ def build_in_memory_catalog(
     config_hash: str,
     search: EvidenceSearch | None = None,
 ) -> InMemoryCatalogResult:
-    """Build a complete B2 proposal without persistence or approval."""
+    """Build a complete B2 proposal without persistence or approval.
+
+    Args:
+        chunks: Validated documentation chunks for the selected source scope.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        config_hash: Frozen catalog configuration digest attached to the proposal.
+        search: Optional callback returning bounded, snapshot-filtered evidence hits.
+
+    Returns:
+        Proposal, intermediate transformations and measured coverage.
+    """
 
     extraction = extract_catalog_candidates(chunks, package)
     normalization = normalize_catalog_topics(extraction, package)
@@ -127,7 +168,20 @@ def assemble_snapshot_catalog_proposal(
     config: CatalogIdentityConfig,
     evidence_search: EvidenceSearch | None = None,
 ) -> SnapshotCatalogProposal:
-    """Build one validated proposal from an exact, read-only database snapshot."""
+    """Build one validated proposal from an exact, read-only database snapshot.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        engine: Database engine; None uses the configured database where supported.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        pipeline_run_id: Exact persisted ingestion-run identity.
+        config: Typed configuration controlling this operation.
+        evidence_search: Optional evidence-retrieval callback for this snapshot.
+
+    Returns:
+        Validated proposal bound to the exact source/configuration/model snapshot.
+    """
 
     snapshot = resolve_catalog_snapshot(
         session,
@@ -197,7 +251,22 @@ def persist_snapshot_catalog_proposal(
     *,
     reconcile: bool = False,
 ) -> PersistenceResult:
-    """Persist a validated proposal in one caller-visible atomic transaction."""
+    """Persist a validated proposal in one caller-visible atomic transaction.
+
+    Args:
+        session_factory: SQLAlchemy session factory used for transactional work.
+        build: Validated snapshot-bound catalog proposal.
+        reconcile: Whether an existing draft may be reconciled with the proposal.
+
+    Returns:
+        Persisted catalog and topic/evidence mutation counts.
+
+    Raises:
+        ValueError: proposal config_hash does not match the build identity; a proposal
+            with blocking findings cannot be persisted.
+        CatalogPersistenceError: catalog identity conflict persisted after one retry.
+        AssertionError: unreachable catalog persistence result.
+    """
 
     validate_catalog_config_snapshot(build.config_snapshot, build.config_hash)
     if build.proposal.config_hash != build.config_hash:

@@ -1,3 +1,10 @@
+# File: catalog/artifacts.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Render, atomically write and verify catalog artifacts against persisted historical
+lineage.
+"""
+
 from __future__ import annotations
 
 import json
@@ -45,6 +52,15 @@ from models.topic import (
 
 @dataclass(frozen=True)
 class ArtifactResult:
+    """Filesystem artifact-write outcome, including partial failure details.
+
+    Attributes:
+        directory (str): Directory.
+        paths (tuple[str, ...]): Paths.
+        complete (bool): Complete.
+        error (str | None): Error.
+    """
+
     directory: str
     paths: tuple[str, ...]
     complete: bool
@@ -52,7 +68,22 @@ class ArtifactResult:
 
 
 def load_catalog_view(session: Session, catalog_id: UUID | str) -> dict[str, Any]:
-    """Rehydrate historical lineage and canonical rows, without current-only filters."""
+    """Rehydrate historical lineage and canonical rows, without current-only filters.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        catalog_id: Persisted catalog UUID or its string representation.
+
+    Returns:
+        Canonical catalog, topic/evidence rows, lineage and configuration view.
+
+    Raises:
+        CatalogPersistenceError: catalog does not exist; catalog embedding identity
+            disagrees with configuration; catalog version does not exist; catalog
+            package does not exist; historical snapshot hash does not match catalog;
+            configuration and catalog lineage disagree; topic parent belongs to another
+            catalog; catalog evidence is outside its snapshot; catalog has no topics.
+    """
     catalog = session.get(TopicCatalogRecord, UUID(str(catalog_id)))
     if catalog is None:
         raise CatalogPersistenceError("catalog does not exist")
@@ -281,7 +312,17 @@ def load_catalog_view(session: Session, catalog_id: UUID | str) -> dict[str, Any
 
 
 def render_artifacts(view: dict[str, Any]) -> dict[str, bytes]:
-    """Pure byte-stable rendering; persisted timestamps only."""
+    """Pure byte-stable rendering; persisted timestamps only.
+
+    Args:
+        view: Canonical catalog view rehydrated from persisted lineage.
+
+    Returns:
+        Artifact filenames mapped to their canonical UTF-8 bytes.
+
+    Raises:
+        CatalogPersistenceError: artifact navigation has a cycle or missing parent.
+    """
     view = {
         **view,
         "topics": sorted(
@@ -368,6 +409,18 @@ def render_artifacts(view: dict[str, Any]) -> dict[str, bytes]:
 
 
 def artifact_directory(view: dict[str, Any], root: Path) -> Path:
+    """Derive the versioned artifact directory from catalog identity.
+
+    Args:
+        view: Canonical catalog view rehydrated from persisted lineage.
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Versioned directory for this exact catalog artifact set.
+
+    Raises:
+        CatalogPersistenceError: unsafe catalog artifact path component.
+    """
     for value in (view["package"], view["version"], view["catalog_id"]):
         if (
             not value
@@ -379,6 +432,16 @@ def artifact_directory(view: dict[str, Any], root: Path) -> Path:
 
 
 def write_artifacts(view: dict[str, Any], root: Path) -> ArtifactResult:
+    """Atomically replace individual catalog artifacts and report partial filesystem
+    failures.
+
+    Args:
+        view: Canonical catalog view rehydrated from persisted lineage.
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Artifact paths, completeness and any filesystem error.
+    """
     directory = artifact_directory(view, root)
     payloads = render_artifacts(view)
     paths = tuple(str(directory / name) for name in payloads)
@@ -409,6 +472,16 @@ def write_artifacts(view: dict[str, Any], root: Path) -> ArtifactResult:
 
 
 def verify_artifacts(view: dict[str, Any], root: Path) -> None:
+    """Reject missing or changed artifact bytes against a fresh canonical rendering.
+
+    Args:
+        view: Canonical catalog view rehydrated from persisted lineage.
+        root: Root directory delimiting artifact or publication access.
+
+    Raises:
+        CatalogPersistenceError: catalog artifacts are missing or stale; inspect with
+            --repair.
+    """
     directory = artifact_directory(view, root)
     for name, content in render_artifacts(view).items():
         try:

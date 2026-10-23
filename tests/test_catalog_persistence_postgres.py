@@ -1,3 +1,8 @@
+# File: tests/test_catalog_persistence_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog persistence postgres."""
+
 from __future__ import annotations
 
 import hashlib
@@ -44,6 +49,11 @@ pytestmark = pytest.mark.db_integration
 
 
 def prepare_build():
+    """Prepare the prepare build test fixture without shared production state.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     assert DATABASE_URL is not None
     package = f"persistdemo{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)
@@ -216,6 +226,7 @@ def prepare_build():
 
 
 def test_persistence_is_atomic_idempotent_and_parent_first():
+    """Verify persistence is atomic idempotent and parent first."""
     engine, session_factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(session_factory, build)
@@ -269,6 +280,7 @@ def test_persistence_is_atomic_idempotent_and_parent_first():
 
 
 def test_changed_draft_updates_topic_and_replaces_only_its_evidence():
+    """Verify changed draft updates topic and replaces only its evidence."""
     engine, session_factory, build = prepare_build()
     try:
         persist_snapshot_catalog_proposal(session_factory, build)
@@ -297,6 +309,12 @@ def test_changed_draft_updates_topic_and_replaces_only_its_evidence():
 
 
 def test_invalid_evidence_and_injected_failure_leave_no_partial_catalog(monkeypatch):
+    """Verify invalid evidence and injected failure leave no partial catalog.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     engine, session_factory, build = prepare_build()
     try:
         invalid_topic = build.proposal.topics[0].model_copy(
@@ -320,6 +338,15 @@ def test_invalid_evidence_and_injected_failure_leave_no_partial_catalog(monkeypa
             persist_snapshot_catalog_proposal(session_factory, invalid)
 
         def fail_after_catalog(*_args, **_kwargs):
+            """Prepare the fail after catalog test fixture without shared production state.
+
+            Args:
+                *_args: Test fixture or parameter controlling the args scenario.
+                **_kwargs: Test fixture or parameter controlling the kwargs scenario.
+
+            Raises:
+                RuntimeError: injected topic write failure.
+            """
             raise RuntimeError("injected topic write failure")
 
         monkeypatch.setattr("catalog.service.persist_topics", fail_after_catalog)
@@ -340,6 +367,7 @@ def test_invalid_evidence_and_injected_failure_leave_no_partial_catalog(monkeypa
 
 
 def test_stale_topics_and_non_draft_catalogs_are_immutable():
+    """Verify stale topics and non draft catalogs are immutable."""
     engine, session_factory, build = prepare_build()
     try:
         persisted = persist_snapshot_catalog_proposal(session_factory, build)

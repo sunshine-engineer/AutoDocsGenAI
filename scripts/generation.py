@@ -1,3 +1,10 @@
+# File: scripts/generation.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and dispatch explicit generation, edit, review and export
+operations.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -30,6 +37,18 @@ from scripts.catalog_cli import uuid_argument
 
 
 def inspect_job(factory, identifier):
+    """Return job status and revision/review metadata without exposing credentials.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        identifier: Job UUID or database identifier to inspect.
+
+    Returns:
+        Job state, immutable input identity and ordered page/review summaries.
+
+    Raises:
+        GenerationError: generation job does not exist.
+    """
     with factory() as session:
         job = session.get(GenerationJobRecord, identifier)
         if job is None:
@@ -78,6 +97,18 @@ def inspect_job(factory, identifier):
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse command-line inputs and dispatch explicit generation, edit, review and export
+    operations.
+
+    Args:
+        argv: Command arguments; None uses the process command line.
+
+    Returns:
+        Zero on success; a nonzero status for a rejected or failed command.
+
+    Raises:
+        GenerationError: page revision does not exist.
+    """
     parser = argparse.ArgumentParser(
         description="Persisted generation, review, and approved export"
     )
@@ -91,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--regeneration-note", default="")
     run = commands.add_parser("run")
     run.add_argument("job_id", type=uuid_argument)
-    run.add_argument("--ollama-url", default="http://127.0.0.1:11434")
+    run.add_argument("--ollama-url", default=None)
     inspect = commands.add_parser("inspect")
     inspect.add_argument("job_id", type=uuid_argument)
     page = commands.add_parser(

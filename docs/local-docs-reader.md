@@ -1,6 +1,12 @@
+<!--
+File: docs/local-docs-reader.md
+Purpose: Local documentation reader.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Local documentation reader
 
-Implemented for review on 2026-10-16 (Asia/Calcutta). This is a local static reader, not a deployed GCP service.
+Implemented on 2026-10-16; documentation rechecked against merged main on 2026-10-22 (Asia/Calcutta). The reader is reproducible from Git; actual VM/public-service acceptance is not established by this review.
 
 ## Start the reader
 

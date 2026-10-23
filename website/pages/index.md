@@ -1,3 +1,9 @@
+<!--
+File: website/pages/index.md
+Purpose: Know the version. Follow the source..
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 <div class="eyebrow">AUTODOCS / PYTHON REFERENCE</div>
 
 # Know the version. Follow the source.

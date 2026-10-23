@@ -1,3 +1,8 @@
+# File: scripts/confirm_source.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the confirm source operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -9,6 +14,14 @@ from models.source_selection import SourceSelection
 
 
 def main() -> int:
+    """Parse command-line inputs and run the confirm source operator command.
+
+    Returns:
+        Zero on success; a nonzero status for a rejected or failed command.
+
+    Raises:
+        ValueError: confirmation output already exists; choose a new review artifact.
+    """
     parser = argparse.ArgumentParser(
         description="Record a human-reviewed exact-release source selection"
     )

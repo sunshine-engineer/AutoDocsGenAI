@@ -1,3 +1,7 @@
+# File: compose.yaml
+# Purpose: Run the development application and PostgreSQL/pgvector services.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 name: autodocs
 
 services:
@@ -10,6 +14,12 @@ services:
       - .:/workspaces/AutoDocsGenAI:cached
       - model_cache:/models
     environment:
+      AUTODOCS_CONFIG_FILE: ${AUTODOCS_CONFIG_FILE:-config/config.yaml}
+      AUTODOCS_HTTP_TIMEOUT_SECONDS: ${AUTODOCS_HTTP_TIMEOUT_SECONDS:-30}
+      AUTODOCS_HTTP_USER_AGENT: ${AUTODOCS_HTTP_USER_AGENT:-AutoDocPipeline/0.1 (Documentation Knowledge Pipeline)}
+      AUTODOCS_OLLAMA_URL: ${AUTODOCS_OLLAMA_URL:-http://127.0.0.1:11434}
+      AUTODOCS_EMBEDDING_THREADS: ${AUTODOCS_EMBEDDING_THREADS:-2}
+      AUTODOCS_DB_CONNECT_TIMEOUT_SECONDS: ${AUTODOCS_DB_CONNECT_TIMEOUT_SECONDS:-10}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-autodocs}

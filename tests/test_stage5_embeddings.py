@@ -1,3 +1,8 @@
+# File: tests/test_stage5_embeddings.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage5 embeddings."""
+
 from pathlib import Path
 
 from pgvector.sqlalchemy import VECTOR
@@ -9,6 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_embedding_schema_is_versioned_and_fixed_to_prototype_dimension():
+    """Verify embedding schema is versioned and fixed to prototype dimension."""
     embedding_versions = Base.metadata.tables["embedding_versions"]
     chunk_embeddings = Base.metadata.tables["chunk_embeddings"]
 
@@ -22,6 +28,7 @@ def test_embedding_schema_is_versioned_and_fixed_to_prototype_dimension():
 
 
 def test_stage5_migration_has_cosine_hnsw_index():
+    """Verify stage5 migration has cosine hnsw index."""
     migration = (
         PROJECT_ROOT / "migrations" / "versions" / "0002_stage5_chunk_embeddings.py"
     ).read_text(encoding="utf-8")

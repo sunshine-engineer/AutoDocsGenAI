@@ -1,3 +1,8 @@
+# File: tests/test_release_snapshot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for release snapshot."""
+
 from __future__ import annotations
 
 import json
@@ -13,7 +18,21 @@ from discovery.release_snapshot import (
 
 
 def fixture_client():
+    """Prepare the fixture client test fixture without shared production state.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
+
     def handle(request):
+        """Prepare the handle test fixture without shared production state.
+
+        Args:
+            request: Mock HTTP request or pytest request context used by this fixture.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         if request.url.host == "pypi.org":
             return httpx.Response(200, json={"info": {"version": "1.4.6"}})
         if request.url.host == "api.github.com":
@@ -28,6 +47,11 @@ def fixture_client():
 
 
 def test_release_snapshot_is_pinned_verified_and_unapproved(tmp_path):
+    """Verify release snapshot is pinned verified and unapproved.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     with fixture_client() as client:
         path = prepare_langchain_snapshot("1.4.6", tmp_path, client)
     manifest = verify_release_snapshot(path)
@@ -45,6 +69,11 @@ def test_release_snapshot_is_pinned_verified_and_unapproved(tmp_path):
 
 
 def test_snapshot_rejects_missing_files_and_traversal_before_read(tmp_path):
+    """Verify snapshot rejects missing files and traversal before read.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     with fixture_client() as client:
         path = prepare_langchain_snapshot("1.4.6", tmp_path, client)
     data = json.loads(path.read_text())
@@ -55,6 +84,11 @@ def test_snapshot_rejects_missing_files_and_traversal_before_read(tmp_path):
 
 
 def test_snapshot_rejects_version_mismatch_without_writing(tmp_path):
+    """Verify snapshot rejects version mismatch without writing.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     with (
         fixture_client() as client,
         pytest.raises(ValueError, match="version mismatch"),

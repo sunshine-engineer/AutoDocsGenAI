@@ -1,3 +1,8 @@
+# File: catalog/identity.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Freeze and validate canonical non-secret catalog construction identities."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,7 +17,31 @@ CATALOG_IDENTITY_SCHEMA_VERSION = "stage6-catalog-v1"
 
 @dataclass(frozen=True)
 class CatalogIdentityConfig:
-    """Versioned inputs that can change catalog construction output."""
+    """Versioned inputs that can change catalog construction output.
+
+    Attributes:
+        embedding (EmbeddingConfig): Typed embedding model, dimension and cache
+            settings.
+        namespace_allow_list (tuple[str, ...]): Allowed source roots or package
+            namespaces.
+        enabled_topic_kinds (tuple[TopicKind, ...]): Categories eligible for
+            first-release topic proposals.
+        extractor_version (str): Version label for extraction semantics included in
+            catalog identity.
+        normalization_version (str): Version label for hierarchy/path normalization
+            semantics.
+        duplicate_resolution_version (str): Version label for canonical duplicate
+            identity resolution.
+        api_evidence_limit (int): Maximum structural/retrieval evidence records for an
+            API topic.
+        curated_evidence_limit (int): Maximum evidence records for a guide or concept
+            topic.
+        hybrid_retrieval_enabled (bool): Whether bounded hybrid retrieval may supplement
+            structural evidence.
+        retrieval_candidate_multiplier (int): Retrieval candidates requested relative to
+            the final evidence limit.
+        schema_version (str): Version of the canonical catalog identity schema.
+    """
 
     embedding: EmbeddingConfig
     namespace_allow_list: tuple[str, ...]
@@ -27,6 +56,17 @@ class CatalogIdentityConfig:
     schema_version: str = CATALOG_IDENTITY_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
+        """Validate nonblank versions, unique namespaces/kinds and positive evidence
+        limits.
+
+        Raises:
+            ValueError: catalog identity versions must not be blank;
+                namespace_allow_list must not be empty; namespace_allow_list entries
+                must not be blank; namespace_allow_list must be unique ignoring case;
+                enabled_topic_kinds must not be empty; enabled_topic_kinds must be
+                unique; evidence limits must be positive; retrieval_candidate_multiplier
+                must be positive.
+        """
         text_fields = (
             self.schema_version,
             self.extractor_version,
@@ -61,7 +101,18 @@ def catalog_config_snapshot(
     input_snapshot_hash: str,
     config: CatalogIdentityConfig,
 ) -> dict[str, object]:
-    """Return the canonical, non-secret inputs that determine a catalog."""
+    """Return the canonical, non-secret inputs that determine a catalog.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        source_pipeline_run_id: Exact persisted ingestion-run identity.
+        input_snapshot_hash: Expected hash of the frozen input source/chunk snapshot.
+        config: Typed configuration controlling this operation.
+
+    Returns:
+        Canonical non-secret construction inputs used for reproducible identity.
+    """
 
     return {
         "schema_version": config.schema_version,
@@ -102,7 +153,18 @@ def catalog_config_hash(
     input_snapshot_hash: str,
     config: CatalogIdentityConfig,
 ) -> str:
-    """Hash every versioned input that can alter a catalog proposal."""
+    """Hash every versioned input that can alter a catalog proposal.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        source_pipeline_run_id: Exact persisted ingestion-run identity.
+        input_snapshot_hash: Expected hash of the frozen input source/chunk snapshot.
+        config: Typed configuration controlling this operation.
+
+    Returns:
+        Lowercase SHA-256 digest of the canonical construction inputs.
+    """
 
     return sha256_identity(
         catalog_config_snapshot(
@@ -118,7 +180,15 @@ def catalog_config_hash(
 def validate_catalog_config_snapshot(
     config_snapshot: dict[str, object], expected_hash: str
 ) -> None:
-    """Reject a persisted configuration snapshot that does not match its hash."""
+    """Reject a persisted configuration snapshot that does not match its hash.
+
+    Args:
+        config_snapshot: Canonical non-secret catalog configuration snapshot.
+        expected_hash: Previously recorded digest to verify.
+
+    Raises:
+        ValueError: catalog configuration snapshot does not reproduce config_hash.
+    """
 
     actual_hash = sha256_identity(config_snapshot)
     if actual_hash != expected_hash:
@@ -128,7 +198,19 @@ def validate_catalog_config_snapshot(
 
 
 def rehydrate_catalog_config(snapshot: dict[str, object]) -> CatalogIdentityConfig:
-    """Accept only the canonical non-secret configuration schema for artifact repair."""
+    """Accept only the canonical non-secret configuration schema for artifact repair.
+
+    Args:
+        snapshot: Persisted canonical non-secret configuration fields to rehydrate.
+
+    Returns:
+        Validated supported historical catalog configuration.
+
+    Raises:
+        ValueError: noncanonical fields; catalog configuration is not a canonical
+            non-secret snapshot; catalog configuration requires an unavailable
+            historical renderer.
+    """
     from typing import Any, cast
 
     raw = cast(dict[str, Any], snapshot)

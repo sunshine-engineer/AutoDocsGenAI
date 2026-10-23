@@ -1,3 +1,7 @@
+# File: mkdocs.yml
+# Purpose: Build the allowlisted static documentation reader.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 site_name: AutoDocs · Python reference
 site_description: Versioned Python documentation with visible provenance and compatibility evidence.
 docs_dir: .site-work/docs

@@ -1,3 +1,6 @@
+# File: scripts/ecosystem_probe.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Offline runtime contracts; run inside an isolated, exactly pinned environment."""
 
 from __future__ import annotations
@@ -10,9 +13,21 @@ from typing import TypedDict
 
 
 def run() -> dict:
+    """Execute independent offline compatibility probes and return their outcomes.
+
+    Returns:
+        dict: Execute independent offline compatibility probes and return their
+            outcomes.
+    """
     checks = []
 
     def check(name, callback):
+        """Run one compatibility callback and record a passed or failed result.
+
+        Args:
+            name: Field, distribution or check name for this operation.
+            callback: Callable implementing one isolated offline probe.
+        """
         try:
             detail = callback()
             checks.append({"name": name, "status": "passed", "detail": detail})
@@ -26,6 +41,11 @@ def run() -> dict:
             )
 
     def chain():
+        """Execute a prompt/fake-model/parser chain and verify its offline result.
+
+        Returns:
+            Description of the verified offline runnable-chain behavior.
+        """
         from langchain_core.language_models.fake_chat_models import FakeListChatModel
         from langchain_core.output_parsers import StrOutputParser
         from langchain_core.prompts import ChatPromptTemplate
@@ -40,11 +60,23 @@ def run() -> dict:
         return "Prompt -> fake chat model -> output parser executed"
 
     def graph():
+        """Verify conditional routing, in-memory checkpoints and graph streaming offline.
+
+        Returns:
+            Description of the verified routing, checkpoint and streaming behavior.
+        """
         from langchain_core.runnables import RunnableConfig
         from langgraph.checkpoint.memory import InMemorySaver
         from langgraph.graph import END, START, StateGraph
 
         class State(TypedDict):
+            """Typed integer state for the offline routing/checkpoint compatibility probe.
+
+            Attributes:
+                value (int): Value to normalize or validate under this function
+                    contract.
+            """
+
             value: int
 
         builder = StateGraph(State)
@@ -65,6 +97,11 @@ def run() -> dict:
         return "StateGraph conditional routing, checkpoint state and streaming executed"
 
     def tools():
+        """Test direct ToolNode invocation and report version-specific runtime failures.
+
+        Returns:
+            Description of the verified direct ToolNode behavior.
+        """
         from langchain_core.messages import AIMessage
         from langchain_core.tools import tool
         from langgraph.prebuilt import ToolNode
@@ -96,6 +133,11 @@ def run() -> dict:
         return "Tool schema and actual local ToolNode execution returned 5"
 
     def graph_tools():
+        """Execute a scripted tool call inside a compiled graph with runtime context.
+
+        Returns:
+            Description of the verified compiled-graph tool behavior.
+        """
         from langchain_core.messages import AIMessage
         from langchain_core.tools import tool
         from langgraph.graph import END, START, MessagesState, StateGraph
@@ -131,6 +173,11 @@ def run() -> dict:
         return "ToolNode executed inside compiled StateGraph with runtime context"
 
     def agent():
+        """Construct and invoke create_agent with a fixed-response model and no tools.
+
+        Returns:
+            Description of the verified offline agent invocation.
+        """
         from langchain.agents import create_agent
         from langchain_core.language_models.fake_chat_models import FakeListChatModel
 

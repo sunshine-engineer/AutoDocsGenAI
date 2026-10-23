@@ -1,3 +1,10 @@
+# File: services/chunk_importer.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Shared persistence, lineage and documentation-framework detection services. Module:
+chunk_importer.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -29,6 +36,24 @@ from models.state import PipelineState
 
 @dataclass
 class ImportResult:
+    """Ingestion persistence identity and mutation counters.
+
+    Attributes:
+        run_id (str): Run id.
+        package (str): Distribution name used to scope lineage and results.
+        version (str): Exact package release; version families are not accepted
+            implicitly.
+        packages_inserted (int): Packages inserted.
+        versions_inserted (int): Versions inserted.
+        runs_inserted (int): Runs inserted.
+        sources_inserted (int): Sources inserted.
+        sources_reused (int): Sources reused.
+        documents_inserted (int): Documents inserted.
+        documents_reused (int): Documents reused.
+        chunks_inserted (int): Chunks inserted.
+        chunks_reused (int): Chunks reused.
+    """
+
     run_id: str
     package: str
     version: str
@@ -43,11 +68,27 @@ class ImportResult:
     chunks_reused: int = 0
 
     def to_dict(self) -> dict[str, object]:
+        """Serialize this result into a plain dictionary for JSON reports.
+
+        Returns:
+            dict[str, object]: Serialize this result into a plain dictionary for JSON
+                reports.
+        """
         return asdict(self)
 
 
 def normalize_package_name(name: str) -> str:
-    """Normalize a Python package name using the PyPI comparison form."""
+    """Normalize a Python package name using the PyPI comparison form.
+
+    Args:
+        name: Field, distribution or check name for this operation.
+
+    Returns:
+        Lowercase distribution name with normalized hyphen separators.
+
+    Raises:
+        ValueError: package name must contain letters or numbers.
+    """
 
     normalized = re.sub(r"[-_.]+", "-", name).lower().strip("-")
     if not normalized:
@@ -56,11 +97,27 @@ def normalize_package_name(name: str) -> str:
 
 
 def canonicalize_url(url: str) -> str:
+    """Remove URL fragments and normalize the trailing slash for source identity.
+
+    Args:
+        url: Absolute source or service URL.
+
+    Returns:
+        Source URL with fragment and trailing-slash differences normalized.
+    """
     without_fragment, _ = urldefrag(url.strip())
     return without_fragment.rstrip("/") or without_fragment
 
 
 def load_chunks_jsonl(path: str | Path) -> list[Chunk]:
+    """Parse and validate chunk records from a UTF-8 JSONL file.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+
+    Returns:
+        Validated chunks in file order.
+    """
     input_path = Path(path)
     chunks: list[Chunk] = []
     with input_path.open("r", encoding="utf-8") as file:
@@ -79,7 +136,19 @@ def load_chunks_jsonl(path: str | Path) -> list[Chunk]:
 
 
 def state_from_chunks(chunks: list[Chunk], package: str, version: str) -> PipelineState:
-    """Reconstruct minimum document records for importing a JSONL artifact."""
+    """Reconstruct minimum document records for importing a JSONL artifact.
+
+    Args:
+        chunks: Validated documentation chunks for the selected source scope.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+
+    Returns:
+        Pipeline state scoped to the requested package/version.
+
+    Raises:
+        ValueError: all chunks must match the requested package and version.
+    """
 
     grouped: dict[str, list[Chunk]] = defaultdict(list)
     for chunk in chunks:
@@ -111,7 +180,18 @@ def persist_pipeline_state(
     state: PipelineState,
     engine: Engine | None = None,
 ) -> ImportResult:
-    """Persist current document and chunk lineage in one atomic transaction."""
+    """Persist current document and chunk lineage in one atomic transaction.
+
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+        engine: Database engine; None uses the configured database where supported.
+
+    Returns:
+        Persisted ingestion-run identity and mutation counts.
+
+    Raises:
+        ValueError: persistence requires cleaned documents and chunks.
+    """
 
     if not state.cleaned_documents or not state.chunks:
         raise ValueError("persistence requires cleaned documents and chunks")
@@ -135,6 +215,15 @@ def persist_pipeline_state(
 
 
 def _persist(session: Session, state: PipelineState) -> ImportResult:
+    """Reconcile one ingestion run, source documents and chunks in the caller transaction.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        state: Typed pipeline or agent state consumed by this operation.
+
+    Returns:
+        Mutation counts and run identity from the caller transaction.
+    """
     now = datetime.now(UTC)
     package_name = normalize_package_name(state.package)
     config_hash = _state_hash(state)
@@ -316,6 +405,14 @@ def _persist(session: Session, state: PipelineState) -> ImportResult:
 
 
 def _state_hash(state: PipelineState) -> str:
+    """Hash ordered source/chunk content for idempotent ingestion-run identity.
+
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+
+    Returns:
+        SHA-256 digest of the canonical ingestion input snapshot.
+    """
     identity = {
         "package": normalize_package_name(state.package),
         "version": state.version,
@@ -328,4 +425,12 @@ def _state_hash(state: PipelineState) -> str:
 
 
 def _sha256(value: str) -> str:
+    """Return the hexadecimal SHA-256 digest of UTF-8 text.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+
+    Returns:
+        Hexadecimal SHA-256 digest of UTF-8 text.
+    """
     return hashlib.sha256(value.encode("utf-8")).hexdigest()

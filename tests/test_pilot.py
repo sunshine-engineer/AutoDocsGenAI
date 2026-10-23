@@ -1,3 +1,8 @@
+# File: tests/test_pilot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for pilot."""
+
 from __future__ import annotations
 
 import json
@@ -12,7 +17,25 @@ from models.source_selection import SourceSelection
 
 
 def snapshot_fixture(tmp_path, version="1.4.6"):
+    """Prepare the snapshot fixture test fixture without shared production state.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        version: Exact package release; version families are not accepted implicitly.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
+
     def source(request):
+        """Return a controlled source response without contacting external services.
+
+        Args:
+            request: Mock HTTP request or pytest request context used by this fixture.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         if request.url.host == "pypi.org":
             return httpx.Response(200, json={"info": {"version": version}})
         if request.url.host == "api.github.com":
@@ -41,7 +64,21 @@ def snapshot_fixture(tmp_path, version="1.4.6"):
 
 
 def model_client():
+    """Prepare the model client test fixture without shared production state.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
+
     def respond(request):
+        """Return a controlled respond response without contacting external services.
+
+        Args:
+            request: Mock HTTP request or pytest request context used by this fixture.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         if request.url.path == "/api/tags":
             return httpx.Response(
                 200,
@@ -79,6 +116,11 @@ def model_client():
 
 
 def test_approved_pilot_writes_five_review_only_records(tmp_path):
+    """Verify approved pilot writes five review only records.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     snapshot, approval = snapshot_fixture(tmp_path)
     with model_client() as client:
         result = generate_pilot(
@@ -109,6 +151,11 @@ def test_approved_pilot_writes_five_review_only_records(tmp_path):
 
 
 def test_pilot_rejects_unapproved_or_changed_outline_before_model_call(tmp_path):
+    """Verify pilot rejects unapproved or changed outline before model call.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     snapshot, approval = snapshot_fixture(tmp_path)
     for changed in (
         approval.model_copy(update={"outline_hash": "f" * 64}),
@@ -137,6 +184,11 @@ def test_pilot_rejects_unapproved_or_changed_outline_before_model_call(tmp_path)
 
 
 def test_pilot_uses_function_implementation_not_empty_overload(tmp_path):
+    """Verify pilot uses function implementation not empty overload.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     snapshot, _ = snapshot_fixture(tmp_path)
     pages = pilot_evidence(snapshot)
     function = next(page for page in pages if page["kind"] == "function")
@@ -147,6 +199,11 @@ def test_pilot_uses_function_implementation_not_empty_overload(tmp_path):
 def test_pilot_can_regenerate_one_approved_topic_without_rewriting_other_pages(
     tmp_path,
 ):
+    """Verify pilot can regenerate one approved topic without rewriting other pages.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     snapshot, approval = snapshot_fixture(tmp_path)
     with model_client() as client:
         result = generate_pilot(
@@ -171,6 +228,11 @@ def test_pilot_can_regenerate_one_approved_topic_without_rewriting_other_pages(
 
 
 def test_pilot_keeps_parameter_hook_and_installation_evidence(tmp_path):
+    """Verify pilot keeps parameter hook and installation evidence.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     snapshot, _ = snapshot_fixture(tmp_path)
     pages = pilot_evidence(snapshot)
     assert "model: The model used by the agent." in pages[1]["evidence"][0].content
@@ -178,3 +240,36 @@ def test_pilot_keeps_parameter_hook_and_installation_evidence(tmp_path):
     assert len(pages[4]["evidence"]) == 2
     assert "pyproject.toml" in pages[4]["evidence"][1].source_url
     assert 'version = "1.4.6"' in pages[4]["evidence"][1].content
+
+
+def test_pilot_endpoint_precedence_uses_explicit_url_before_environment(
+    tmp_path, monkeypatch
+):
+    """Apply service defaults without changing an explicit caller-selected endpoint.
+
+    Args:
+        tmp_path: Temporary source and output directories.
+        monkeypatch: Restored environment override fixture.
+    """
+    snapshot, approval = snapshot_fixture(tmp_path)
+    monkeypatch.setenv("AUTODOCS_OLLAMA_URL", "http://private-ollama:11434")
+    for index, (explicit, expected) in enumerate(
+        ((None, "private-ollama"), ("http://explicit-ollama:11434", "explicit-ollama"))
+    ):
+        if explicit is not None:
+            monkeypatch.setenv("AUTODOCS_OLLAMA_URL", "file:///invalid-default")
+        calls = []
+        with model_client() as client:
+            client.event_hooks["request"].append(
+                lambda request: calls.append(request.url.host)
+            )
+            result = generate_pilot(
+                snapshot,
+                approval,
+                tmp_path / f"endpoint-{index}",
+                model="fixture:small",
+                client=client,
+                base_url=explicit,
+            )
+        assert len(result["pages"]) == 5
+        assert calls and set(calls) == {expected}

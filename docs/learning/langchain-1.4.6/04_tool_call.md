@@ -1,3 +1,9 @@
+<!--
+File: docs/learning/langchain-1.4.6/04_tool_call.md
+Purpose: Execute a local tool and handle invalid arguments.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Execute a local tool and handle invalid arguments
 
 **Content status:** authored by Codex; teaching draft; Sunny final approval pending.
@@ -31,6 +37,9 @@ python examples/learning/langchain_1_4_6/04_tool_call.py
 ```
 
 ```python
+# File: examples/learning/langchain_1_4_6/04_tool_call.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Execute a local tool using scripted model messages; no provider inference."""
 
 from langchain.agents import create_agent
@@ -40,9 +49,24 @@ from langchain_core.tools import tool
 
 
 class ScriptedToolModel(FakeMessagesListChatModel):
+    """Fixed-response test model that accepts tool binding without provider inference."""
+
     def bind_tools(self, tools, *, tool_choice=None, **kwargs):
         # Fixture-only adapter: messages below already contain scripted tool calls.
         # This does not teach a model to select tools or validate provider support.
+        """Return this scripted model unchanged so the offline tool example can construct
+        an agent.
+
+        Args:
+            tools: Tool definitions accepted to satisfy the fake-model binding
+                interface.
+            tool_choice: Unused binding choice; this model emits a fixed scripted
+                response.
+            **kwargs: Keyword overrides forwarded to the wrapped API.
+
+        Returns:
+            This scripted model instance; no provider-side binding occurs.
+        """
         return self
 
 
@@ -57,6 +81,14 @@ def add(a: int, b: int) -> int:
 
 
 def build_agent(arguments):
+    """Construct a deterministic agent with a scripted tool request and final response.
+
+    Args:
+        arguments: Explicit command arguments or scripted tool arguments.
+
+    Returns:
+        Compiled agent using fixed messages and the real local add tool.
+    """
     return create_agent(
         model=ScriptedToolModel(
             responses=[

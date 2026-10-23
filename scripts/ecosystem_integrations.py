@@ -1,3 +1,6 @@
+# File: scripts/ecosystem_integrations.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Offline integration contracts; provider requests are deliberately blocked."""
 
 from __future__ import annotations
@@ -12,6 +15,11 @@ from unittest.mock import patch
 
 
 def run() -> dict:
+    """Execute bounded offline integration contracts and report measured results.
+
+    Returns:
+        dict: Execute bounded offline integration contracts and report measured results.
+    """
     ChatAnthropic = import_module("langchain_anthropic").ChatAnthropic
     from langchain_core.embeddings import DeterministicFakeEmbedding
     from langchain_core.tools import tool

@@ -1,3 +1,8 @@
+# File: catalog/repository.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Persist draft catalogs, topic reconciliation and ranked evidence in caller transactions."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -26,6 +31,15 @@ class CatalogPersistenceError(ValueError):
 
 @dataclass(frozen=True)
 class MutationCounts:
+    """Immutable insert, update and deletion counters for reconciliation.
+
+    Attributes:
+        inserted (int): Inserted.
+        updated (int): Updated.
+        reused (int): Reused.
+        removed (int): Removed.
+    """
+
     inserted: int = 0
     updated: int = 0
     reused: int = 0
@@ -34,6 +48,17 @@ class MutationCounts:
 
 @dataclass(frozen=True)
 class PersistenceResult:
+    """Persisted catalog identity, mutation counts and artifact-write outcome.
+
+    Attributes:
+        catalog_id (str): Persisted catalog UUID or its string representation.
+        status (str): Status.
+        catalogs (MutationCounts): Catalogs.
+        topics (MutationCounts): Topic records in the current extraction, proposal or
+            catalog.
+        evidence (MutationCounts): Evidence.
+    """
+
     catalog_id: str
     status: str
     catalogs: MutationCounts
@@ -44,7 +69,19 @@ class PersistenceResult:
 def resolve_draft_catalog(
     session: Session, build: SnapshotCatalogProposal
 ) -> tuple[TopicCatalogRecord, MutationCounts]:
-    """Lock the documentation version and resolve one mutable catalog identity."""
+    """Lock the documentation version and resolve one mutable catalog identity.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        build: Validated snapshot-bound catalog proposal.
+
+    Returns:
+        The resolved catalog and catalog mutation counts.
+
+    Raises:
+        CatalogPersistenceError: documentation version no longer exists; existing
+            catalog identity conflicts with the selected snapshot.
+    """
 
     documentation_version_id = UUID(build.snapshot.documentation_version_id)
     documentation_version = session.scalar(
@@ -107,7 +144,23 @@ def persist_topics(
     *,
     reconcile: bool = False,
 ) -> tuple[MutationCounts, MutationCounts]:
-    """Upsert a draft, removing exact stale rows only with explicit consent."""
+    """Upsert a draft, removing exact stale rows only with explicit consent.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        catalog: Persisted catalog record controlling topic/review scope.
+        build: Validated snapshot-bound catalog proposal.
+        reconcile: Whether an existing draft may be reconciled with the proposal.
+
+    Returns:
+        Topic and evidence mutation counts.
+
+    Raises:
+        CatalogPersistenceError: only draft catalogs can be reconciled or built; an
+            empty proposal cannot replace a catalog; each topic requires one rank-one
+            primary and contiguous evidence ranks; stale topic hierarchy contains a
+            cycle.
+    """
 
     if catalog.status != "draft":
         raise CatalogPersistenceError("only draft catalogs can be reconciled or built")
@@ -220,6 +273,17 @@ def persist_topics(
 
 
 def _parent_first(topics: Iterable[TopicCandidate]) -> list[TopicCandidate]:
+    """Topologically order candidates so parent records precede children.
+
+    Args:
+        topics: Topic records in the current extraction, proposal or catalog.
+
+    Returns:
+        Candidates ordered so parents precede their descendants.
+
+    Raises:
+        CatalogPersistenceError: topic hierarchy cannot be resolved.
+    """
     remaining = {topic.qualified_name.casefold(): topic for topic in topics}
     ordered: list[TopicCandidate] = []
     resolved: set[str] = set()
@@ -246,6 +310,15 @@ def _parent_first(topics: Iterable[TopicCandidate]) -> list[TopicCandidate]:
 def _topic_values(
     proposed: TopicCandidate, parent_id: UUID | None
 ) -> dict[str, object]:
+    """Build canonical persisted topic fields for a resolved parent ID.
+
+    Args:
+        proposed: Proposed topic fields and ranked evidence.
+        parent_id: Resolved parent-topic UUID, or None for a root topic.
+
+    Returns:
+        Canonical column values for the proposed topic.
+    """
     return {
         "parent_id": parent_id,
         "kind": proposed.kind.value,
@@ -261,6 +334,15 @@ def _topic_values(
 
 
 def _topic_changed(stored: TopicRecord, values: dict[str, object]) -> bool:
+    """Compare a persisted topic against its proposed field values.
+
+    Args:
+        stored: Existing persisted topic to compare.
+        values: Values to compare, update or deduplicate.
+
+    Returns:
+        True if any proposed column differs from the stored row.
+    """
     return any(getattr(stored, field) != value for field, value in values.items())
 
 
@@ -270,6 +352,17 @@ def _persist_evidence(
     proposed: TopicCandidate,
     counts: MutationCounts,
 ) -> MutationCounts:
+    """Reconcile ranked evidence rows for a topic and update mutation counts.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        topic: Topic whose identity or evidence is being processed.
+        proposed: Proposed topic fields and ranked evidence.
+        counts: Current insert/update/delete counters.
+
+    Returns:
+        Updated evidence mutation counts.
+    """
     existing = list(
         session.scalars(
             select(TopicEvidenceRecord)
@@ -315,6 +408,15 @@ def _persist_evidence(
 
 
 def _increment(counts: MutationCounts, field: str) -> MutationCounts:
+    """Return mutation counts with one named counter incremented.
+
+    Args:
+        counts: Current insert/update/delete counters.
+        field: Counter name to increment.
+
+    Returns:
+        A new counter value with the named field incremented.
+    """
     values = {
         "inserted": counts.inserted,
         "updated": counts.updated,

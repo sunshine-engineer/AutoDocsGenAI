@@ -1,3 +1,7 @@
+# File: deploy/autodocs.service
+# Purpose: Start the prebuilt website through Compose after required storage and Docker.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 [Unit]
 Description=AutoDocs static documentation reader
 Requires=docker.service

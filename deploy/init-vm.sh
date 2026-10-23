@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# File: deploy/init-vm.sh
+# Purpose: Create protected persistent directories and install the reader systemd unit.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 set -euo pipefail
 if [[ ${EUID} -ne 0 ]]; then echo "Run with sudo on the supplied Linux VM" >&2; exit 1; fi
 repo_root=$(cd -- "$(dirname -- "$0")/.." && pwd)

@@ -1,3 +1,6 @@
+# File: scripts/compare_doc_models.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Compare installed Ollama writers on identical pinned evidence; no auto approval."""
 
 from __future__ import annotations
@@ -13,20 +16,25 @@ from typing import Any
 
 import httpx
 
+from config.environment import ollama_base_url
 from generation.contracts import EvidenceChunk
 from generation.ollama import write_page, writer_contract_hash
 from scripts.doc_review_queue import save_report
 
 
 def main():
+    """Parse command-line inputs and compare selected installed models and save review-only
+    evidence.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", nargs="+", required=True)
     parser.add_argument(
         "--input", type=Path, default=Path("docs/quality/benchmark-input.json")
     )
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--base-url", default="http://127.0.0.1:11434")
+    parser.add_argument("--base-url", default=None)
     args = parser.parse_args()
+    base_url = args.base_url if args.base_url is not None else ollama_base_url()
     if args.output.exists() or args.output.with_suffix(".review-queue.json").exists():
         parser.error("Choose a new output file; benchmark evidence is not overwritten")
     payload = args.input.read_bytes()
@@ -40,7 +48,7 @@ def main():
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with httpx.Client(timeout=httpx.Timeout(240, connect=10)) as client:
-        tags = client.get(args.base_url + "/api/tags")
+        tags = client.get(base_url + "/api/tags")
         tags.raise_for_status()
         installed = {item["name"]: item["digest"] for item in tags.json()["models"]}
         if any(name not in installed for name in args.models):
@@ -63,7 +71,7 @@ def main():
                 try:
                     result = write_page(
                         client,
-                        base_url=args.base_url,
+                        base_url=base_url,
                         model=model,
                         package="langchain",
                         version="1.4.6",
@@ -93,7 +101,7 @@ def main():
                 print(f"{model}: {task['title']}: {row['status']}", flush=True)
                 # Release model memory between trials; loading time is included when needed.
                 response = client.post(
-                    args.base_url + "/api/generate",
+                    base_url + "/api/generate",
                     json={"model": model, "keep_alive": 0},
                 )
                 response.raise_for_status()

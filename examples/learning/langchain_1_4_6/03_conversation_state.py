@@ -1,3 +1,6 @@
+# File: examples/learning/langchain_1_4_6/03_conversation_state.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Check same-thread retention and separate-thread isolation in memory."""
 
 from langchain.agents import create_agent

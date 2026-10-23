@@ -1,3 +1,8 @@
+# File: discovery/release_snapshot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Freeze and verify exact-release official LangChain source snapshots."""
+
 from __future__ import annotations
 
 import hashlib
@@ -22,7 +27,21 @@ PILOT_FILES = (
 def prepare_langchain_snapshot(
     version: str, output: Path, client: httpx.Client
 ) -> Path:
-    """Pin official release source. The result is a candidate, never human approval."""
+    """Pin official release source. The result is a candidate, never human approval.
+
+    Args:
+        version: Exact package release; version families are not accepted implicitly.
+        output: Destination for newly generated artifacts or reports.
+        client: Caller-owned HTTP client with bounded request settings.
+
+    Returns:
+        Path to the newly frozen source snapshot manifest.
+
+    Raises:
+        ValueError: release metadata version mismatch; release tag does not identify a
+            commit; release tag resolution failed; release source exceeds the pilot file
+            budget; pinned repository package version differs from PyPI.
+    """
     # Validate version/path components before any request or directory creation.
     SourceSelection(
         package="langchain",
@@ -113,7 +132,18 @@ def prepare_langchain_snapshot(
 
 
 def verify_release_snapshot(path: Path) -> dict:
-    """Verify every downloaded byte before it becomes evidence."""
+    """Verify every downloaded byte before it becomes evidence.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+
+    Returns:
+        Verified manifest and its exact source-selection metadata.
+
+    Raises:
+        ValueError: snapshot identity mismatch; snapshot must contain the exact pilot
+            source file set; snapshot source URL, size, or content hash mismatch.
+    """
     manifest = json.loads(path.read_text(encoding="utf-8"))
     selection = SourceSelection.model_validate(manifest["source_selection"])
     if (

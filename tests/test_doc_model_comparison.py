@@ -1,3 +1,6 @@
+# File: tests/test_doc_model_comparison.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Benchmark failures must remain visible and never become successful scores."""
 
 import hashlib
@@ -11,6 +14,13 @@ from scripts import compare_doc_models
 
 
 def test_model_failure_is_recorded_and_next_model_still_runs(tmp_path, monkeypatch):
+    """Verify model failure is recorded and next model still runs.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     source = tmp_path / "input.json"
     source.write_text(
         json.dumps({"tasks": [{"title": "create_agent", "evidence": []}]})
@@ -33,16 +43,41 @@ def test_model_failure_is_recorded_and_next_model_still_runs(tmp_path, monkeypat
     unloaded = []
 
     class Client:
+        """Controlled client fixture for isolated behavioral tests."""
+
         def __init__(self, **kwargs):
+            """Initialize the isolated test double with the requested fixture state.
+
+            Args:
+                **kwargs: Keyword overrides forwarded to the wrapped API.
+            """
             pass
 
         def __enter__(self):
+            """Return the test resource for its context-managed lifetime.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             return self
 
         def __exit__(self, *args):
+            """Close the test resource without suppressing unexpected failures.
+
+            Args:
+                *args: Additional positional arguments.
+            """
             pass
 
         def get(self, url):
+            """Return a controlled get response without contacting external services.
+
+            Args:
+                url: Absolute source or service URL.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             return SimpleNamespace(
                 raise_for_status=lambda: None,
                 json=lambda: {
@@ -54,10 +89,28 @@ def test_model_failure_is_recorded_and_next_model_still_runs(tmp_path, monkeypat
             )
 
         def post(self, url, *, json):
+            """Return a controlled post response without contacting external services.
+
+            Args:
+                url: Absolute source or service URL.
+                json: Test fixture or parameter controlling the json scenario.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             unloaded.append(json["model"])
             return SimpleNamespace(raise_for_status=lambda: None)
 
     def failed_writer(client, **kwargs):
+        """Prepare the failed writer test fixture without shared production state.
+
+        Args:
+            client: Caller-owned HTTP client with bounded request settings.
+            **kwargs: Keyword overrides forwarded to the wrapped API.
+
+        Raises:
+            ValueError: incomplete draft.
+        """
         raise ValueError("incomplete draft")
 
     monkeypatch.setattr(compare_doc_models.httpx, "Client", Client)
@@ -81,6 +134,7 @@ def test_model_failure_is_recorded_and_next_model_still_runs(tmp_path, monkeypat
 
 
 def test_quote_valid_draft_still_requires_semantic_review():
+    """Verify quote valid draft still requires semantic review."""
     from scripts.doc_review_queue import build_queue
 
     report = {
@@ -106,6 +160,7 @@ def test_quote_valid_draft_still_requires_semantic_review():
 
 
 def test_clean_citations_do_not_automatically_approve_a_draft():
+    """Verify clean citations do not automatically approve a draft."""
     from scripts.doc_review_queue import build_queue
 
     report = {

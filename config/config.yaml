@@ -1,3 +1,7 @@
+# File: config/config.yaml
+# Purpose: Declare typed application, embedding, crawl and artifact defaults.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 project:
   name: "Documentation Knowledge Pipeline"
   version: "0.1.0"

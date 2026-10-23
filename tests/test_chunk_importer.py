@@ -1,3 +1,8 @@
+# File: tests/test_chunk_importer.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for chunk importer."""
+
 import json
 
 import pytest
@@ -12,6 +17,14 @@ from services.chunk_importer import (
 
 
 def build_chunk(**overrides):
+    """Prepare the build chunk test fixture without shared production state.
+
+    Args:
+        **overrides: Test fixture or parameter controlling the overrides scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     content = overrides.pop("content", "# Guide\n\nContent")
     values = {
         "id": "chunk-1",
@@ -30,6 +43,7 @@ def build_chunk(**overrides):
 
 
 def test_identity_normalization():
+    """Verify identity normalization."""
     assert normalize_package_name("Demo_Package.Name") == "demo-package-name"
     assert canonicalize_url("https://example.com/docs/#install") == (
         "https://example.com/docs"
@@ -37,6 +51,11 @@ def test_identity_normalization():
 
 
 def test_jsonl_loading_and_document_reconstruction(tmp_path):
+    """Verify jsonl loading and document reconstruction.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     chunks = [
         build_chunk(),
         build_chunk(
@@ -62,5 +81,6 @@ def test_jsonl_loading_and_document_reconstruction(tmp_path):
 
 
 def test_jsonl_import_rejects_mixed_package_identity():
+    """Verify jsonl import rejects mixed package identity."""
     with pytest.raises(ValueError, match="all chunks must match"):
         state_from_chunks([build_chunk(package="another")], "Demo_Package", "1.0.0")

@@ -1,0 +1,113 @@
+{
+  "writer_hash": "76129532aa80504c56b4298a8afc4519478a232ea0f322979ecd1b740baec694",
+  "draft_schema": {
+    "$defs": {
+      "Citation": {
+        "additionalProperties": false,
+        "properties": {
+          "chunk_id": {
+            "minLength": 1,
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "quote": {
+            "minLength": 8,
+            "title": "Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "quote"
+        ],
+        "title": "Citation",
+        "type": "object"
+      },
+      "GroundedClaim": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/$defs/Citation"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Citations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "text",
+          "citations"
+        ],
+        "title": "GroundedClaim",
+        "type": "object"
+      },
+      "PageSection": {
+        "additionalProperties": false,
+        "properties": {
+          "heading": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Heading",
+            "type": "string"
+          },
+          "claims": {
+            "items": {
+              "$ref": "#/$defs/GroundedClaim"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Claims",
+            "type": "array"
+          }
+        },
+        "required": [
+          "heading",
+          "claims"
+        ],
+        "title": "PageSection",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "title": {
+        "maxLength": 200,
+        "minLength": 1,
+        "title": "Title",
+        "type": "string"
+      },
+      "abstained": {
+        "title": "Abstained",
+        "type": "boolean"
+      },
+      "reason": {
+        "title": "Reason",
+        "type": "string"
+      },
+      "sections": {
+        "items": {
+          "$ref": "#/$defs/PageSection"
+        },
+        "maxItems": 8,
+        "title": "Sections",
+        "type": "array"
+      }
+    },
+    "required": [
+      "title",
+      "abstained",
+      "reason",
+      "sections"
+    ],
+    "title": "PageDraft",
+    "type": "object"
+  }
+}

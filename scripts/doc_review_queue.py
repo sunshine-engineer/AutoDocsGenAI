@@ -1,3 +1,6 @@
+# File: scripts/doc_review_queue.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Build review handoffs from recorded model runs; never approve content."""
 
 from __future__ import annotations
@@ -10,6 +13,16 @@ from typing import Any
 
 
 def build_queue(report: dict, artifact: str, digest: str) -> dict:
+    """Create pending human-review handoffs for model drafts without granting publication.
+
+    Args:
+        report: Measured benchmark or execution report.
+        artifact: Artifact path or identity retained for evidence.
+        digest: Expected SHA-256 digest of the referenced artifact.
+
+    Returns:
+        Pending review items retaining model/topic/source artifact identity.
+    """
     items = []
     for index, row in enumerate(report["runs"]):
         issues = list(row.get("citation_issues", []))
@@ -58,6 +71,13 @@ def build_queue(report: dict, artifact: str, digest: str) -> dict:
 
 
 def write_queue(report: dict, artifact: Path, output: Path):
+    """Write a review queue bound to the exact saved benchmark artifact hash.
+
+    Args:
+        report: Measured benchmark or execution report.
+        artifact: Artifact path or identity retained for evidence.
+        output: Destination for newly generated artifacts or reports.
+    """
     digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
     queue = build_queue(report, artifact.as_posix(), digest)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -65,11 +85,18 @@ def write_queue(report: dict, artifact: Path, output: Path):
 
 
 def save_report(report: dict[str, Any], output: Path):
+    """Persist benchmark results and their pending human-review queue together.
+
+    Args:
+        report: Measured benchmark or execution report.
+        output: Destination for newly generated artifacts or reports.
+    """
     output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     write_queue(report, output, output.with_suffix(".review-queue.json"))
 
 
 def main():
+    """Parse command-line inputs and run the doc review queue operator command."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)

@@ -1,3 +1,6 @@
+# File: deploy/runtime_config.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Validate a small explicit VM env file without executing shell expressions."""
 
 from __future__ import annotations
@@ -10,6 +13,21 @@ REQUIRED = {"RELEASE_ID", "SITE_ADDRESS", "ACME_EMAIL", "STATE_DIR", "DB_PASSWOR
 
 
 def load_config(path: Path) -> dict[str, str]:
+    """Parse a strict runtime env file without executing shell text or expanding values.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+
+    Returns:
+        Validated runtime option names mapped to literal string values.
+
+    Raises:
+        ValueError: Use unique KEY=value entries without whitespace, quotes or
+            interpolation; Missing required VM settings; RELEASE_ID must be the full
+            reviewed Git commit SHA; HTTP_ONLY must be true or false; HTTP-only preview
+            requires SITE_ADDRESS=http://:80; Set a real DNS hostname without a scheme
+            or port; Set the certificate contact email; VM helper/systemd paths.
+    """
     values = {}
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.strip()

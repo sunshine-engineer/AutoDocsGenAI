@@ -1,3 +1,8 @@
+# File: catalog/extractors.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Extract raw API, curated-page and deferred-symbol candidates from documentation chunks."""
+
 from __future__ import annotations
 
 import re
@@ -22,22 +27,42 @@ MARKER_TO_TOPIC_KIND = {
 
 
 class ExtractionOrigin(StrEnum):
+    """Supported origins of extracted API or curated-page candidates."""
+
     API_REFERENCE = "api_reference"
     CURATED_PAGE = "curated_page"
 
 
 class ExclusionReason(StrEnum):
+    """Reasons a raw source candidate is excluded from the catalog."""
+
     CROSS_NAMESPACE = "cross_namespace"
     MALFORMED_REFERENCE = "malformed_reference"
 
 
 class DeferredKind(StrEnum):
+    """Symbol categories recorded but not promoted to first-release topics."""
+
     TYPE = "type"
     CONSTANT = "constant"
 
 
 @dataclass(frozen=True)
 class ExtractedTopic:
+    """Raw topic identity and its originating source chunk.
+
+    Attributes:
+        kind (TopicKind): Kind.
+        qualified_name (str): Qualified name.
+        display_name (str): Human-readable topic or symbol name.
+        canonical_target (str): Canonical target.
+        definition (str | None): Definition.
+        source_chunk_id (str): Source chunk id.
+        source_url (str): Official source URL retained for provenance and namespace
+            checks.
+        origin (ExtractionOrigin): Origin.
+    """
+
     kind: TopicKind
     qualified_name: str
     display_name: str
@@ -50,6 +75,19 @@ class ExtractedTopic:
 
 @dataclass(frozen=True)
 class DeferredSymbol:
+    """Type or constant recorded for later API coverage work.
+
+    Attributes:
+        kind (DeferredKind): Kind.
+        qualified_name (str): Qualified name.
+        display_name (str): Human-readable topic or symbol name.
+        canonical_target (str): Canonical target.
+        owner_qualified_name (str): Owner qualified name.
+        source_chunk_id (str): Source chunk id.
+        source_url (str): Official source URL retained for provenance and namespace
+            checks.
+    """
+
     kind: DeferredKind
     qualified_name: str
     display_name: str
@@ -61,6 +99,17 @@ class DeferredSymbol:
 
 @dataclass(frozen=True)
 class ExcludedCandidate:
+    """Raw candidate excluded with a reason and source lineage.
+
+    Attributes:
+        reason (ExclusionReason): Reason.
+        source_chunk_id (str): Source chunk id.
+        source_url (str): Official source URL retained for provenance and namespace
+            checks.
+        canonical_target (str | None): Canonical target.
+        marker (str | None): Marker.
+    """
+
     reason: ExclusionReason
     source_chunk_id: str
     source_url: str
@@ -70,11 +119,25 @@ class ExcludedCandidate:
 
 @dataclass
 class CatalogExtraction:
+    """Mutable extraction collections with deterministic sorting.
+
+    Attributes:
+        topics (list[ExtractedTopic]): Topic records in the current extraction, proposal
+            or catalog.
+        deferred_symbols (list[DeferredSymbol]): Deferred symbols.
+        exclusions (list[ExcludedCandidate]): Exclusions.
+    """
+
     topics: list[ExtractedTopic] = field(default_factory=list)
     deferred_symbols: list[DeferredSymbol] = field(default_factory=list)
     exclusions: list[ExcludedCandidate] = field(default_factory=list)
 
     def sorted(self) -> CatalogExtraction:
+        """Sort the extraction collections in place and return the same extraction.
+
+        Returns:
+            This extraction after sorting its collections in place.
+        """
         self.topics.sort(
             key=lambda item: (
                 item.qualified_name.casefold(),
@@ -100,7 +163,15 @@ class CatalogExtraction:
 
 
 def extract_catalog_candidates(chunks: list[Chunk], package: str) -> CatalogExtraction:
-    """Extract deterministic raw candidates without persistence or generation."""
+    """Extract deterministic raw candidates without persistence or generation.
+
+    Args:
+        chunks: Validated documentation chunks for the selected source scope.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        Sorted topic candidates, deferred symbols and exclusions.
+    """
 
     normalized_package = normalize_package_name(package)
     result = CatalogExtraction()
@@ -117,6 +188,13 @@ def _extract_reference_candidates(
     normalized_package: str,
     result: CatalogExtraction,
 ) -> None:
+    """Append API markers, deferred symbols and malformed-reference exclusions.
+
+    Args:
+        chunk: Documentation chunk carrying content and source lineage.
+        normalized_package: Package name after canonical punctuation/case normalization.
+        result: Mutable accumulator or completed result consumed by this operation.
+    """
     matches = list(REFERENCE_MARKER.finditer(chunk.content))
     for match in matches:
         target = match.group("target").rstrip("/")
@@ -188,6 +266,15 @@ def _extract_reference_candidates(
 def _extract_curated_candidate(
     chunk: Chunk, normalized_package: str
 ) -> ExtractedTopic | None:
+    """Recognize a curated concept or guide page within the requested package.
+
+    Args:
+        chunk: Documentation chunk carrying content and source lineage.
+        normalized_package: Package name after canonical punctuation/case normalization.
+
+    Returns:
+        Recognized curated topic, or None when the chunk is not a supported page.
+    """
     expected_prefix = f"/python/{normalized_package}"
     path = urlsplit(chunk.source_url).path.rstrip("/")
     if path != expected_prefix and not path.startswith(f"{expected_prefix}/"):
@@ -237,6 +324,14 @@ def _extract_curated_candidate(
 
 
 def _target_parts(target: str) -> list[str]:
+    """Decode the nonempty path components following an API reference prefix.
+
+    Args:
+        target: Reference URL path to decode and inspect.
+
+    Returns:
+        Decoded nonempty API namespace components.
+    """
     path_parts = [unquote(part) for part in target.split("/") if part]
     if len(path_parts) < 2 or path_parts[0] != "python":
         return []
@@ -244,6 +339,15 @@ def _target_parts(target: str) -> list[str]:
 
 
 def _definition_from_content(content: str, display_name: str) -> str | None:
+    """Find a short definition near a named API symbol.
+
+    Args:
+        content: Source text or Markdown content to process.
+        display_name: Human-readable topic or symbol name.
+
+    Returns:
+        Extracted definition text, or None if no suitable line exists.
+    """
     plain = _clean_markdown_text(content)
     prefix = _clean_markdown_text(display_name)
     if plain.casefold().startswith(prefix.casefold()):
@@ -253,6 +357,14 @@ def _definition_from_content(content: str, display_name: str) -> str | None:
 
 
 def _plain_definition(content: str) -> str | None:
+    """Select the first non-heading definition line from curated Markdown.
+
+    Args:
+        content: Source text or Markdown content to process.
+
+    Returns:
+        First suitable definition line, or None.
+    """
     lines = [line.strip() for line in content.splitlines() if line.strip()]
     for line in lines:
         if re.match(r"^#{1,6}\s", line):
@@ -264,6 +376,14 @@ def _plain_definition(content: str) -> str | None:
 
 
 def _clean_markdown_text(value: str) -> str:
+    """Remove link syntax and inline emphasis from a candidate definition.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+
+    Returns:
+        Definition text with link/emphasis syntax removed.
+    """
     value = value.replace("\\_", "_").strip()
     value = re.sub(r"^#{1,6}\s*", "", value)
     value = re.sub(r"[`*]", "", value)

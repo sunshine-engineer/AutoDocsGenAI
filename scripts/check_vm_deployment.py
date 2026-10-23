@@ -1,3 +1,6 @@
+# File: scripts/check_vm_deployment.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Smoke-test the supplied-VM bundle in isolated local Docker containers."""
 
 from __future__ import annotations
@@ -16,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    """Parse command-line inputs and validate the supplied-VM containers in an isolated
+    disposable project.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--docker", default="docker")
     parser.add_argument("--build", action="store_true")
@@ -77,9 +83,26 @@ def main():
     ]
 
     def run(arguments, **kwargs):
+        """Run a bounded checked subprocess from the repository root.
+
+        Args:
+            arguments: Explicit command arguments or scripted tool arguments.
+            **kwargs: Keyword overrides forwarded to the wrapped API.
+
+        Returns:
+            Checked subprocess result, including captured output when requested.
+        """
         return subprocess.run(arguments, check=True, timeout=120, cwd=ROOT, **kwargs)
 
     def worker(*arguments):
+        """Run one explicit worker command in the isolated disposable Compose project.
+
+        Args:
+            *arguments: Explicit command arguments or scripted tool arguments.
+
+        Returns:
+            Captured stdout bytes from the explicit worker command.
+        """
         return run(
             [*compose, "run", "--rm", "worker", *arguments], capture_output=True
         ).stdout

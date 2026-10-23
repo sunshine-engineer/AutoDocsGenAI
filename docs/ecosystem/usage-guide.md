@@ -1,3 +1,9 @@
+<!--
+File: docs/ecosystem/usage-guide.md
+Purpose: Source-backed usage guide.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Source-backed usage guide
 
 ## Choose a compatible installation

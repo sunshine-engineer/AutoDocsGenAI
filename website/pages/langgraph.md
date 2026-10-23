@@ -1,3 +1,9 @@
+<!--
+File: website/pages/langgraph.md
+Purpose: LangGraph.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # LangGraph
 
 ## Version inventory

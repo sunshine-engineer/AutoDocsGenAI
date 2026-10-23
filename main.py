@@ -1,3 +1,10 @@
+# File: main.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Run confirmed-source ingestion and indexing; generation and export remain separate
+commands.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -9,6 +16,7 @@ from pipeline.workflow import run_pipeline
 
 
 def main() -> None:
+    """Parse confirmed-source inputs, ingest/index them and report the generation boundary."""
     parser = argparse.ArgumentParser(
         description="Ingest an explicitly confirmed package documentation source"
     )

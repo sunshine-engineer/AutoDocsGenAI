@@ -1,3 +1,7 @@
+# File: .devcontainer/Dockerfile
+# Purpose: Build the Python development runtime and pinned uv bootstrap.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

@@ -1,3 +1,7 @@
+# File: deploy/web.Dockerfile
+# Purpose: Build approved reader artifacts and serve them from an unprivileged static image.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 FROM python:3.12.15-slim-bookworm AS build
 RUN pip install --no-cache-dir uv==0.12.3
 WORKDIR /app

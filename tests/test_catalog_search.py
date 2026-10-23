@@ -1,3 +1,8 @@
+# File: tests/test_catalog_search.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog search."""
+
 from unittest.mock import Mock, patch
 
 from catalog.search import CatalogEvidenceSearch
@@ -5,6 +10,7 @@ from models.config import EmbeddingConfig
 
 
 def test_catalog_search_reuses_one_embedder_for_multiple_queries():
+    """Verify catalog search reuses one embedder for multiple queries."""
     config = EmbeddingConfig(
         provider="fastembed",
         model="BAAI/bge-small-en-v1.5",

@@ -1,3 +1,9 @@
+<!--
+File: docs/ecosystem/README.md
+Purpose: LangChain and LangGraph ecosystem documentation.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # LangChain and LangGraph ecosystem documentation
 
 This batch produces a source-derived reference for a bounded ecosystem of 30 packages: 89 exact releases, 8,432 Python modules, and 34,452 class/function/method declarations. Every release wheel matched the SHA-256 in official PyPI metadata. All Python files parsed successfully. These counts include private implementation modules; they are **not** a count of verified public APIs.

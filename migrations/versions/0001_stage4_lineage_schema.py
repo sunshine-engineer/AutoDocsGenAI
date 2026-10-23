@@ -1,3 +1,6 @@
+# File: migrations/versions/0001_stage4_lineage_schema.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Create the Stage 4 documentation lineage schema.
 
 Revision ID: 0001_stage4_lineage
@@ -24,6 +27,7 @@ TIMESTAMPED_TABLES = (
 
 
 def upgrade() -> None:
+    """Apply this revision of the database schema using Alembic operations."""
     op.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
     op.create_table(
@@ -343,6 +347,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    """Remove this revision of the schema; affected tables and data may be dropped."""
     op.drop_table("chunks")
     op.drop_table("source_documents")
     op.drop_table("sources")

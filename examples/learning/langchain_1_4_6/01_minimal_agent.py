@@ -1,3 +1,6 @@
+# File: examples/learning/langchain_1_4_6/01_minimal_agent.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Minimal agent invocation: fixed model output, no tools or provider calls."""
 
 from langchain.agents import create_agent

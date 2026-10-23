@@ -1,3 +1,7 @@
+# File: .github/workflows/ci.yml
+# Purpose: Validate quality, PostgreSQL, compatibility and VM containers on reviewed changes.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 name: CI
 
 on:
@@ -48,6 +52,9 @@ jobs:
 
       - name: Run Ruff
         run: uv run ruff check .
+
+      - name: Check repository documentation conventions
+        run: uv run python -m scripts.check_repository_consistency
 
       - name: Run MyPy
         run: uv run mypy .

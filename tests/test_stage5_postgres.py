@@ -1,3 +1,8 @@
+# File: tests/test_stage5_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage5 postgres."""
+
 import os
 
 import pytest
@@ -18,6 +23,12 @@ pytestmark = [
 
 
 def build_state() -> PipelineState:
+    """Prepare the build state test fixture without shared production state.
+
+    Returns:
+        PipelineState: Prepare the build state test fixture without shared production
+            state.
+    """
     documents = [
         CleanDocument(
             title="Installation",
@@ -65,6 +76,7 @@ def build_state() -> PipelineState:
 
 
 def test_real_cpu_embeddings_are_idempotent_and_searchable():
+    """Verify real cpu embeddings are idempotent and searchable."""
     assert DATABASE_URL is not None
     engine = create_database_engine(DATABASE_URL)
     config = EmbeddingConfig(

@@ -1,0 +1,1604 @@
+{
+  "schema_version": "file-inventory-v1",
+  "metadata_policy": "Maintainer defaults were supplied by the user; no original authorship is inferred. JSON, locks, licenses and frozen evidence retain their original format and metadata.",
+  "directories": {
+    ".devcontainer": "Development image and editor bootstrap",
+    ".github": "Repository automation and continuous validation",
+    "agents": "Reserved main-pipeline generation/review adapters",
+    "catalog": "Snapshot-bound topic catalog construction and review",
+    "config": "Typed YAML settings and validated environment defaults",
+    "data": "Reserved package and ignored runtime artifacts",
+    "database": "Relational lineage tables and database access",
+    "deploy": "Supplied-VM static reader and optional private pipeline operations",
+    "discovery": "Official source discovery and human-confirmed release boundaries",
+    "docs": "Operating guides, immutable exports and historical evidence",
+    "examples": "Pinned executable offline demonstrations",
+    "generation": "Grounded generation, immutable revisions and approval-gated export",
+    "indexing": "Chunking, CPU embeddings and filtered vector search",
+    "ingestion": "Confirmed-source fetching, extraction and normalization",
+    "migrations": "Alembic database evolution and revision template",
+    "models": "Typed data and configuration validation contracts",
+    "notebooks": "Reserved notebook namespace",
+    "pipeline": "Ordered ingestion/indexing orchestration",
+    "planner": "Documentation crawl discovery, filtering and selection",
+    "prompts": "Reserved prompt namespace",
+    "retrieval": "Adapter boundary and bounded retrieval evaluation",
+    "scripts": "Operator CLIs and reproducible validation tools",
+    "services": "Shared persistence and framework-detection services",
+    "tests": "Behavioral tests and isolated evidence fixtures",
+    "utils": "Configuration, transport, logging and progress utilities",
+    "website": "Reader templates, assets and publication allowlist"
+  },
+  "files": [
+    {
+      "path": ".devcontainer/Dockerfile",
+      "purpose": "Development image and editor bootstrap: Dockerfile",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".devcontainer/devcontainer.json",
+      "purpose": "Development image and editor bootstrap: devcontainer.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": ".devcontainer/setup.sh",
+      "purpose": "Development image and editor bootstrap: setup.sh",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".dockerignore",
+      "purpose": "Root project configuration or repository contract: .dockerignore",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".editorconfig",
+      "purpose": "Root project configuration or repository contract: .editorconfig",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".env.example",
+      "purpose": "Root project configuration or repository contract: .env.example",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".gitattributes",
+      "purpose": "Root project configuration or repository contract: .gitattributes",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "purpose": "Repository automation and continuous validation: ci.yml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": ".gitignore",
+      "purpose": "Root project configuration or repository contract: .gitignore",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "LICENSE",
+      "purpose": "Root project configuration or repository contract: LICENSE",
+      "policy": "preserve-license-text"
+    },
+    {
+      "path": "README.md",
+      "purpose": "AutoDocsGenAI",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "agents/__init__.py",
+      "purpose": "Reserved main-pipeline writing and review adapters; standalone generation is implemented",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "agents/reviewer.py",
+      "purpose": "Reserve the main-pipeline review adapter; final page approval uses standalone commands.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "agents/validator.py",
+      "purpose": "Reserve the main-pipeline validation adapter; citation checks are implemented",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "agents/writer.py",
+      "purpose": "Reserve the main-pipeline writing adapter; grounded drafts use standalone generation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "alembic.ini",
+      "purpose": "Root project configuration or repository contract: alembic.ini",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "catalog/__init__.py",
+      "purpose": "Deterministic topic-catalog construction services.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/artifacts.py",
+      "purpose": "Render, atomically write and verify catalog artifacts against persisted historical",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/coverage.py",
+      "purpose": "Calculate catalog coverage with explicit input and evidence denominators.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/evidence.py",
+      "purpose": "Select structural and optional hybrid evidence within package and snapshot boundaries.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/extractors.py",
+      "purpose": "Extract raw API, curated-page and deferred-symbol candidates from documentation chunks.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/identity.py",
+      "purpose": "Freeze and validate canonical non-secret catalog construction identities.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/normalization.py",
+      "purpose": "Merge candidate identities and assign stable hierarchy, ordering and output paths.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/repository.py",
+      "purpose": "Persist draft catalogs, topic reconciliation and ranked evidence in caller transactions.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/search.py",
+      "purpose": "Reuse a single local embedding model for snapshot-filtered catalog evidence queries.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/service.py",
+      "purpose": "Assemble and persist deterministic snapshot-bound catalog proposals.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/snapshot.py",
+      "purpose": "Resolve complete database snapshots and verify their chunk lineage hashes.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "catalog/workflow.py",
+      "purpose": "Lock catalog rows and enforce explicit submit, approve and reject transitions.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "compose.ollama.yaml",
+      "purpose": "Root project configuration or repository contract: compose.ollama.yaml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "compose.yaml",
+      "purpose": "Root project configuration or repository contract: compose.yaml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "config/__init__.py",
+      "purpose": "Application settings and configuration compatibility exports.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "config/config.yaml",
+      "purpose": "Typed YAML settings and validated environment defaults: config.yaml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "config/environment.py",
+      "purpose": "Resolve deployment-dependent defaults without reading secrets or .env implicitly.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "config/logging.yaml",
+      "purpose": "Typed YAML settings and validated environment defaults: logging.yaml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "config/runtime.py",
+      "purpose": "Load typed application settings for compatibility with existing runtime imports.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "config/settings.py",
+      "purpose": "Re-export crawl and chunking settings for existing pipeline imports.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "data/__init__.py",
+      "purpose": "Reserved package marker beside ignored runtime artifacts.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "database/__init__.py",
+      "purpose": "PostgreSQL persistence infrastructure for AutoDocsGenAI.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "database/base.py",
+      "purpose": "Define the shared SQLAlchemy declarative metadata base.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "database/engine.py",
+      "purpose": "Create PostgreSQL engines and session factories without logging credentials.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "database/models.py",
+      "purpose": "Define persisted package, source, chunk, catalog and generation lineage tables.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "deploy/Caddyfile",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: Caddyfile",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/__init__.py",
+      "purpose": "Supplied-VM runtime configuration and private worker bootstrap.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "deploy/autodocs.service",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: autodocs.service",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/compose.vm.yml",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: compose.vm.yml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/init-vm.sh",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: init-vm.sh",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/ops.sh",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: ops.sh",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/runtime.env.example",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: runtime.env.example",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/runtime_config.py",
+      "purpose": "Validate a small explicit VM env file without executing shell expressions.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "deploy/setup-vm.sh",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: setup-vm.sh",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/web.Dockerfile",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: web.Dockerfile",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/worker.Dockerfile",
+      "purpose": "Supplied-VM static reader and optional private pipeline operations: worker.Dockerfile",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "deploy/worker_entrypoint.py",
+      "purpose": "Build the private database URL from a mounted secret, then exec one job.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/__init__.py",
+      "purpose": "Discover official package documentation and validate confirmed source selections.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/discover.py",
+      "purpose": "Populate pipeline discovery state after explicit source confirmation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/manager.py",
+      "purpose": "Delegate discovery metadata lookup to the configured PyPI provider.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/manifest_builder.py",
+      "purpose": "Translate provider metadata into typed documentation source manifests.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/providers/__init__.py",
+      "purpose": "Discover official package documentation and validate confirmed source selections.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/providers/base.py",
+      "purpose": "Define the documentation discovery provider interface.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/providers/manual.py",
+      "purpose": "Reserve the manual discovery provider; it currently returns no metadata.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/providers/pypi.py",
+      "purpose": "Read official package metadata from the PyPI JSON API.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/pypi_client.py",
+      "purpose": "Reserved discovery transport module; PyPI currently uses the shared HTTP client.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/release_snapshot.py",
+      "purpose": "Freeze and verify exact-release official LangChain source snapshots.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/source_selection.py",
+      "purpose": "Check canonical crawl URLs against explicit human-confirmed source boundaries.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "discovery/validator.py",
+      "purpose": "Validate documentation-source reachability through the shared HTTP client.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "docs/README.md",
+      "purpose": "Documentation index",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/architecture.md",
+      "purpose": "Architecture and project boundaries",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/chunking-stage.md",
+      "purpose": "Chunking Stage",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/closure-final-demo-validation.md",
+      "purpose": "Five-page closure demo validation",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/closure-pilot-validation.md",
+      "purpose": "Exact-release source and Docker writing pilot",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/closure-tracker.md",
+      "purpose": "Closure tracker and deployment priorities",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/configuration.md",
+      "purpose": "Configuration reference",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/README.md",
+      "purpose": "LangChain 1.4.6 — historical content review pack",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/concepts/agent-architecture.md",
+      "purpose": "LangChain agents and LangGraph",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/guides/installation.md",
+      "purpose": "Installation",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/modules/agents/README.md",
+      "purpose": "langchain.agents",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/modules/agents/classes/agent-middleware.md",
+      "purpose": "AgentMiddleware",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/modules/agents/functions/create-agent.md",
+      "purpose": "create_agent",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/demo/langchain-1.4.6/review-manifest.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: review-manifest.json",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/deployment/local-validation.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: local-validation.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/deployment/supplied-vm.md",
+      "purpose": "Deploy to the supplied Linux VM",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/ecosystem/README.md",
+      "purpose": "LangChain and LangGraph ecosystem documentation",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/ecosystem/coverage.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: coverage.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/assessment.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: assessment.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/current-requirements.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: current-requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/current.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: current.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/incompatible-install.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: incompatible-install.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/integration-requirements.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: integration-requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/integrations.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: integrations.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/intermediate-requirements.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: intermediate-requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/intermediate.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: intermediate.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/legacy-requirements.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: legacy-requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/legacy.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: legacy.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/matrix.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: matrix.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/evidence/previous-requirements.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: previous-requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "docs/ecosystem/evidence/previous.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: previous.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/release-plan.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: release-plan.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/ecosystem/usage-guide.md",
+      "purpose": "Source-backed usage guide",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/README.md",
+      "purpose": "langchain 1.4.6",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/approval-record.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: approval-record.json",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/build-manifest.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: build-manifest.json",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/concepts/agent-architecture.md",
+      "purpose": "LangChain agents and LangGraph",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/guides/installation.md",
+      "purpose": "Installation",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/modules/agents/README.md",
+      "purpose": "langchain.agents",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/modules/agents/classes/agent-middleware.md",
+      "purpose": "AgentMiddleware",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/generated/langchain/1.4.6/modules/agents/functions/create-agent.md",
+      "purpose": "create_agent",
+      "policy": "immutable-publication-or-review-snapshot"
+    },
+    {
+      "path": "docs/handover.md",
+      "purpose": "Handover checklist",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/interview-demo.md",
+      "purpose": "Interview demo and closure checklist",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/01_minimal_agent.md",
+      "purpose": "Invoke an agent without a provider account",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/02_middleware.md",
+      "purpose": "Observe the model step with middleware",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/03_conversation_state.md",
+      "purpose": "Retain a conversation and isolate another one",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/04_tool_call.md",
+      "purpose": "Execute a local tool and handle invalid arguments",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/README.md",
+      "purpose": "Learn agents through four executable recipes",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/execution-consistency-2026-10-23.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: execution-consistency-2026-10-23.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/learning/langchain-1.4.6/execution.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: execution.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/local-docs-reader.md",
+      "purpose": "Local documentation reader",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/maintenance.md",
+      "purpose": "Maintenance standards",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/maintenance/file-inventory.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: file-inventory.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/maintenance/validation-2026-10-23.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: validation-2026-10-23.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/persistent-generation-validation.md",
+      "purpose": "Persistent generation validation — 2026-10-15",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/persistent-generation.md",
+      "purpose": "Persistent generation workflow",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "docs/pilot-langchain-1.4.6-review.md",
+      "purpose": "LangChain 1.4.6: source and five-page pilot for human review",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/project-completion-plan.md",
+      "purpose": "AutoDocsGenAI project completion plan",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/quality/README.md",
+      "purpose": "Documentation quality and model comparison",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/quality/UPSTREAM-LANGCHAIN-LICENSE.txt",
+      "purpose": "Operating guides, immutable exports and historical evidence: UPSTREAM-LANGCHAIN-LICENSE.txt",
+      "policy": "preserve-license-text"
+    },
+    {
+      "path": "docs/quality/agent-review.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: agent-review.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/benchmark-input-full.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: benchmark-input-full.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/benchmark-input.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: benchmark-input.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/comparison-run-01.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: comparison-run-01.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/comparison-run-02.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: comparison-run-02.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/comparison-run-02.review-queue.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: comparison-run-02.review-queue.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/findings.md",
+      "purpose": "Exploratory model comparison findings",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/quality/human-review-queue.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: human-review-queue.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/quality/runtime-environment.json",
+      "purpose": "Operating guides, immutable exports and historical evidence: runtime-environment.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "docs/stage-4-postgres-pgvector-plan.md",
+      "purpose": "Stage 4 implementation plan: PostgreSQL and pgvector foundation",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-4-schema-review.md",
+      "purpose": "Stage 4 review stop B: lineage schema",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-5-embedding-prototype.md",
+      "purpose": "Stage 5 embedding and vector-indexing prototype",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-stop-b1-extractor-review.md",
+      "purpose": "Stage 6 Stop B1: catalog extractor review",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-stop-b2-normalization-evidence-review.md",
+      "purpose": "Stage 6 Stop B2: normalization and evidence review",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-stop-b3-1-snapshot-identity-review.md",
+      "purpose": "Stage 6 Stop B3.1: snapshot resolution and identity review",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-stop-b3-persistence-plan.md",
+      "purpose": "Stage 6 Stop B3: catalog persistence and review workflow plan",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-stop-b3-validation.md",
+      "purpose": "Stage 6 B3: catalog workflow validation",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-topic-catalog-stop-a.md",
+      "purpose": "Stage 6 Stop A: topic catalog foundation",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "docs/stage-6-topic-catalog-stop-b-plan.md",
+      "purpose": "Stage 6 Stop B: catalog construction plan",
+      "policy": "historical-or-hash-bound-markdown-preserve-record"
+    },
+    {
+      "path": "examples/langchain_1_4_6_offline.py",
+      "purpose": "Author-written smoke example for langchain==1.4.6; no provider or API key.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "examples/learning/langchain_1_4_6/01_minimal_agent.py",
+      "purpose": "Minimal agent invocation: fixed model output, no tools or provider calls.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "examples/learning/langchain_1_4_6/02_middleware.py",
+      "purpose": "Observe synchronous model calls without changing the conversation state.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "examples/learning/langchain_1_4_6/03_conversation_state.py",
+      "purpose": "Check same-thread retention and separate-thread isolation in memory.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "examples/learning/langchain_1_4_6/04_tool_call.py",
+      "purpose": "Execute a local tool using scripted model messages; no provider inference.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "examples/learning/langchain_1_4_6/requirements.txt",
+      "purpose": "Pinned executable offline demonstrations: requirements.txt",
+      "policy": "preserve-exact-requirements-or-evidence"
+    },
+    {
+      "path": "generation/__init__.py",
+      "purpose": "Grounded-writing contracts and providers; production workflow is review-gated.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/contracts.py",
+      "purpose": "Validate structured source evidence, writer responses and exact source quotations.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/export.py",
+      "purpose": "Export only exact approved revisions with provenance and approval manifests.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/navigation.py",
+      "purpose": "Validate safe relative navigation outside fenced Markdown examples.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/ollama.py",
+      "purpose": "Grounded drafts, durable job state, human review and approval-gated export. Module:",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/persistence.py",
+      "purpose": "Persist bounded jobs, worker leases, immutable revisions and human page reviews.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/pilot.py",
+      "purpose": "Generate a fixed five-topic review-only pilot from an explicitly approved source",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "generation/release_bridge.py",
+      "purpose": "Import an approved official source snapshot into persisted pilot lineage and catalogs.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "indexing/__init__.py",
+      "purpose": "Deterministic Markdown chunking, CPU embeddings and pgvector retrieval.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "indexing/chunk_storage.py",
+      "purpose": "Write validated chunks as deterministic JSONL artifacts.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "indexing/chunker.py",
+      "purpose": "Split Markdown deterministically while preserving headings, fences and stable chunk",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "indexing/embedder.py",
+      "purpose": "Adapt FastEmbed CPU vectors to application indexing and query contracts.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "indexing/vectorstore.py",
+      "purpose": "Persist versioned chunk vectors and rank filtered semantic and lexical search results.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/__init__.py",
+      "purpose": "Fetch confirmed documentation, extract content and persist normalized Markdown.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/cleaner.py",
+      "purpose": "Normalize Markdown whitespace; keep the legacy pipeline cleaner adapter explicit.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/detectors/__init__.py",
+      "purpose": "Fetch confirmed documentation, extract content and persist normalized Markdown.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/detectors/framework.py",
+      "purpose": "Reserve the detector namespace; framework detection lives in",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/downloader.py",
+      "purpose": "Reserve the legacy downloader adapter; actual fetching occurs in ingestion.ingest.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractor.py",
+      "purpose": "Select a documentation-framework content extractor for fetched HTML.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/__init__.py",
+      "purpose": "Fetch confirmed documentation, extract content and persist normalized Markdown.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/base.py",
+      "purpose": "Define the abstract main-content extraction interface.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/docusaurus.py",
+      "purpose": "Reserve the docusaurus extractor module; the active selector currently uses the generic",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/generic.py",
+      "purpose": "Select generic main/article HTML content with a document fallback.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/mintlify.py",
+      "purpose": "Reserve the mintlify extractor module; the active selector currently uses the generic",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/mkdocs.py",
+      "purpose": "Reserve the mkdocs extractor module; the active selector currently uses the generic",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/selector.py",
+      "purpose": "Return the generic extractor; framework-specific dispatch remains reserved.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/extractors/sphinx.py",
+      "purpose": "Reserve the sphinx extractor module; the active selector currently uses the generic",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/fetchers/__init__.py",
+      "purpose": "Fetch confirmed documentation, extract content and persist normalized Markdown.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/fetchers/base.py",
+      "purpose": "Define the raw-document source fetching interface.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/fetchers/http_fetcher.py",
+      "purpose": "Fetch official pages over synchronous HTTP and retain response/framework provenance.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/fetchers/playwright_fetcher.py",
+      "purpose": "Fetch JavaScript-rendered pages through a headless browser.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/fetchers/selector.py",
+      "purpose": "Select browser or plain-HTTP source fetching explicitly.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/ingest.py",
+      "purpose": "Fetch confirmed crawl pages and persist cleaned Markdown with source provenance.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/normalizer.py",
+      "purpose": "Convert extracted HTML into ATX-heading Markdown.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/parser.py",
+      "purpose": "Reserve the legacy parser adapter; active parsing occurs in ingestion.ingest.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/rm_fetcher.py",
+      "purpose": "Reserved fetcher module; active fetchers live in ingestion/fetchers/.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "ingestion/storage.py",
+      "purpose": "Persist one cleaned document under a title-derived Markdown filename.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "main.py",
+      "purpose": "Run confirmed-source ingestion and indexing; generation and export remain separate",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "migrations/README.md",
+      "purpose": "Database migrations",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "migrations/env.py",
+      "purpose": "Alembic schema migrations for lineage, embeddings, catalogs and generation. Module: env.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "migrations/script.py.mako",
+      "purpose": "Alembic database evolution and revision template: script.py.mako",
+      "policy": "template-metadata-in-non-emitting-comment"
+    },
+    {
+      "path": "migrations/versions/0001_stage4_lineage_schema.py",
+      "purpose": "Create the Stage 4 documentation lineage schema.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "migrations/versions/0002_stage5_chunk_embeddings.py",
+      "purpose": "Add versioned chunk embeddings and cosine index.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "migrations/versions/0003_stage6_topic_catalog.py",
+      "purpose": "Add versioned topic catalogs and chunk evidence mappings.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "migrations/versions/0004_persistent_generation.py",
+      "purpose": "Persist bounded generation jobs, immutable page revisions, citations and reviews.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "mkdocs.yml",
+      "purpose": "Root project configuration or repository contract: mkdocs.yml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "models/__init__.py",
+      "purpose": "Typed validation contracts shared by the documentation pipeline.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/chunk.py",
+      "purpose": "Validate deterministic chunk identity, source lineage and content metadata.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/clean_document.py",
+      "purpose": "Represent normalized Markdown with retained source provenance.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/config.py",
+      "purpose": "Validate YAML application configuration and chunking limits.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/crawl.py",
+      "purpose": "Represent bounded crawl page selections and their source root.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/document.py",
+      "purpose": "Represent retrieval hits, generated sections and validation findings.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/framework.py",
+      "purpose": "Enumerate recognized documentation-framework identifiers.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/identity.py",
+      "purpose": "Serialize and hash canonical JSON identities shared by persisted lineage.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/manifest.py",
+      "purpose": "Represent discovered official documentation sources and exact package manifests.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/metadata.py",
+      "purpose": "Represent page/chunk metadata and source attribution.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/raw_document.py",
+      "purpose": "Represent fetched HTML, response status and fetch provenance.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/source_selection.py",
+      "purpose": "Represent explicit human source confirmation and exact release boundaries.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/state.py",
+      "purpose": "Carry typed artifacts and stage results through pipeline orchestration.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "models/topic.py",
+      "purpose": "Validate catalog topics, acyclic hierarchy, evidence and review-state invariants.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "notebooks/__init__.py",
+      "purpose": "Reserved namespace for future exploratory notebooks; no notebook workflow is",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "pipeline/__init__.py",
+      "purpose": "Orchestrate ingestion and indexing with explicit progress reporting.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "pipeline/workflow.py",
+      "purpose": "Execute pipeline stages in dependency order and report stage completion.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "planner/__init__.py",
+      "purpose": "Discover, filter and select documentation pages for bounded crawling.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "planner/filters.py",
+      "purpose": "Apply documentation URL inclusion rules before crawl planning.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "planner/planner.py",
+      "purpose": "Build a typed, bounded crawl plan from the selected documentation root.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "planner/selectors.py",
+      "purpose": "Select a bounded prefix of discovered crawl pages.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "planner/sitemap.py",
+      "purpose": "Discover same-documentation links from a root page.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "prompts/__init__.py",
+      "purpose": "Reserved prompt package; the current writer prompt lives in generation/ollama.py.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "pyproject.toml",
+      "purpose": "Root project configuration or repository contract: pyproject.toml",
+      "policy": "native-line-comment-header"
+    },
+    {
+      "path": "retrieval/__init__.py",
+      "purpose": "Retrieval adapter boundary and bounded keyword-based evaluation contracts.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "retrieval/evaluation.py",
+      "purpose": "Measure bounded retrieval hit rates and reciprocal ranks against keyword cases.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "retrieval/evaluation_cases/langchain-0.3.json",
+      "purpose": "Adapter boundary and bounded retrieval evaluation: langchain-0.3.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "retrieval/retriever.py",
+      "purpose": "Reserve the main retrieval adapter; standalone filtered search is implemented",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/__init__.py",
+      "purpose": "Explicit operator commands, compatibility probes and static-reader validation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "purpose": "Assemble an allowlisted, approval-checked local reader and build static HTML.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/build_topic_catalog.py",
+      "purpose": "Parse command-line inputs and run the build topic catalog operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/catalog_cli.py",
+      "purpose": "Explicit operator commands, compatibility probes and static-reader validation. Module:",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/check_docs_site_browser.py",
+      "purpose": "Verify the built reader's links and desktop/mobile browser interactions.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/check_learning_examples.py",
+      "purpose": "Execute the authored learning examples; validate snippets and record evidence.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/check_repository_consistency.py",
+      "purpose": "Check tracked-file documentation and generate the format-aware file inventory.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/check_vm_deployment.py",
+      "purpose": "Smoke-test the supplied-VM bundle in isolated local Docker containers.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/compare_doc_models.py",
+      "purpose": "Compare installed Ollama writers on identical pinned evidence; no auto approval.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/confirm_source.py",
+      "purpose": "Parse command-line inputs and run the confirm source operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/doc_review_queue.py",
+      "purpose": "Build review handoffs from recorded model runs; never approve content.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/ecosystem_docs.py",
+      "purpose": "Build version-pinned API references from hash-verified PyPI wheels.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/ecosystem_integrations.py",
+      "purpose": "Offline integration contracts; provider requests are deliberately blocked.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/ecosystem_matrix.py",
+      "purpose": "Run offline contracts in disposable exact-version environments using uv.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/ecosystem_probe.py",
+      "purpose": "Offline runtime contracts; run inside an isolated, exactly pinned environment.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/evaluate_retrieval.py",
+      "purpose": "Parse command-line inputs and run the evaluate retrieval operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/generate_pilot.py",
+      "purpose": "Parse command-line inputs and run the generate pilot operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/generation.py",
+      "purpose": "Parse command-line inputs and dispatch explicit generation, edit, review and export",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/import_chunks.py",
+      "purpose": "Parse command-line inputs and run the import chunks operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/import_release_pilot.py",
+      "purpose": "Parse command-line inputs and run the import release pilot operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/index_chunks.py",
+      "purpose": "Parse command-line inputs and run the index chunks operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/inspect_topic_catalog.py",
+      "purpose": "Parse command-line inputs and run the inspect topic catalog operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/prepare_embedding_model.py",
+      "purpose": "Parse command-line inputs and run the prepare embedding model operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/prepare_release_snapshot.py",
+      "purpose": "Parse command-line inputs and run the prepare release snapshot operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/review_topic_catalog.py",
+      "purpose": "Parse command-line inputs and run the review topic catalog operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "scripts/search_chunks.py",
+      "purpose": "Parse command-line inputs and run the search chunks operator command.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "services/__init__.py",
+      "purpose": "Shared persistence, lineage and documentation-framework detection services.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "services/chunk_importer.py",
+      "purpose": "Shared persistence, lineage and documentation-framework detection services. Module:",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "services/framework_detector.py",
+      "purpose": "Shared persistence, lineage and documentation-framework detection services. Module:",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/__init__.py",
+      "purpose": "Behavioral tests for   init  .",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/fixtures/catalog/reference_chunks.json",
+      "purpose": "Behavioral tests and isolated evidence fixtures: reference_chunks.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "tests/fixtures/generation/writer-contract-v6.json",
+      "purpose": "Behavioral tests and isolated evidence fixtures: writer-contract-v6.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    },
+    {
+      "path": "tests/test_catalog_artifacts.py",
+      "purpose": "Behavioral tests for catalog artifacts.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_evidence.py",
+      "purpose": "Behavioral tests for catalog evidence.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_extractors.py",
+      "purpose": "Behavioral tests for catalog extractors.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_identity.py",
+      "purpose": "Behavioral tests for catalog identity.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_normalization.py",
+      "purpose": "Behavioral tests for catalog normalization.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_persistence_postgres.py",
+      "purpose": "Behavioral tests for catalog persistence postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_proposal_postgres.py",
+      "purpose": "Behavioral tests for catalog proposal postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_search.py",
+      "purpose": "Behavioral tests for catalog search.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_service.py",
+      "purpose": "Behavioral tests for catalog service.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_snapshot_postgres.py",
+      "purpose": "Behavioral tests for catalog snapshot postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_catalog_workflow_postgres.py",
+      "purpose": "Behavioral tests for catalog workflow postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_chunk_importer.py",
+      "purpose": "Behavioral tests for chunk importer.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_chunk_importer_postgres.py",
+      "purpose": "Behavioral tests for chunk importer postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_chunker.py",
+      "purpose": "Behavioral tests for chunker.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_chunking_contract.py",
+      "purpose": "Behavioral tests for chunking contract.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_cleaner.py",
+      "purpose": "Behavioral tests for cleaner.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_config.py",
+      "purpose": "Behavioral tests for config.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_discovery.py",
+      "purpose": "Behavioral tests for discovery.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_doc_model_comparison.py",
+      "purpose": "Benchmark failures must remain visible and never become successful scores.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_docs_site.py",
+      "purpose": "Behavioral tests for docs site.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_ecosystem_docs.py",
+      "purpose": "Behavioral tests for ecosystem docs.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_environment.py",
+      "purpose": "Verify configuration precedence, validation and runtime consumers without network calls.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_generation_navigation.py",
+      "purpose": "Behavioral tests for generation navigation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_grounded_writer.py",
+      "purpose": "Behavioral tests for grounded writer.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_logger.py",
+      "purpose": "Behavioral tests for logger.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_persistent_generation_postgres.py",
+      "purpose": "Behavioral tests for persistent generation postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_pilot.py",
+      "purpose": "Behavioral tests for pilot.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_progress.py",
+      "purpose": "Behavioral tests for progress.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_release_bridge_postgres.py",
+      "purpose": "Behavioral tests for release bridge postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_release_snapshot.py",
+      "purpose": "Behavioral tests for release snapshot.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_retrieval_evaluation.py",
+      "purpose": "Behavioral tests for retrieval evaluation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_source_confirmation_postgres.py",
+      "purpose": "Behavioral tests for source confirmation postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_source_selection.py",
+      "purpose": "Behavioral tests for source selection.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage4a_foundation.py",
+      "purpose": "Behavioral tests for stage4a foundation.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage4b_schema.py",
+      "purpose": "Behavioral tests for stage4b schema.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage5_embeddings.py",
+      "purpose": "Behavioral tests for stage5 embeddings.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage5_postgres.py",
+      "purpose": "Behavioral tests for stage5 postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage6_catalog_schema_postgres.py",
+      "purpose": "Behavioral tests for stage6 catalog schema postgres.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_stage6_topic_catalog.py",
+      "purpose": "Behavioral tests for stage6 topic catalog.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_vm_deployment.py",
+      "purpose": "Behavioral tests for vm deployment.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_vm_setup.py",
+      "purpose": "Exercise the real shell entrypoint's non-mutating planning and input paths.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "tests/test_workflow_progress.py",
+      "purpose": "Behavioral tests for workflow progress.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/__init__.py",
+      "purpose": "Shared configuration loading, HTTP transport, logging and progress reporting.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/config_loader.py",
+      "purpose": "Load YAML application configuration through the typed Config contract.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/file_utils.py",
+      "purpose": "Reserved filesystem helper module; no behavior is implemented.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/helpers.py",
+      "purpose": "Reserved shared helper module; no behavior is implemented.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/http_client.py",
+      "purpose": "Own the shared synchronous HTTP client and configurable transport defaults.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/logger.py",
+      "purpose": "Initialize application logging and create configured file-handler directories.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "utils/progress.py",
+      "purpose": "Write concise structured stage-completion and next-stage progress messages.",
+      "policy": "python-header-and-docstrings"
+    },
+    {
+      "path": "uv.lock",
+      "purpose": "Root project configuration or repository contract: uv.lock",
+      "policy": "generated-lock-no-manual-headers"
+    },
+    {
+      "path": "website/assets/catalog.js",
+      "purpose": "Reader templates, assets and publication allowlist: catalog.js",
+      "policy": "native-block-comment-header"
+    },
+    {
+      "path": "website/assets/reader.css",
+      "purpose": "Reader templates, assets and publication allowlist: reader.css",
+      "policy": "native-block-comment-header"
+    },
+    {
+      "path": "website/overrides/main.html",
+      "purpose": "Reader templates, assets and publication allowlist: main.html",
+      "policy": "native-block-comment-header"
+    },
+    {
+      "path": "website/pages/index.md",
+      "purpose": "Know the version. Follow the source.",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "website/pages/langchain.md",
+      "purpose": "LangChain",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "website/pages/langgraph.md",
+      "purpose": "LangGraph",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "website/pages/provenance.md",
+      "purpose": "Sources & review policy",
+      "policy": "maintained-markdown-html-header"
+    },
+    {
+      "path": "website/publication.json",
+      "purpose": "Reader templates, assets and publication allowlist: publication.json",
+      "policy": "strict-json-sidecar-metadata-only"
+    }
+  ]
+}

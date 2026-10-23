@@ -1,3 +1,7 @@
+# File: deploy/Caddyfile
+# Purpose: Serve static reader files, managed HTTPS and a private health listener.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 {
     admin off
     email {$ACME_EMAIL}

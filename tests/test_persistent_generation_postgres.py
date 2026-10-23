@@ -1,3 +1,8 @@
+# File: tests/test_persistent_generation_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for persistent generation postgres."""
+
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
@@ -38,6 +43,16 @@ pytestmark = pytest.mark.db_integration
 
 
 def approved_build(tmp_path, *, confirm_sources=True):
+    """Prepare the approved build test fixture without shared production state.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        confirm_sources: Test fixture or parameter controlling the confirm sources
+            scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     engine, factory, build = prepare_build()
     catalog = persist_snapshot_catalog_proposal(factory, build)
     if confirm_sources:
@@ -81,6 +96,19 @@ def approved_build(tmp_path, *, confirm_sources=True):
 
 
 def plan(factory, build, catalog_id, *, index=0, max_attempts=2, note=""):
+    """Prepare the plan test fixture without shared production state.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        build: Validated snapshot-bound catalog proposal.
+        catalog_id: Persisted catalog UUID or its string representation.
+        index: Test fixture or parameter controlling the index scenario.
+        max_attempts: Bounded number of permitted job attempts.
+        note: Test fixture or parameter controlling the note scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return enqueue_page(
         factory,
         catalog_id,
@@ -93,6 +121,15 @@ def plan(factory, build, catalog_id, *, index=0, max_attempts=2, note=""):
 
 
 def result_for(claim, *, invalid=False):
+    """Prepare the result for test fixture without shared production state.
+
+    Args:
+        claim: Lease token, attempt and job identity owned by this worker.
+        invalid: Test fixture or parameter controlling the invalid scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     chunk = claim.input_snapshot["evidence"][0]
     quote = (
         "Invented quotation not present in the source." if invalid else chunk["content"]
@@ -123,12 +160,26 @@ def result_for(claim, *, invalid=False):
 
 
 def complete(factory, job_id):
+    """Prepare the complete test fixture without shared production state.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        job_id: Generation job UUID or its string representation.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     claim = claim_page(factory, job_id)
     assert claim is not None
     return finish_page(factory, claim, result_for(claim))
 
 
 def test_planning_requires_catalog_and_human_source_approval(tmp_path):
+    """Verify planning requires catalog and human source approval.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path, confirm_sources=False)
     try:
         with pytest.raises(GenerationError, match="human-confirmed"):
@@ -138,6 +189,11 @@ def test_planning_requires_catalog_and_human_source_approval(tmp_path):
 
 
 def test_jobs_are_idempotent_and_completed_work_is_not_repeated(tmp_path):
+    """Verify jobs are idempotent and completed work is not repeated.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         job = plan(factory, build, catalog)
@@ -158,6 +214,11 @@ def test_jobs_are_idempotent_and_completed_work_is_not_repeated(tmp_path):
 
 
 def test_expired_worker_cannot_commit_and_retries_are_bounded(tmp_path):
+    """Verify expired worker cannot commit and retries are bounded.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         job = plan(factory, build, catalog)
@@ -184,6 +245,11 @@ def test_expired_worker_cannot_commit_and_retries_are_bounded(tmp_path):
 
 
 def test_validation_failure_keeps_revision_and_blocks_approval(tmp_path):
+    """Verify validation failure keeps revision and blocks approval.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         job = plan(factory, build, catalog)
@@ -213,6 +279,11 @@ def test_validation_failure_keeps_revision_and_blocks_approval(tmp_path):
 
 
 def test_page_and_audit_rows_are_database_immutable(tmp_path):
+    """Verify page and audit rows are database immutable.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         page = complete(factory, plan(factory, build, catalog))
@@ -240,11 +311,27 @@ def test_page_and_audit_rows_are_database_immutable(tmp_path):
 
 
 def test_model_call_holds_no_database_connection(tmp_path, monkeypatch):
+    """Verify model call holds no database connection.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         job = plan(factory, build, catalog)
 
         def writer(*args, **kwargs):
+            """Prepare the writer test fixture without shared production state.
+
+            Args:
+                *args: Additional positional arguments.
+                **kwargs: Keyword overrides forwarded to the wrapped API.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             assert engine.pool.checkedout() == 0
             from types import SimpleNamespace
 
@@ -262,6 +349,11 @@ def test_model_call_holds_no_database_connection(tmp_path, monkeypatch):
 
 
 def test_export_is_complete_approved_only_and_non_destructive(tmp_path):
+    """Verify export is complete approved only and non destructive.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path / "catalog")
     try:
         first = complete(factory, plan(factory, build, catalog, index=0))
@@ -286,12 +378,22 @@ def test_export_is_complete_approved_only_and_non_destructive(tmp_path):
 
 
 def test_two_workers_cannot_claim_one_job(tmp_path):
+    """Verify two workers cannot claim one job.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build, catalog = approved_build(tmp_path)
     try:
         job = plan(factory, build, catalog)
         barrier = Barrier(2)
 
         def worker():
+            """Prepare the worker test fixture without shared production state.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             barrier.wait(timeout=10)
             try:
                 return claim_page(factory, job)
@@ -308,6 +410,13 @@ def test_two_workers_cannot_claim_one_job(tmp_path):
 def test_editorial_revision_is_traceable_idempotent_and_not_approved(
     tmp_path, monkeypatch
 ):
+    """Verify editorial revision is traceable idempotent and not approved.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     from generation.persistence import edit_page
 
     engine, factory, build, catalog = approved_build(tmp_path)

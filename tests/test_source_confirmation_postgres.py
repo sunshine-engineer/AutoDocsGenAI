@@ -1,3 +1,8 @@
+# File: tests/test_source_confirmation_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for source confirmation postgres."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -15,6 +20,7 @@ pytestmark = pytest.mark.db_integration
 
 
 def test_imports_never_invent_human_confirmation_and_accept_explicit_attestation():
+    """Verify imports never invent human confirmation and accept explicit attestation."""
     engine, factory, build = prepare_build()
     try:
         with factory() as session:

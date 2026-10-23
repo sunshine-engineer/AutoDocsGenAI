@@ -1,3 +1,8 @@
+# File: scripts/generate_pilot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the generate pilot operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -9,6 +14,11 @@ from generation.pilot import PilotApproval, generate_pilot
 
 
 def main() -> int:
+    """Parse command-line inputs and run the generate pilot operator command.
+
+    Returns:
+        Zero on success; a nonzero status for a rejected or failed command.
+    """
     parser = argparse.ArgumentParser(
         description="Generate review-only pilot drafts from an explicitly approved release snapshot"
     )
@@ -20,7 +30,7 @@ def main() -> int:
         "--topic",
         help="regenerate only this approved topic into a new output directory",
     )
-    parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
+    parser.add_argument("--ollama-url", default=None)
     args = parser.parse_args()
     try:
         approval = PilotApproval.model_validate_json(

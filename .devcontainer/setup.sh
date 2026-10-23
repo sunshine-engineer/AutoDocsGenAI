@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# File: .devcontainer/setup.sh
+# Purpose: Bootstrap the development environment with explicit migration opt-in.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 
 set -Eeuo pipefail
 
@@ -17,6 +21,7 @@ case "${AUTO_APPLY_MIGRATIONS}" in
         ;;
 esac
 
+# Write a setup progress message. Args: $1 message. Returns: printf status.
 log() {
     printf '\n==> %s\n' "$1"
 }

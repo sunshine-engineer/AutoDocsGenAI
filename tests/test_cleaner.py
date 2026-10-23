@@ -1,7 +1,13 @@
+# File: tests/test_cleaner.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for cleaner."""
+
 from ingestion.cleaner import clean_markdown
 
 
 def test_clean_markdown_normalizes_blank_lines_and_trailing_whitespace():
+    """Verify clean markdown normalizes blank lines and trailing whitespace."""
     markdown = (
         "\n# Title   \n\n\nBody text.  \n   \n"
         "```python\nprint('ok')\n\nprint('done')\n```\n"

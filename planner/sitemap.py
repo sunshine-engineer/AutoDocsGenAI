@@ -1,14 +1,21 @@
+# File: planner/sitemap.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Discover same-documentation links from a root page."""
+
 from bs4 import BeautifulSoup
 
 from utils.http_client import http_client
 
 
 def discover_links(root_url: str) -> list[tuple[str, str]]:
-    """
-    Discover titled links from a documentation page.
+    """Discover titled links from a documentation page.
 
     Returns:
-        A list of ``(title, url)`` pairs.
+        Deduplicated (title, URL) pairs belonging to the documentation root.
+
+    Args:
+        root_url: Confirmed documentation root URL.
     """
 
     response = http_client.get(root_url)

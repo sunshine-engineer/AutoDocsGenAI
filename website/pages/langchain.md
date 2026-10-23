@@ -1,3 +1,9 @@
+<!--
+File: website/pages/langchain.md
+Purpose: LangChain.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # LangChain
 
 Compose model-driven applications and inspect the API for your exact release.

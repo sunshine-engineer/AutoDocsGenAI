@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# File: deploy/setup-vm.sh
+# Purpose: Plan or apply website-only first-run setup on a supplied Linux VM.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 # First-run outline: select settings -> validate/preview -> initialize -> build/start.
 set -euo pipefail
 umask 077
@@ -11,6 +15,7 @@ domain="${AUTODOCS_DOMAIN:-}"
 email="${AUTODOCS_ACME_EMAIL:-}"
 http_only="${AUTODOCS_HTTP_ONLY:-}"
 env_file=/etc/autodocs/runtime.env
+# Print supported setup options. Args: none. Returns: output status.
 usage() {
   cat <<'HELP'
 Usage: sudo bash deploy/setup-vm.sh [options]
@@ -27,6 +32,7 @@ Environment defaults: AUTODOCS_DOMAIN, AUTODOCS_ACME_EMAIL, AUTODOCS_HTTP_ONLY.
 Prerequisites: Linux x86-64, systemd, Bash, Git and Python 3.
 HELP
 }
+# Write an error and exit 1. Args: message words. Does not return.
 fail() { echo "$*" >&2; exit 1; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -51,6 +57,7 @@ done
 [[ "$env_file" == /etc/autodocs/runtime.env || "$plan" == true ]] || fail '--config is only supported with --plan.'
 command -v python3 >/dev/null || fail "Install Python 3 first (sudo apt-get install python3)."
 command -v git >/dev/null || fail "Install Git first."
+# Run Git against the managed checkout. Args: Git arguments. Returns: Git status.
 git_repo() { git -c safe.directory="$repo_root" -C "$repo_root" "$@"; }
 release=$(git_repo rev-parse HEAD)
 [[ -z "$(git_repo status --porcelain)" ]] || fail "Use a clean committed checkout before setup."
@@ -59,6 +66,7 @@ if [[ "$assume_yes" == false && "$plan" == false ]]; then
   [[ -t 0 ]] || fail "No interactive terminal: use --yes or --plan."
   interactive=true
 fi
+# Write the selected input/default to stdout. Args: prompt and default. Returns: read/printf status.
 ask() {
   local answer
   if [[ "$interactive" == true ]]; then
@@ -68,6 +76,7 @@ ask() {
     printf '%s' "$2"
   fi
 }
+# Read one validated runtime option. Args: key. Returns: parser status.
 setting() { python3 "$repo_root/deploy/runtime_config.py" "$env_file" "$1"; }
 if [[ -f "$env_file" && "$reconfigure" == true ]]; then
   python3 "$repo_root/deploy/runtime_config.py" "$env_file" >/dev/null

@@ -1,0 +1,29 @@
+# File: .editorconfig
+# Purpose: Keep editor whitespace and line endings consistent with repository tools.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.py]
+indent_size = 4
+
+[*.{sh,toml,ini}]
+indent_size = 4
+
+# Byte-hashed evidence and approved content are immutable; editors must preserve it.
+[docs/{generated,demo,quality,learning,ecosystem/evidence}/**]
+trim_trailing_whitespace = false
+
+[*.md]
+trim_trailing_whitespace = false
+
+[{LICENSE,uv.lock,website/publication.json}]
+trim_trailing_whitespace = false

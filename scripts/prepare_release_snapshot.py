@@ -1,3 +1,8 @@
+# File: scripts/prepare_release_snapshot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the prepare release snapshot operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -12,6 +17,11 @@ from discovery.release_snapshot import (
 
 
 def main() -> int:
+    """Parse command-line inputs and run the prepare release snapshot operator command.
+
+    Returns:
+        Zero on success; a nonzero status for a rejected or failed command.
+    """
     parser = argparse.ArgumentParser(
         description="Prepare an exact-release LangChain source snapshot for review"
     )

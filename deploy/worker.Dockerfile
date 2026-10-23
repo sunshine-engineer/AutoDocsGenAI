@@ -1,3 +1,7 @@
+# File: deploy/worker.Dockerfile
+# Purpose: Build the optional nonroot private batch worker image.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 FROM python:3.12.15-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     PATH=/app/.venv/bin:$PATH PLAYWRIGHT_BROWSERS_PATH=/opt/playwright

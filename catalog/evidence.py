@@ -1,3 +1,8 @@
+# File: catalog/evidence.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Select structural and optional hybrid evidence within package and snapshot boundaries."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -15,6 +20,15 @@ EvidenceSearch = Callable[[str, int], list[SearchHit]]
 
 @dataclass(frozen=True)
 class EvidenceMappingIssue:
+    """Blocking or advisory evidence-mapping finding for one topic.
+
+    Attributes:
+        code (str): Code.
+        qualified_name (str): Qualified name.
+        blocking (bool): Blocking.
+        detail (str): Detail.
+    """
+
     code: str
     qualified_name: str
     blocking: bool
@@ -23,6 +37,13 @@ class EvidenceMappingIssue:
 
 @dataclass
 class MappedTopic:
+    """Normalized topic paired with its ranked source evidence.
+
+    Attributes:
+        normalized (NormalizedTopic): Normalized.
+        evidence (list[TopicEvidence]): Evidence.
+    """
+
     normalized: NormalizedTopic
     evidence: list[TopicEvidence]
 
@@ -33,7 +54,17 @@ def map_topic_evidence(
     package: str,
     search: EvidenceSearch | None = None,
 ) -> tuple[list[MappedTopic], list[EvidenceMappingIssue]]:
-    """Map structural and optional hybrid evidence within one input snapshot."""
+    """Map structural and optional hybrid evidence within one input snapshot.
+
+    Args:
+        topics: Topic records in the current extraction, proposal or catalog.
+        chunks: Validated documentation chunks for the selected source scope.
+        package: Distribution name used to scope lineage and results.
+        search: Optional callback returning bounded, snapshot-filtered evidence hits.
+
+    Returns:
+        Mapped topics and blocking/advisory mapping issues.
+    """
 
     eligible_ids = eligible_chunk_ids(chunks, package)
     allowed_chunks = {chunk.id: chunk for chunk in chunks if chunk.id in eligible_ids}
@@ -103,6 +134,14 @@ def map_topic_evidence(
 
 
 def _evidence_query(topic: NormalizedTopic) -> str:
+    """Build a retrieval query from a topic identity, kind and optional definition.
+
+    Args:
+        topic: Topic whose identity or evidence is being processed.
+
+    Returns:
+        Space-separated topic identity, display name, kind and optional definition.
+    """
     parts = [topic.qualified_name, topic.display_name, topic.kind.value]
     if topic.definition:
         parts.append(topic.definition)
@@ -110,6 +149,15 @@ def _evidence_query(topic: NormalizedTopic) -> str:
 
 
 def _belongs_to_package_namespace(source_url: str, package: str) -> bool:
+    """Check whether a source path belongs to the expected /python/package namespace.
+
+    Args:
+        source_url: Official source URL retained for provenance and namespace checks.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        True when the source is inside the exact package path boundary.
+    """
     path = urlsplit(source_url).path.rstrip("/")
     prefix = f"/python/{package}"
     return path == prefix or path.startswith(f"{prefix}/")
@@ -120,6 +168,16 @@ def eligible_chunk_ids(
     package: str,
     namespace_allow_list: tuple[str, ...] | None = None,
 ) -> set[str]:
+    """Select chunk IDs inside the confirmed source allowlist or package namespace.
+
+    Args:
+        chunks: Validated documentation chunks for the selected source scope.
+        package: Distribution name used to scope lineage and results.
+        namespace_allow_list: Allowed source roots or package namespaces.
+
+    Returns:
+        IDs of chunks allowed to provide evidence for this package.
+    """
     normalized_package = normalize_package_name(package)
     if namespace_allow_list and all(
         root.startswith("https://") for root in namespace_allow_list

@@ -1,3 +1,8 @@
+# File: tests/test_stage6_catalog_schema_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage6 catalog schema postgres."""
+
 from __future__ import annotations
 
 import hashlib
@@ -26,6 +31,15 @@ pytestmark = pytest.mark.db_integration
 
 
 def build_state(package: str) -> PipelineState:
+    """Prepare the build state test fixture without shared production state.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        PipelineState: Prepare the build state test fixture without shared production
+            state.
+    """
     content = f"Catalog schema evidence for {package}."
     url = f"https://example.com/{package}/catalog"
     document = CleanDocument(title="Catalog", url=url, markdown=content)
@@ -62,6 +76,24 @@ def add_catalog(
     approved_at: datetime | None = None,
     review_feedback: str | None = None,
 ) -> TopicCatalogRecord:
+    """Prepare the add catalog test fixture without shared production state.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        documentation_version_id: Persisted documentation-version identity.
+        pipeline_run_id: Exact persisted ingestion-run identity.
+        embedding_version_id: Exact persisted embedding-model/version identity.
+        seed: Test fixture or parameter controlling the seed scenario.
+        status: Test fixture or parameter controlling the status scenario.
+        approved_by: Test fixture or parameter controlling the approved by scenario.
+        approved_at: Test fixture or parameter controlling the approved at scenario.
+        review_feedback: Test fixture or parameter controlling the review feedback
+            scenario.
+
+    Returns:
+        TopicCatalogRecord: Prepare the add catalog test fixture without shared
+            production state.
+    """
     catalog = TopicCatalogRecord(
         documentation_version_id=documentation_version_id,
         source_pipeline_run_id=pipeline_run_id,
@@ -81,6 +113,11 @@ def add_catalog(
 
 @pytest.fixture
 def catalog_lineage():
+    """Prepare the catalog lineage test fixture without shared production state.
+
+    Yields:
+        The controlled fixture result used by this test.
+    """
     assert DATABASE_URL is not None
     package = f"catalog-schema-{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)
@@ -112,6 +149,12 @@ def catalog_lineage():
 
 
 def test_catalog_schema_accepts_review_states_and_preserves_approval(catalog_lineage):
+    """Verify catalog schema accepts review states and preserves approval.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     now = datetime.now(UTC)
@@ -157,6 +200,13 @@ def test_catalog_schema_accepts_review_states_and_preserves_approval(catalog_lin
     ],
 )
 def test_catalog_schema_rejects_invalid_review_metadata(catalog_lineage, values):
+    """Verify catalog schema rejects invalid review metadata.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+        values: Values to compare, update or deduplicate.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     with pytest.raises(IntegrityError), session_factory.begin() as session:
@@ -171,6 +221,12 @@ def test_catalog_schema_rejects_invalid_review_metadata(catalog_lineage, values)
 
 
 def test_catalog_schema_rejects_invalid_hashes(catalog_lineage):
+    """Verify catalog schema rejects invalid hashes.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     with pytest.raises(IntegrityError), session_factory.begin() as session:
@@ -191,6 +247,12 @@ def test_catalog_schema_rejects_invalid_hashes(catalog_lineage):
 def test_only_one_catalog_can_be_approved_per_documentation_version(
     catalog_lineage,
 ):
+    """Verify only one catalog can be approved per documentation version.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     now = datetime.now(UTC)
@@ -220,6 +282,12 @@ def test_only_one_catalog_can_be_approved_per_documentation_version(
 
 
 def test_catalog_embedding_lineage_is_restrictive(catalog_lineage):
+    """Verify catalog embedding lineage is restrictive.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     with session_factory.begin() as session:
@@ -240,6 +308,12 @@ def test_catalog_embedding_lineage_is_restrictive(catalog_lineage):
 
 
 def test_catalog_columns_are_queryable(catalog_lineage):
+    """Verify catalog columns are queryable.
+
+    Args:
+        catalog_lineage: Test fixture or parameter controlling the catalog lineage
+            scenario.
+    """
     session_factory, identity = catalog_lineage
     documentation_version_id, pipeline_run_id, embedding_version_id = identity
     with session_factory.begin() as session:

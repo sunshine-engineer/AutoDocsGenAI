@@ -1,3 +1,8 @@
+# File: database/models.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Define persisted package, source, chunk, catalog and generation lineage tables."""
+
 from datetime import datetime
 from uuid import UUID
 
@@ -21,6 +26,13 @@ from database.base import Base
 
 
 class TimestampMixin:
+    """Server-managed creation timestamp shared by persisted lineage records.
+
+    Attributes:
+        created_at (Mapped[datetime]): Created at.
+        updated_at (Mapped[datetime]): Updated at.
+    """
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP")
     )
@@ -30,6 +42,14 @@ class TimestampMixin:
 
 
 class PackageRecord(TimestampMixin, Base):
+    """Persist package lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        name (Mapped[str]): Field, distribution or check name for this operation.
+        ecosystem (Mapped[str]): Ecosystem.
+    """
+
     __tablename__ = "packages"
     __table_args__ = (
         CheckConstraint(
@@ -49,6 +69,15 @@ class PackageRecord(TimestampMixin, Base):
 
 
 class DocumentationVersionRecord(TimestampMixin, Base):
+    """Persist documentation version lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        package_id (Mapped[UUID]): Package id.
+        package_version (Mapped[str]): Package version.
+        status (Mapped[str]): Status.
+    """
+
     __tablename__ = "documentation_versions"
     __table_args__ = (
         CheckConstraint(
@@ -75,6 +104,19 @@ class DocumentationVersionRecord(TimestampMixin, Base):
 
 
 class PipelineRunRecord(TimestampMixin, Base):
+    """Persist pipeline run lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        documentation_version_id (Mapped[UUID]): Persisted documentation-version
+            identity.
+        config_hash (Mapped[str]): Config hash.
+        status (Mapped[str]): Status.
+        started_at (Mapped[datetime | None]): Started at.
+        completed_at (Mapped[datetime | None]): Completed at.
+        error_summary (Mapped[str | None]): Error summary.
+    """
+
     __tablename__ = "pipeline_runs"
     __table_args__ = (
         CheckConstraint(
@@ -104,6 +146,20 @@ class PipelineRunRecord(TimestampMixin, Base):
 
 
 class SourceRecord(TimestampMixin, Base):
+    """Persist source lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        documentation_version_id (Mapped[UUID]): Persisted documentation-version
+            identity.
+        source_type (Mapped[str]): Source type.
+        url (Mapped[str]): Absolute source or service URL.
+        canonical_url (Mapped[str]): Canonical url.
+        confirmation_status (Mapped[str]): Confirmation status.
+        confirmed_by (Mapped[str | None]): Confirmed by.
+        confirmed_at (Mapped[datetime | None]): Confirmed at.
+    """
+
     __tablename__ = "sources"
     __table_args__ = (
         CheckConstraint(
@@ -136,6 +192,29 @@ class SourceRecord(TimestampMixin, Base):
 
 
 class SourceDocumentRecord(Base):
+    """Persist source document lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        source_id (Mapped[UUID]): Source id.
+        pipeline_run_id (Mapped[UUID]): Exact persisted ingestion-run identity.
+        url (Mapped[str]): Absolute source or service URL.
+        canonical_url (Mapped[str]): Canonical url.
+        page_title (Mapped[str]): Page title.
+        http_status (Mapped[int]): Http status.
+        framework (Mapped[str | None]): Detected documentation-framework enum.
+        raw_content_hash (Mapped[str]): Raw content hash.
+        normalized_content_hash (Mapped[str]): Normalized content hash.
+        normalized_markdown (Mapped[str]): Normalized markdown.
+        fetch_metadata (Mapped[dict[str, object]]): Fetch metadata.
+        fetched_at (Mapped[datetime]): Fetched at.
+        valid_from (Mapped[datetime]): Valid from.
+        valid_to (Mapped[datetime | None]): Valid to.
+        created_at (Mapped[datetime]): Created at.
+        is_current (Mapped[bool]): Is current.
+        supersedes_id (Mapped[UUID | None]): Supersedes id.
+    """
+
     __tablename__ = "source_documents"
     __table_args__ = (
         CheckConstraint("http_status BETWEEN 100 AND 599", name="valid_http_status"),
@@ -187,6 +266,25 @@ class SourceDocumentRecord(Base):
 
 
 class ChunkRecord(Base):
+    """Persist chunk lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[str]): Id.
+        source_document_id (Mapped[UUID]): Source document id.
+        package_name (Mapped[str]): Package name.
+        package_version (Mapped[str]): Package version.
+        source_url (Mapped[str]): Official source URL retained for provenance and
+            namespace checks.
+        page_title (Mapped[str]): Page title.
+        header_path (Mapped[list[str]]): Ordered heading hierarchy locating the chunk.
+        chunk_index (Mapped[int]): Stable position of the chunk within its source
+            document.
+        content (Mapped[str]): Source text or Markdown content to process.
+        content_hash (Mapped[str]): Recorded digest of normalized content.
+        character_count (Mapped[int]): Character count.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "chunks"
     __table_args__ = (
         CheckConstraint("chunk_index >= 0", name="nonnegative_chunk_index"),
@@ -222,6 +320,15 @@ class ChunkRecord(Base):
 
 
 class EmbeddingVersionRecord(TimestampMixin, Base):
+    """Persist embedding version lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        provider (Mapped[str]): Provider.
+        model_name (Mapped[str]): FastEmbed model identifier.
+        dimension (Mapped[int]): Dimension.
+    """
+
     __tablename__ = "embedding_versions"
     __table_args__ = (
         UniqueConstraint(
@@ -244,6 +351,18 @@ class EmbeddingVersionRecord(TimestampMixin, Base):
 
 
 class ChunkEmbeddingRecord(Base):
+    """Persist chunk embedding lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        chunk_id (Mapped[str]): Chunk id.
+        embedding_version_id (Mapped[UUID]): Exact persisted embedding-model/version
+            identity.
+        embedding (Mapped[list[float]]): Typed embedding model, dimension and cache
+            settings.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "chunk_embeddings"
     __table_args__ = (
         UniqueConstraint(
@@ -275,6 +394,26 @@ class ChunkEmbeddingRecord(Base):
 
 
 class TopicCatalogRecord(TimestampMixin, Base):
+    """Persist topic catalog lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        documentation_version_id (Mapped[UUID]): Persisted documentation-version
+            identity.
+        source_pipeline_run_id (Mapped[UUID]): Exact persisted ingestion-run identity.
+        embedding_version_id (Mapped[UUID]): Exact persisted embedding-model/version
+            identity.
+        input_snapshot_hash (Mapped[str]): Expected hash of the frozen input
+            source/chunk snapshot.
+        config_hash (Mapped[str]): Config hash.
+        config_snapshot (Mapped[dict[str, object]]): Canonical non-secret catalog
+            configuration snapshot.
+        status (Mapped[str]): Status.
+        approved_by (Mapped[str | None]): Approved by.
+        approved_at (Mapped[datetime | None]): Approved at.
+        review_feedback (Mapped[str | None]): Review feedback.
+    """
+
     __tablename__ = "topic_catalogs"
     __table_args__ = (
         CheckConstraint(
@@ -336,6 +475,24 @@ class TopicCatalogRecord(TimestampMixin, Base):
 
 
 class TopicRecord(TimestampMixin, Base):
+    """Persist topic lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        catalog_id (Mapped[UUID]): Persisted catalog UUID or its string representation.
+        parent_id (Mapped[UUID | None]): Resolved parent-topic UUID, or None for a root
+            topic.
+        kind (Mapped[str]): Kind.
+        qualified_name (Mapped[str]): Qualified name.
+        display_name (Mapped[str]): Human-readable topic or symbol name.
+        slug (Mapped[str]): Slug.
+        output_path (Mapped[str]): Destination file path for the generated artifact.
+        aliases (Mapped[list[str]]): Aliases.
+        summary (Mapped[str | None]): Summary.
+        sort_order (Mapped[int]): Sort order.
+        status (Mapped[str]): Status.
+    """
+
     __tablename__ = "topics"
     __table_args__ = (
         CheckConstraint(
@@ -394,6 +551,18 @@ class TopicRecord(TimestampMixin, Base):
 
 
 class TopicEvidenceRecord(Base):
+    """Persist topic evidence lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        topic_id (Mapped[UUID]): Topic id.
+        chunk_id (Mapped[str]): Chunk id.
+        role (Mapped[str]): Role.
+        rank (Mapped[int]): Rank.
+        score (Mapped[float | None]): Score.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "topic_evidence"
     __table_args__ = (
         CheckConstraint("role IN ('primary', 'supporting')", name="valid_role"),
@@ -420,6 +589,21 @@ class TopicEvidenceRecord(Base):
 
 
 class GenerationJobRecord(TimestampMixin, Base):
+    """Persist generation job lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        topic_id (Mapped[UUID]): Topic id.
+        identity_hash (Mapped[str]): Identity hash.
+        input_snapshot (Mapped[dict[str, object]]): Input snapshot.
+        status (Mapped[str]): Status.
+        attempts (Mapped[int]): Attempts.
+        max_attempts (Mapped[int]): Bounded number of permitted job attempts.
+        lease_token (Mapped[UUID | None]): Lease token.
+        lease_expires_at (Mapped[datetime | None]): Lease expires at.
+        error_summary (Mapped[str | None]): Error summary.
+    """
+
     __tablename__ = "generation_jobs"
     __table_args__ = (
         UniqueConstraint(
@@ -456,6 +640,18 @@ class GenerationJobRecord(TimestampMixin, Base):
 
 
 class GeneratedPageRecord(Base):
+    """Persist generated page lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        job_id (Mapped[UUID]): Generation job UUID or its string representation.
+        revision (Mapped[int]): Immutable revision number being created.
+        content_hash (Mapped[str]): Recorded digest of normalized content.
+        payload (Mapped[dict[str, object]]): Frozen serialized job inputs and evidence.
+        model_metadata (Mapped[dict[str, object]]): Model metadata.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "generated_pages"
     __table_args__ = (
         UniqueConstraint("job_id", "revision", name="uq_generated_pages_job_revision"),
@@ -480,6 +676,16 @@ class GeneratedPageRecord(Base):
 
 
 class PageCitationRecord(Base):
+    """Persist page citation lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        page_id (Mapped[UUID]): Exact generated page revision UUID.
+        chunk_id (Mapped[str]): Chunk id.
+        locator (Mapped[str]): Locator.
+        quote (Mapped[str]): Quote.
+    """
+
     __tablename__ = "page_citations"
     __table_args__ = (
         UniqueConstraint(
@@ -500,6 +706,17 @@ class PageCitationRecord(Base):
 
 
 class PageValidationRecord(Base):
+    """Persist page validation lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        page_id (Mapped[UUID]): Exact generated page revision UUID.
+        validator_version (Mapped[str]): Validator version.
+        passed (Mapped[bool]): Passed.
+        issues (Mapped[list[str]]): Issues.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "validation_results"
     __table_args__ = (
         UniqueConstraint(
@@ -523,6 +740,18 @@ class PageValidationRecord(Base):
 
 
 class PageReviewRecord(Base):
+    """Persist page review lineage and relational constraints.
+
+    Attributes:
+        id (Mapped[UUID]): Id.
+        page_id (Mapped[UUID]): Exact generated page revision UUID.
+        decision (Mapped[str]): Explicit review transition, restricted by the workflow.
+        reviewer (Mapped[str]): Human reviewer identifier supplied by the operator.
+        feedback (Mapped[str | None]): Human review feedback; required for rejection
+            where applicable.
+        created_at (Mapped[datetime]): Created at.
+    """
+
     __tablename__ = "review_decisions"
     __table_args__ = (
         UniqueConstraint("page_id", name="uq_review_decisions_page"),
