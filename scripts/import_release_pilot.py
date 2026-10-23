@@ -1,3 +1,8 @@
+# File: scripts/import_release_pilot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the import release pilot operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -16,6 +21,11 @@ from models.config import EmbeddingConfig
 
 
 def main() -> int:
+    """Parse command-line inputs and run the import release pilot operator command.
+
+    Returns:
+        Zero on success; a nonzero status for a rejected or failed command.
+    """
     parser = argparse.ArgumentParser(
         description="Import an approved release outline as a draft catalog with real CPU embeddings"
     )

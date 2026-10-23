@@ -1,3 +1,8 @@
+# File: scripts/import_chunks.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the import chunks operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -12,6 +17,11 @@ from utils.progress import ProgressReporter
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse the command-line options for this operator command.
+
+    Returns:
+        Parsed command arguments with their documented defaults.
+    """
     parser = argparse.ArgumentParser(description="Import chunk JSONL into PostgreSQL")
     parser.add_argument("package")
     parser.add_argument("version")
@@ -20,6 +30,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Parse command-line inputs and run the import chunks operator command."""
     args = parse_args()
     input_path = args.input or (
         Path("data/chunks") / args.package / args.version / "chunks.jsonl"

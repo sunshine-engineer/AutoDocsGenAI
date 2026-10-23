@@ -1,3 +1,8 @@
+# File: generation/persistence.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Persist bounded jobs, worker leases, immutable revisions and human page reviews."""
+
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from catalog.artifacts import load_catalog_view
 from catalog.workflow import lock_catalog, review_text
+from config.environment import ollama_base_url
 from database.models import (
     ChunkRecord,
     GeneratedPageRecord,
@@ -43,6 +49,15 @@ class GenerationError(ValueError):
 
 @dataclass(frozen=True)
 class JobClaim:
+    """Worker lease identity and frozen generation inputs for one job attempt.
+
+    Attributes:
+        job_id (str): Generation job UUID or its string representation.
+        lease_token (UUID): Lease token.
+        attempt (int): Attempt.
+        input_snapshot (dict[str, Any]): Input snapshot.
+    """
+
     job_id: str
     lease_token: UUID
     attempt: int
@@ -52,6 +67,22 @@ class JobClaim:
 def _source_evidence(
     session: Session, chunk_ids: list[str], package: str, version: str
 ) -> list[EvidenceChunk]:
+    """Load exact current evidence chunks for a package/version generation request.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        chunk_ids: Exact chunk identifiers to rehydrate.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+
+    Returns:
+        Exact current evidence contracts matching the requested chunk IDs.
+
+    Raises:
+        GenerationError: evidence is missing or crosses package/version boundaries;
+            evidence content does not reproduce its stored hash; generation requires
+            human-confirmed source provenance; evidence is outside the confirmed source.
+    """
     result = []
     for identifier in chunk_ids:
         row = session.get(ChunkRecord, identifier)
@@ -102,6 +133,26 @@ def enqueue_page(
     max_attempts: int = 2,
     regeneration_note: str = "",
 ) -> str:
+    """Reuse or enqueue an approved topic job with a frozen writer and evidence identity.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        catalog_id: Persisted catalog UUID or its string representation.
+        topic_name: Qualified topic identity from the approved catalog.
+        model: Installed model name whose exact digest is recorded.
+        model_digest: Exact installed model digest used to identify the writer.
+        max_attempts: Bounded number of permitted job attempts.
+        regeneration_note: Explicit note distinguishing an intentional regeneration.
+
+    Returns:
+        Existing or newly created generation-job UUID string.
+
+    Raises:
+        GenerationError: model identity and an attempt limit between one and five are
+            required; the catalog must be explicitly approved before generation; topic
+            is absent or not approved; catalog evidence no longer exists; primary
+            evidence exceeds the context budget; topic has no usable evidence.
+    """
     if not 1 <= max_attempts <= 5 or not model.strip() or not model_digest.strip():
         raise GenerationError(
             "model identity and an attempt limit between one and five are required"
@@ -178,6 +229,21 @@ def enqueue_page(
 def _assert_ready(
     session: Session, job: GenerationJobRecord, *, require_writer: bool = True
 ) -> dict[str, Any]:
+    """Reject changed approvals, writer contracts or source evidence before a job proceeds.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        job: Persisted generation job record.
+        require_writer: Whether the current writer contract must match the frozen job.
+
+    Returns:
+        Verified frozen job payload, with approvals and source evidence checked.
+
+    Raises:
+        GenerationError: stored job inputs do not reproduce their identity; generation
+            approval is no longer active; job snapshot identity changed; job requires a
+            different prompt implementation; job evidence changed after planning.
+    """
     payload = cast(dict[str, Any], job.input_snapshot)
     if sha256_identity(payload) != job.identity_hash:
         raise GenerationError("stored job inputs do not reproduce their identity")
@@ -217,6 +283,20 @@ def _assert_ready(
 def claim_page(
     factory: sessionmaker[Session], job_id: str, *, lease_seconds: int = 300
 ) -> JobClaim | None:
+    """Lease an eligible job under row locking without duplicating active work.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        job_id: Generation job UUID or its string representation.
+        lease_seconds: Lease duration in seconds, subject to the validated bounds.
+
+    Returns:
+        Owned lease claim, or None when no attempt is eligible.
+
+    Raises:
+        GenerationError: lease must be between 30 and 3600 seconds; generation job does
+            not exist; generation job is already leased to another worker.
+    """
     if not 30 <= lease_seconds <= 3600:
         raise GenerationError("lease must be between 30 and 3600 seconds")
     with factory.begin() as session:
@@ -253,6 +333,18 @@ def claim_page(
 
 
 def _owned_job(session: Session, claim: JobClaim) -> GenerationJobRecord:
+    """Require a valid lease token, attempt and unexpired job before mutation.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        claim: Lease token, attempt and job identity owned by this worker.
+
+    Returns:
+        Locked job row still owned by this unexpired worker lease.
+
+    Raises:
+        GenerationError: worker lease is stale; its result cannot be committed.
+    """
     job = session.scalar(
         select(GenerationJobRecord)
         .where(GenerationJobRecord.id == UUID(claim.job_id))
@@ -273,6 +365,12 @@ def _owned_job(session: Session, claim: JobClaim) -> GenerationJobRecord:
 
 
 def fail_page(factory: sessionmaker[Session], claim: JobClaim) -> None:
+    """Release an owned lease and record job failure within the retry budget.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        claim: Lease token, attempt and job identity owned by this worker.
+    """
     with factory.begin() as session:
         job = _owned_job(session, claim)
         job.status, job.lease_token, job.lease_expires_at = "failed", None, None
@@ -283,6 +381,19 @@ def fail_page(factory: sessionmaker[Session], claim: JobClaim) -> None:
 def finish_page(
     factory: sessionmaker[Session], claim: JobClaim, result: WritingResult
 ) -> str:
+    """Persist a writer result and revision only while the caller still owns the lease.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        claim: Lease token, attempt and job identity owned by this worker.
+        result: Mutable accumulator or completed result consumed by this operation.
+
+    Returns:
+        Identifier of the stored immutable generated-page revision.
+
+    Raises:
+        GenerationError: model or prompt identity differs from the planned job.
+    """
     with factory.begin() as session:
         job = _owned_job(session, claim)
         payload = _assert_ready(session, job)
@@ -321,6 +432,19 @@ def _store_revision(
     revision: int,
     metadata: dict[str, Any],
 ) -> str:
+    """Persist an immutable generated-page revision and its citation lineage.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        job: Persisted generation job record.
+        payload: Frozen serialized job inputs and evidence.
+        draft_value: Validated structured page content for the new revision.
+        revision: Immutable revision number being created.
+        metadata: Source metadata or safe progress attributes.
+
+    Returns:
+        UUID string of the newly persisted immutable page revision.
+    """
     evidence = [EvidenceChunk.model_validate(item) for item in payload["evidence"]]
     issues = validate_citations(
         draft_value, evidence, str(payload["package"]), str(payload["version"])
@@ -373,7 +497,23 @@ def edit_page(
     editor: str,
     feedback: str,
 ) -> str:
-    """Create a validated editorial revision; never impersonate a model or approve it."""
+    """Create a validated editorial revision; never impersonate a model or approve it.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        page_id: Exact generated page revision UUID.
+        draft: Structured generated or editorial page revision.
+        editor: Human editor identity recorded on the new revision.
+        feedback: Human review feedback; required for rejection where applicable.
+
+    Returns:
+        Identifier of the new attributed editorial page revision.
+
+    Raises:
+        GenerationError: parent page revision does not exist; parent page identity is
+            corrupt; editorial revision requires the topic title and valid source
+            citations; editorial job has no saved revision.
+    """
     editor_value = review_text(editor, "editor", 200, required=True)
     note = review_text(feedback, "editorial feedback", 4000, required=True)
     with factory.begin() as session:
@@ -452,8 +592,23 @@ def run_page(
     job_id: str,
     *,
     client: httpx.Client,
-    base_url: str = "http://127.0.0.1:11434",
+    base_url: str | None = None,
 ) -> str | None:
+    """Claim and execute one bounded page job, recording failure before propagating errors.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        job_id: Generation job UUID or its string representation.
+        client: Caller-owned HTTP client with bounded request settings.
+        base_url: Ollama service URL; no provider credentials are inferred.
+
+    Returns:
+        Stored page revision ID, or None if the job could not be claimed.
+
+    Raises:
+        GenerationError: generation attempt failed; inspect the job before a bounded
+            retry.
+    """
     claim = claim_page(factory, job_id)
     if claim is None:
         return None
@@ -462,7 +617,7 @@ def run_page(
     try:
         result = write_page(
             client,
-            base_url=base_url,
+            base_url=base_url if base_url is not None else ollama_base_url(),
             model=payload["model"],
             package=payload["package"],
             version=payload["version"],
@@ -488,6 +643,23 @@ def review_page(
     reviewer: str,
     feedback: str | None = None,
 ) -> str:
+    """Approve or reject one exact page revision under catalog and citation guards.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        page_id: Exact generated page revision UUID.
+        decision: Explicit review transition, restricted by the workflow.
+        reviewer: Human reviewer identifier supplied by the operator.
+        feedback: Human review feedback; required for rejection where applicable.
+
+    Returns:
+        Identifier of the reviewed exact page revision.
+
+    Raises:
+        GenerationError: page decision must be approved or rejected; page revision does
+            not exist; page revision already has a conflicting final decision; only a
+            validated page revision can be approved.
+    """
     if decision not in {"approved", "rejected"}:
         raise GenerationError("page decision must be approved or rejected")
     reviewer_value = review_text(reviewer, "reviewer", 200, required=True)

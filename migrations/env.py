@@ -1,3 +1,8 @@
+# File: migrations/env.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Alembic schema migrations for lineage, embeddings, catalogs and generation. Module: env."""
+
 from __future__ import annotations
 
 import os
@@ -26,6 +31,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
+    """Configure Alembic to emit migration SQL without opening a database connection."""
     context.configure(
         url=database_url,
         target_metadata=target_metadata,
@@ -40,6 +46,7 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    """Apply Alembic operations through the configured database connection."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

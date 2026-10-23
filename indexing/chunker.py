@@ -1,3 +1,10 @@
+# File: indexing/chunker.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Split Markdown deterministically while preserving headings, fences and stable chunk
+identities.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -18,7 +25,12 @@ FENCE_PATTERN = re.compile(r"^[ \t]*(`{3,}|~{3,})")
 
 @dataclass(frozen=True)
 class MarkdownSection:
-    """A Markdown section and the heading hierarchy that owns it."""
+    """A Markdown section and the heading hierarchy that owns it.
+
+    Attributes:
+        header_path (tuple[str, ...]): Ordered heading hierarchy locating the chunk.
+        content (str): Source text or Markdown content to process.
+    """
 
     header_path: tuple[str, ...]
     content: str
@@ -34,6 +46,14 @@ def create_chunks(
     Existing chunks are replaced so repeated pipeline runs are idempotent.
     Configuration and output paths can be injected for tests; normal pipeline
     calls use ``config/config.yaml``.
+
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+        config: Typed configuration controlling this operation.
+        output_directory: Chunk artifact directory override, when supplied.
+
+    Returns:
+        Input state with deterministic chunks and artifact metadata populated.
     """
 
     application_config = None
@@ -72,7 +92,17 @@ def chunk_document(
     version: str,
     config: ChunkingConfig,
 ) -> list[Chunk]:
-    """Split one cleaned document into traceable chunks."""
+    """Split one cleaned document into traceable chunks.
+
+    Args:
+        document: Validated cleaned document with source metadata.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        config: Typed configuration controlling this operation.
+
+    Returns:
+        Validated lineage-aware chunks in stable document order.
+    """
 
     chunks: list[Chunk] = []
     chunk_index = 0
@@ -123,7 +153,15 @@ def split_markdown_sections(
     markdown: str,
     headers: list[str],
 ) -> list[MarkdownSection]:
-    """Split Markdown on configured ATX headings outside fenced code blocks."""
+    """Split Markdown on configured ATX headings outside fenced code blocks.
+
+    Args:
+        markdown: Markdown text to normalize, split or inspect.
+        headers: ATX heading markers eligible to create sections.
+
+    Returns:
+        Heading-aware Markdown sections, excluding headings inside code fences.
+    """
 
     heading_levels = {len(marker) for marker in headers}
     sections: list[MarkdownSection] = []
@@ -133,6 +171,7 @@ def split_markdown_sections(
     active_fence: tuple[str, int] | None = None
 
     def flush_section() -> None:
+        """Append the buffered Markdown section and clear its local accumulator."""
         content = "\n".join(current_lines).strip()
         if content:
             sections.append(MarkdownSection(current_path, content))
@@ -168,7 +207,16 @@ def split_section_content(
     max_characters: int,
     overlap_characters: int,
 ) -> list[str]:
-    """Split a section at Markdown block boundaries with bounded overlap."""
+    """Split a section at Markdown block boundaries with bounded overlap.
+
+    Args:
+        content: Source text or Markdown content to process.
+        max_characters: Maximum chunk/segment character count.
+        overlap_characters: Requested overlap between plain-text segments.
+
+    Returns:
+        Markdown segments respecting size and code-fence boundaries.
+    """
 
     blocks = _markdown_blocks(content)
     chunks: list[str] = []
@@ -202,7 +250,14 @@ def split_section_content(
 
 
 def _markdown_blocks(content: str) -> list[tuple[str, bool]]:
-    """Return paragraph/code-fence blocks without breaking fenced code."""
+    """Return paragraph/code-fence blocks without breaking fenced code.
+
+    Args:
+        content: Source text or Markdown content to process.
+
+    Returns:
+        Ordered (block text, is-fenced-code) pairs.
+    """
 
     blocks: list[tuple[str, bool]] = []
     current_lines: list[str] = []
@@ -210,6 +265,7 @@ def _markdown_blocks(content: str) -> list[tuple[str, bool]]:
     block_is_fenced = False
 
     def flush() -> None:
+        """Append buffered plain text and reset the block accumulator."""
         nonlocal current_lines, block_is_fenced
         block = "\n".join(current_lines).strip()
         if block:
@@ -241,7 +297,16 @@ def _markdown_blocks(content: str) -> list[tuple[str, bool]]:
 
 
 def _split_plain_text(text: str, limit: int, overlap: int) -> list[str]:
-    """Split oversized prose at natural boundaries."""
+    """Split oversized prose at natural boundaries.
+
+    Args:
+        text: Plain text to split or hash.
+        limit: Maximum requested records or text size, as used by this operation.
+        overlap: Maximum number of overlapping trailing characters.
+
+    Returns:
+        Plain-text segments with bounded overlap.
+    """
 
     parts: list[str] = []
     start = 0
@@ -272,7 +337,15 @@ def _split_plain_text(text: str, limit: int, overlap: int) -> list[str]:
 
 
 def _split_fenced_block(block: str, limit: int) -> list[str]:
-    """Split an oversized code fence while keeping every part balanced."""
+    """Split an oversized code fence while keeping every part balanced.
+
+    Args:
+        block: Fenced Markdown block to split.
+        limit: Maximum requested records or text size, as used by this operation.
+
+    Returns:
+        Size-bounded code segments, each with complete fence delimiters.
+    """
 
     lines = block.splitlines()
     if len(lines) < 2:
@@ -300,6 +373,15 @@ def _updated_fence_state(
     line: str,
     active_fence: tuple[str, int] | None,
 ) -> tuple[str, int] | None:
+    """Track whether a line opens or closes the active Markdown fence.
+
+    Args:
+        line: Single Markdown line to inspect.
+        active_fence: Current fence character/length pair, or None outside code.
+
+    Returns:
+        Updated fence character/length pair, or None outside a fence.
+    """
     match = FENCE_PATTERN.match(line)
     if match is None:
         return active_fence
@@ -313,6 +395,15 @@ def _updated_fence_state(
 
 
 def _is_closing_fence(line: str, opener: str) -> bool:
+    """Check a line against the active fence character and minimum delimiter length.
+
+    Args:
+        line: Single Markdown line to inspect.
+        opener: Fence delimiter that a closing line must match.
+
+    Returns:
+        True when this line closes the active fence.
+    """
     match = FENCE_PATTERN.match(line)
     return bool(
         match and match.group(1)[0] == opener[0] and len(match.group(1)) >= len(opener)
@@ -320,6 +411,15 @@ def _is_closing_fence(line: str, opener: str) -> bool:
 
 
 def _safe_overlap_tail(content: str, overlap: int) -> str:
+    """Choose overlap text without carrying a partial fenced code block.
+
+    Args:
+        content: Source text or Markdown content to process.
+        overlap: Maximum number of overlapping trailing characters.
+
+    Returns:
+        Bounded trailing text that avoids carrying a partial code fence.
+    """
     if overlap <= 0 or "```" in content or "~~~" in content:
         return ""
 
@@ -331,6 +431,15 @@ def _safe_overlap_tail(content: str, overlap: int) -> str:
 
 
 def _join_blocks(left: str, right: str) -> str:
+    """Join nonempty Markdown blocks with one separating blank line.
+
+    Args:
+        left: First Markdown block.
+        right: Second Markdown block.
+
+    Returns:
+        Nonempty blocks separated by a blank line.
+    """
     if not left:
         return right.strip()
     return f"{left.rstrip()}\n\n{right.lstrip()}"
@@ -344,6 +453,19 @@ def _build_chunk_id(
     chunk_index: int,
     content_hash: str,
 ) -> str:
+    """Hash package, version, source, heading path, position and content identity.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        source_url: Official source URL retained for provenance and namespace checks.
+        header_path: Ordered heading hierarchy locating the chunk.
+        chunk_index: Stable position of the chunk within its source document.
+        content_hash: Recorded digest of normalized content.
+
+    Returns:
+        Deterministic SHA-256 identity for this chunk and its lineage.
+    """
     identity = "\0".join(
         (
             package,

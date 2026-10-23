@@ -1,3 +1,8 @@
+# File: tests/test_catalog_proposal_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog proposal postgres."""
+
 from __future__ import annotations
 
 import json
@@ -29,6 +34,15 @@ pytestmark = pytest.mark.db_integration
 
 
 def build_chunks(package: str) -> list[Chunk]:
+    """Prepare the build chunks test fixture without shared production state.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        list[Chunk]: Prepare the build chunks test fixture without shared production
+            state.
+    """
     records = json.loads(FIXTURE.read_text(encoding="utf-8"))
     chunks = []
     for index, record in enumerate(records):
@@ -52,6 +66,7 @@ def build_chunks(package: str) -> list[Chunk]:
 
 
 def test_assembles_deterministic_read_only_proposal_from_exact_snapshot():
+    """Verify assembles deterministic read only proposal from exact snapshot."""
     assert DATABASE_URL is not None
     package = f"catalogdemo{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)
@@ -152,6 +167,7 @@ def test_assembles_deterministic_read_only_proposal_from_exact_snapshot():
 
 
 def test_rejects_empty_snapshot_proposal_without_writing_catalog_rows():
+    """Verify rejects empty snapshot proposal without writing catalog rows."""
     assert DATABASE_URL is not None
     package = f"emptycatalog{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)

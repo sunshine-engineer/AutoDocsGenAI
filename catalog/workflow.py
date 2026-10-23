@@ -1,3 +1,8 @@
+# File: catalog/workflow.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Lock catalog rows and enforce explicit submit, approve and reject transitions."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -30,6 +35,21 @@ TRANSITIONS = {
 
 @dataclass(frozen=True)
 class ReviewResult:
+    """Catalog review outcome with refreshed artifact state.
+
+    Attributes:
+        catalog_id (str): Persisted catalog UUID or its string representation.
+        previous_status (str): Previous status.
+        status (str): Status.
+        topic_count (int): Topic count.
+        reviewer (str | None): Human reviewer identifier supplied by the operator.
+        approved_at (str | None): Approved at.
+        feedback (str | None): Human review feedback; required for rejection where
+            applicable.
+        no_op (bool): No op.
+        artifacts (ArtifactResult): Artifacts.
+    """
+
     catalog_id: str
     previous_status: str
     status: str
@@ -42,6 +62,18 @@ class ReviewResult:
 
 
 def lock_catalog(session: Session, catalog_id: UUID | str) -> TopicCatalogRecord:
+    """Lock a catalog and its documentation version for consistent review transitions.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        catalog_id: Persisted catalog UUID or its string representation.
+
+    Returns:
+        Locked catalog record ready for the caller review transaction.
+
+    Raises:
+        CatalogPersistenceError: catalog does not exist; catalog no longer exists.
+    """
     identifier = UUID(str(catalog_id))
     version_id = session.scalar(
         select(TopicCatalogRecord.documentation_version_id).where(
@@ -74,6 +106,17 @@ def inspect_catalog(
     root: Path = DEFAULT_ARTIFACT_ROOT,
     repair: bool = False,
 ) -> tuple[dict[str, Any], ArtifactResult | None]:
+    """Load canonical catalog state and optionally repair missing artifact files.
+
+    Args:
+        session_factory: SQLAlchemy session factory used for transactional work.
+        catalog_id: Persisted catalog UUID or its string representation.
+        root: Root directory delimiting artifact or publication access.
+        repair: Whether canonical artifacts may be regenerated from stored lineage.
+
+    Returns:
+        Canonical catalog view and optional repair outcome.
+    """
     with session_factory.begin() as session:
         lock_catalog(session, catalog_id)
         view = load_catalog_view(session, catalog_id)
@@ -84,6 +127,17 @@ def inspect_catalog(
 def review_text(
     value: str | None, name: str, limit: int, *, required: bool
 ) -> str | None:
+    """Validate bounded reviewer or feedback text and normalize optional blanks.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+        name: Field, distribution or check name for this operation.
+        limit: Maximum requested records or text size, as used by this operation.
+        required: Whether blank input must be rejected.
+
+    Returns:
+        Normalized text, or None for an optional blank value.
+    """
     cleaned = value.strip() if value is not None else ""
     if required and not cleaned:
         raise CatalogPersistenceError(f"{name} is required")
@@ -105,6 +159,26 @@ def review_catalog(
     feedback: str | None = None,
     root: Path = DEFAULT_ARTIFACT_ROOT,
 ) -> ReviewResult:
+    """Apply an atomic submit, approve or reject transition and refresh artifacts.
+
+    Args:
+        session_factory: SQLAlchemy session factory used for transactional work.
+        catalog_id: Persisted catalog UUID or its string representation.
+        decision: Explicit review transition, restricted by the workflow.
+        reviewer: Human reviewer identifier supplied by the operator.
+        feedback: Human review feedback; required for rejection where applicable.
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Review transition result and artifact-write outcome.
+
+    Raises:
+        CatalogPersistenceError: decision must be submit, approve, or reject; reviewer
+            is only accepted for approval; feedback is only accepted for rejection;
+            catalog has blocking evidence or hierarchy findings; catalog and topic
+            review states disagree; review conflicts with an existing approved catalog
+            or database constraint.
+    """
     if decision not in {"submit", "approve", "reject"}:
         raise CatalogPersistenceError("decision must be submit, approve, or reject")
     reviewer = review_text(reviewer, "reviewer", 200, required=decision == "approve")

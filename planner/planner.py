@@ -1,3 +1,8 @@
+# File: planner/planner.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Build a typed, bounded crawl plan from the selected documentation root."""
+
 from urllib.parse import urljoin
 
 from discovery.source_selection import canonical_crawl_url, source_contains
@@ -8,6 +13,18 @@ from planner.sitemap import discover_links
 
 
 def build_crawl_plan(state: PipelineState) -> PipelineState:
+    """Discover, filter and select pages from the confirmed documentation root.
+
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+
+    Returns:
+        Input state populated with the bounded crawl plan.
+
+    Raises:
+        ValueError: choose and explicitly confirm a versioned source before crawling;
+            source is unreachable or redirects outside the confirmed scope.
+    """
     selection = state.source_selection
     if selection is None:
         raise ValueError(

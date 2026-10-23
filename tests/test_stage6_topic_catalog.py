@@ -1,3 +1,8 @@
+# File: tests/test_stage6_topic_catalog.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage6 topic catalog."""
+
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -23,6 +28,15 @@ VALID_HASH = "a" * 64
 
 
 def candidate(**overrides: object) -> TopicCandidate:
+    """Prepare the candidate test fixture without shared production state.
+
+    Args:
+        **overrides: Test fixture or parameter controlling the overrides scenario.
+
+    Returns:
+        TopicCandidate: Prepare the candidate test fixture without shared production
+            state.
+    """
     values: dict[str, object] = {
         "qualified_name": "langchain.agents.create_agent",
         "display_name": "create_agent",
@@ -40,6 +54,7 @@ def candidate(**overrides: object) -> TopicCandidate:
 
 
 def test_topic_contract_accepts_a_grounded_function():
+    """Verify topic contract accepts a grounded function."""
     topic = candidate()
 
     assert topic.kind == "function"
@@ -51,11 +66,17 @@ def test_topic_contract_accepts_a_grounded_function():
     ["/absolute.md", "../escape.md", "guides/../../escape.md", "guides\\bad.md"],
 )
 def test_topic_contract_rejects_unsafe_output_paths(output_path: str):
+    """Verify topic contract rejects unsafe output paths.
+
+    Args:
+        output_path: Destination file path for the generated artifact.
+    """
     with pytest.raises(ValidationError, match="relative Markdown path"):
         candidate(output_path=output_path)
 
 
 def test_topic_contract_rejects_duplicate_aliases_and_evidence():
+    """Verify topic contract rejects duplicate aliases and evidence."""
     with pytest.raises(ValidationError, match="aliases must be unique"):
         candidate(aliases=["Agent", "agent"])
 
@@ -69,6 +90,7 @@ def test_topic_contract_rejects_duplicate_aliases_and_evidence():
 
 
 def test_catalog_contract_rejects_duplicate_paths_missing_parents_and_cycles():
+    """Verify catalog contract rejects duplicate paths missing parents and cycles."""
     first = candidate()
     duplicate_path = candidate(
         qualified_name="langchain.agents.another",
@@ -111,6 +133,7 @@ def test_catalog_contract_rejects_duplicate_paths_missing_parents_and_cycles():
 
 
 def test_stage6_metadata_has_catalog_topic_and_evidence_constraints():
+    """Verify stage6 metadata has catalog topic and evidence constraints."""
     catalogs = Base.metadata.tables["topic_catalogs"]
     topics = Base.metadata.tables["topics"]
     evidence = Base.metadata.tables["topic_evidence"]
@@ -139,6 +162,15 @@ def test_stage6_metadata_has_catalog_topic_and_evidence_constraints():
 
 
 def catalog_identity(**overrides: object) -> TopicCatalogIdentity:
+    """Prepare the catalog identity test fixture without shared production state.
+
+    Args:
+        **overrides: Test fixture or parameter controlling the overrides scenario.
+
+    Returns:
+        TopicCatalogIdentity: Prepare the catalog identity test fixture without shared
+            production state.
+    """
     config_snapshot = {"schema_version": "test"}
     values: dict[str, object] = {
         "documentation_version_id": uuid4(),
@@ -158,11 +190,21 @@ def catalog_identity(**overrides: object) -> TopicCatalogIdentity:
 def test_catalog_identity_accepts_unreviewed_states_without_metadata(
     status: CatalogStatus,
 ):
+    """Verify catalog identity accepts unreviewed states without metadata.
+
+    Args:
+        status: Test fixture or parameter controlling the status scenario.
+    """
     assert catalog_identity(status=status).status == status
 
 
 @pytest.mark.parametrize("status", [CatalogStatus.APPROVED, CatalogStatus.SUPERSEDED])
 def test_catalog_identity_preserves_approval_metadata(status: CatalogStatus):
+    """Verify catalog identity preserves approval metadata.
+
+    Args:
+        status: Test fixture or parameter controlling the status scenario.
+    """
     catalog = catalog_identity(
         status=status,
         approved_by=" reviewer ",
@@ -173,6 +215,7 @@ def test_catalog_identity_preserves_approval_metadata(status: CatalogStatus):
 
 
 def test_catalog_identity_requires_rejection_feedback_and_valid_hashes():
+    """Verify catalog identity requires rejection feedback and valid hashes."""
     rejected = catalog_identity(
         status=CatalogStatus.REJECTED, review_feedback=" revise "
     )
@@ -187,11 +230,13 @@ def test_catalog_identity_requires_rejection_feedback_and_valid_hashes():
 
 
 def test_catalog_identity_rejects_metadata_for_unreviewed_state():
+    """Verify catalog identity rejects metadata for unreviewed state."""
     with pytest.raises(ValidationError, match="cannot have review metadata"):
         catalog_identity(status=CatalogStatus.DRAFT, review_feedback="not allowed")
 
 
 def test_stage6_migration_stays_within_catalog_scope():
+    """Verify stage6 migration stays within catalog scope."""
     migration = (
         PROJECT_ROOT / "migrations" / "versions" / "0003_stage6_topic_catalog.py"
     ).read_text(encoding="utf-8")

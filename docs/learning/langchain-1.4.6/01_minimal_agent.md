@@ -1,3 +1,9 @@
+<!--
+File: docs/learning/langchain-1.4.6/01_minimal_agent.md
+Purpose: Invoke an agent without a provider account.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Invoke an agent without a provider account
 
 **Content status:** authored by Codex; teaching draft; Sunny final approval pending.
@@ -27,6 +33,9 @@ python examples/learning/langchain_1_4_6/01_minimal_agent.py
 This is the complete file, not a fragment requiring hidden helper code:
 
 ```python
+# File: examples/learning/langchain_1_4_6/01_minimal_agent.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Minimal agent invocation: fixed model output, no tools or provider calls."""
 
 from langchain.agents import create_agent

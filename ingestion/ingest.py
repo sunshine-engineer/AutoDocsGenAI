@@ -1,3 +1,8 @@
+# File: ingestion/ingest.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Fetch confirmed crawl pages and persist cleaned Markdown with source provenance."""
+
 from pathlib import Path
 
 from config.settings import CrawlConfig
@@ -16,7 +21,19 @@ def ingest_documents(
     state: PipelineState,
     config: CrawlConfig | None = None,
 ) -> PipelineState:
+    """Fetch confirmed crawl pages, normalize content and persist cleaned Markdown.
 
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+        config: Typed configuration controlling this operation.
+
+    Returns:
+        Input state populated with fetched and cleaned confirmed-source documents.
+
+    Raises:
+        ValueError: source confirmation is required before ingestion; source fetch did
+            not return HTTP 200.
+    """
     if state.crawl_plan is None:
         return state
 

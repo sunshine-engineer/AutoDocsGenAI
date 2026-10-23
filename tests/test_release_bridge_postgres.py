@@ -1,3 +1,8 @@
+# File: tests/test_release_bridge_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for release bridge postgres."""
+
 from __future__ import annotations
 
 import os
@@ -22,6 +27,13 @@ pytestmark = pytest.mark.db_integration
 def test_approved_release_to_persistent_pages_and_reviewed_export(
     tmp_path, monkeypatch
 ):
+    """Verify approved release to persistent pages and reviewed export.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     snapshot, approval = snapshot_fixture(tmp_path, version=f"1.4.6+{uuid4().hex}")
     engine = create_database_engine(os.environ["AUTODOCS_INTEGRATION_DATABASE_URL"])
     factory = create_session_factory(engine)
@@ -33,6 +45,15 @@ def test_approved_release_to_persistent_pages_and_reviewed_export(
     )
 
     def fixture_index(package, version, config, *, engine):
+        """Prepare the fixture index test fixture without shared production state.
+
+        Args:
+            package: Distribution name used to scope lineage and results.
+            version: Exact package release; version families are not accepted
+                implicitly.
+            config: Typed configuration controlling this operation.
+            engine: Database engine; None uses the configured database where supported.
+        """
         with factory.begin() as session:
             identity = session.scalar(
                 select(EmbeddingVersionRecord).where(

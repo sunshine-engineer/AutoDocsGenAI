@@ -1,3 +1,8 @@
+# File: tests/test_vm_deployment.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for vm deployment."""
+
 import os
 from pathlib import Path
 
@@ -11,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_database_secret_is_url_encoded_and_invalid_lines_rejected():
+    """Verify database secret is url encoded and invalid lines rejected."""
     assert "p%40ss%3Aword%2F%25" in database_url("p@ss:word/%")
     for value in ("", "secret\nline", "secret\r"):
         with pytest.raises(ValueError):
@@ -18,6 +24,11 @@ def test_database_secret_is_url_encoded_and_invalid_lines_rejected():
 
 
 def test_vm_env_rejects_interpolation_and_unreviewed_release(tmp_path):
+    """Verify vm env rejects interpolation and unreviewed release.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     path = tmp_path / "runtime.env"
     valid = "\n".join(
         [
@@ -42,6 +53,7 @@ def test_vm_env_rejects_interpolation_and_unreviewed_release(tmp_path):
 
 
 def test_vm_network_and_secret_boundaries():
+    """Verify vm network and secret boundaries."""
     config = yaml.safe_load((ROOT / "deploy/compose.vm.yml").read_text())
     services = config["services"]
     assert "private" not in services["web"]["networks"]
@@ -60,6 +72,7 @@ def test_vm_network_and_secret_boundaries():
 
 
 def test_service_boot_only_starts_reader_and_never_migrates():
+    """Verify service boot only starts reader and never migrates."""
     text = (ROOT / "deploy/autodocs.service").read_text()
     assert "--no-build --wait web" in text
     assert "alembic" not in text
@@ -68,6 +81,11 @@ def test_service_boot_only_starts_reader_and_never_migrates():
 
 
 def test_http_preview_requires_explicit_mode(tmp_path):
+    """Verify http preview requires explicit mode.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     path = tmp_path / "runtime.env"
     path.write_text(
         "RELEASE_ID="
@@ -82,6 +100,11 @@ def test_http_preview_requires_explicit_mode(tmp_path):
 
 @pytest.mark.skipif(__import__("os").name == "nt", reason="Linux VM timeout contract")
 def test_timed_out_worker_forces_container_cleanup(tmp_path):
+    """Verify timed out worker forces container cleanup.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     import subprocess
 
     env_file = tmp_path / "runtime.env"

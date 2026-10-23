@@ -1,3 +1,8 @@
+# File: scripts/search_chunks.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the search chunks operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -7,6 +12,11 @@ from utils.config_loader import load_config
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse the command-line options for this operator command.
+
+    Returns:
+        Parsed command arguments with their documented defaults.
+    """
     parser = argparse.ArgumentParser(description="Search indexed documentation chunks")
     parser.add_argument("package")
     parser.add_argument("version")
@@ -16,6 +26,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Parse command-line inputs and run the search chunks operator command."""
     args = parse_args()
     config = load_config()
     hits = search_similar_chunks(

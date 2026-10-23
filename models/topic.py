@@ -1,3 +1,8 @@
+# File: models/topic.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Validate catalog topics, acyclic hierarchy, evidence and review-state invariants."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -12,6 +17,8 @@ from models.identity import sha256_identity
 
 
 class TopicKind(StrEnum):
+    """Supported first-release API and curated topic categories."""
+
     MODULE = "module"
     CLASS = "class"
     FUNCTION = "function"
@@ -20,12 +27,16 @@ class TopicKind(StrEnum):
 
 
 class TopicStatus(StrEnum):
+    """Review states for individual catalog topics."""
+
     PROPOSED = "proposed"
     APPROVED = "approved"
     REJECTED = "rejected"
 
 
 class CatalogStatus(StrEnum):
+    """Lifecycle and approval states for a persisted catalog."""
+
     DRAFT = "draft"
     AWAITING_APPROVAL = "awaiting_approval"
     APPROVED = "approved"
@@ -34,11 +45,22 @@ class CatalogStatus(StrEnum):
 
 
 class EvidenceRole(StrEnum):
+    """Primary or supporting role of a topic source chunk."""
+
     PRIMARY = "primary"
     SUPPORTING = "supporting"
 
 
 class TopicEvidence(BaseModel):
+    """Ranked chunk reference and optional retrieval score for a topic.
+
+    Attributes:
+        chunk_id (str): Chunk id.
+        role (EvidenceRole): Role.
+        rank (int): Rank.
+        score (float | None): Score.
+    """
+
     chunk_id: str = Field(min_length=1)
     role: EvidenceRole = EvidenceRole.SUPPORTING
     rank: int = Field(ge=1)
@@ -46,6 +68,22 @@ class TopicEvidence(BaseModel):
 
 
 class TopicCandidate(BaseModel):
+    """Validated topic identity, output path, hierarchy and evidence.
+
+    Attributes:
+        qualified_name (str): Qualified name.
+        display_name (str): Human-readable topic or symbol name.
+        kind (TopicKind): Kind.
+        slug (str): Slug.
+        output_path (str): Destination file path for the generated artifact.
+        parent_qualified_name (str | None): Parent qualified name.
+        aliases (list[str]): Aliases.
+        summary (str | None): Summary.
+        sort_order (int): Sort order.
+        status (TopicStatus): Status.
+        evidence (list[TopicEvidence]): Evidence.
+    """
+
     qualified_name: str = Field(min_length=1)
     display_name: str = Field(min_length=1)
     kind: TopicKind
@@ -60,6 +98,17 @@ class TopicCandidate(BaseModel):
 
     @model_validator(mode="after")
     def validate_catalog_identity(self) -> Self:
+        """Validate safe paths, parent identity, aliases and evidence uniqueness.
+
+        Returns:
+            The same validated topic instance.
+
+        Raises:
+            ValueError: output_path must be a relative Markdown path; a topic cannot be
+                its own parent; aliases must not be blank; aliases must be unique
+                ignoring case; evidence chunk IDs must be unique within a topic;
+                evidence ranks must be unique within a topic.
+        """
         path = PurePosixPath(self.output_path)
         if (
             "\\" in self.output_path
@@ -85,6 +134,17 @@ class TopicCandidate(BaseModel):
 
 
 class TopicCatalogProposal(BaseModel):
+    """Exact-version topic proposal with unique, acyclic navigation identities.
+
+    Attributes:
+        package (str): Distribution name used to scope lineage and results.
+        version (str): Exact package release; version families are not accepted
+            implicitly.
+        config_hash (str): Config hash.
+        topics (list[TopicCandidate]): Topic records in the current extraction, proposal
+            or catalog.
+    """
+
     package: str = Field(min_length=1)
     version: str = Field(min_length=1)
     config_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -92,6 +152,16 @@ class TopicCatalogProposal(BaseModel):
 
     @model_validator(mode="after")
     def validate_unique_topics(self) -> Self:
+        """Require unique identities/paths and a complete acyclic topic hierarchy.
+
+        Returns:
+            The same validated catalog proposal instance.
+
+        Raises:
+            ValueError: topic qualified names must be unique ignoring case; topic output
+                paths must be unique ignoring case; every parent topic must exist in the
+                same catalog; topic parent relationships must be acyclic.
+        """
         qualified_names = [topic.qualified_name.casefold() for topic in self.topics]
         output_paths = [topic.output_path.casefold() for topic in self.topics]
         if len(qualified_names) != len(set(qualified_names)):
@@ -127,7 +197,22 @@ class TopicCatalogProposal(BaseModel):
 
 
 class TopicCatalogIdentity(BaseModel):
-    """Reproducible identity and review state for one persisted catalog."""
+    """Reproducible identity and review state for one persisted catalog.
+
+    Attributes:
+        documentation_version_id (UUID): Persisted documentation-version identity.
+        source_pipeline_run_id (UUID): Exact persisted ingestion-run identity.
+        embedding_version_id (UUID): Exact persisted embedding-model/version identity.
+        input_snapshot_hash (str): Expected hash of the frozen input source/chunk
+            snapshot.
+        config_hash (str): Config hash.
+        config_snapshot (dict[str, object]): Canonical non-secret catalog configuration
+            snapshot.
+        status (CatalogStatus): Status.
+        approved_by (str | None): Approved by.
+        approved_at (datetime | None): Approved at.
+        review_feedback (str | None): Review feedback.
+    """
 
     documentation_version_id: UUID
     source_pipeline_run_id: UUID
@@ -142,6 +227,19 @@ class TopicCatalogIdentity(BaseModel):
 
     @model_validator(mode="after")
     def validate_review_state(self) -> Self:
+        """Require a valid snapshot hash and status-appropriate approval or rejection
+        metadata.
+
+        Returns:
+            The same instance with normalized reviewer/feedback text.
+
+        Raises:
+            ValueError: catalog configuration snapshot must not be empty; catalog
+                configuration snapshot does not reproduce config_hash; approved and
+                superseded catalogs require approval metadata only; rejected catalogs
+                require non-blank feedback and no approval metadata; draft and
+                awaiting-approval catalogs cannot have review metadata.
+        """
         if not self.config_snapshot:
             raise ValueError("catalog configuration snapshot must not be empty")
         if sha256_identity(self.config_snapshot) != self.config_hash:

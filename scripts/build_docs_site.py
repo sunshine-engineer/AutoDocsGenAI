@@ -1,3 +1,6 @@
+# File: scripts/build_docs_site.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Assemble an allowlisted, approval-checked local reader and build static HTML."""
 
 from __future__ import annotations
@@ -17,10 +20,31 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def sha256(path: Path) -> str:
+    """Return the hexadecimal SHA-256 digest of a file.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+
+    Returns:
+        Hexadecimal SHA-256 digest of the file bytes.
+    """
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def read_checked(root: Path, relative: str, expected: str) -> bytes:
+    """Read only an in-root file whose bytes match the selected publication digest.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+        relative: Publication path relative to the selected source root.
+        expected: Expected file digest or pinned value.
+
+    Returns:
+        Exact bytes of the in-root, digest-matched publication input.
+
+    Raises:
+        ValueError: publication path escapes source root or is missing.
+    """
     path = (root / relative).resolve()
     if not path.is_relative_to(root.resolve()) or not path.is_file():
         raise ValueError("publication path escapes source root or is missing")
@@ -31,6 +55,21 @@ def read_checked(root: Path, relative: str, expected: str) -> bytes:
 
 
 def verify_publication(root: Path, selection: dict) -> tuple[dict, dict]:
+    """Verify the exact approved export allowlist and matching page review records.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+        selection: Explicit human-confirmed source selection.
+
+    Returns:
+        Validated build manifest and approval record.
+
+    Raises:
+        ValueError: publication package/version mismatch; approval does not identify
+            selected export; approval/catalog mismatch; incomplete or duplicate page
+            approval; publication allowlist differs from approved export; page is not
+            matched to final approval.
+    """
     files = selection["files"]
     payloads = {
         name: read_checked(root, name, digest) for name, digest in files.items()
@@ -73,6 +112,14 @@ def verify_publication(root: Path, selection: dict) -> tuple[dict, dict]:
 
 
 def catalog_page(root: Path) -> str:
+    """Render package/version navigation from the recorded coverage inventory.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Markdown/HTML package cards and version filtering controls.
+    """
     coverage = json.loads(
         (root / "docs/ecosystem/coverage.json").read_text(encoding="utf-8")
     )
@@ -118,6 +165,14 @@ def catalog_page(root: Path) -> str:
 
 
 def compatibility_page(root: Path) -> str:
+    """Render measured cross-version results with their explicit execution limits.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Markdown summarizing measured release contracts and known failures.
+    """
     evidence = root / "docs/ecosystem/evidence"
     rows = []
     for case in json.loads((evidence / "matrix.json").read_text(encoding="utf-8")):
@@ -184,7 +239,18 @@ The separate source reference covers 30 packages and 89 releases. Source declara
 
 
 def human_review_page(root: Path) -> str:
-    """Render placeholders only; queue resolution never publishes draft prose."""
+    """Render placeholders only; queue resolution never publishes draft prose.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Markdown/HTML review placeholders for the current pending learning items.
+
+    Raises:
+        ValueError: unknown human review queue schema; duplicate human review issue ID;
+            review queue cannot authorize publication.
+    """
     queue = json.loads(
         (root / "docs/quality/human-review-queue.json").read_text(encoding="utf-8")
     )
@@ -225,6 +291,14 @@ def human_review_page(root: Path) -> str:
 
 
 def prepare(root: Path = ROOT) -> Path:
+    """Assemble allowlisted reader sources while preserving approved input bytes.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+
+    Returns:
+        Staging directory containing the assembled reader Markdown and assets.
+    """
     selection = json.loads(
         (root / "website/publication.json").read_text(encoding="utf-8")
     )
@@ -282,6 +356,9 @@ def prepare(root: Path = ROOT) -> Path:
 
 
 def main():
+    """Parse command-line inputs and build the approval-checked reader and optionally serve
+    it on loopback.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument(

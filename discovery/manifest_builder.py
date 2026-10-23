@@ -1,3 +1,8 @@
+# File: discovery/manifest_builder.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Translate provider metadata into typed documentation source manifests."""
+
 from models.manifest import (
     DocumentationManifest,
     DocumentationSource,
@@ -9,7 +14,16 @@ def build_manifest(
     version: str,
     metadata: dict,
 ) -> DocumentationManifest:
+    """Translate provider URLs into typed sources for one exact package release.
 
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        metadata: Source metadata or safe progress attributes.
+
+    Returns:
+        Manifest of typed official documentation sources.
+    """
     info = metadata.get("info", {})
 
     project_urls = info.get("project_urls") or {}

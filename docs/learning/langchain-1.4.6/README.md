@@ -1,3 +1,9 @@
+<!--
+File: docs/learning/langchain-1.4.6/README.md
+Purpose: Reproduce exact-version teaching recipes with current and historical evidence.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Learn agents through four executable recipes
 
 This teaching collection is separate from the five approved exports. It adds
@@ -18,7 +24,6 @@ results do not constitute editorial approval.
 | [Minimal invocation](01_minimal_agent.md) | Message types and exact fixture reply | See execution record |
 | [Middleware](02_middleware.md) | Synchronous hook order and reply | See execution record |
 | [Conversation state](03_conversation_state.md) | Same-thread retention, separate-thread isolation, missing-config rejection | See execution record |
-
 | [Local tool call](04_tool_call.md) | Actual Python execution, message routing and invalid-argument rejection | See execution record |
 
 ## Environment and execution
@@ -35,7 +40,7 @@ uv run --no-project --python .venv-learning python -m scripts.check_learning_exa
 
 The default report is `.site-work/learning-results.json`. To deliberately refresh
 the tracked evidence after reviewing changes, pass
-`--output docs/learning/langchain-1.4.6/execution.json`. Run without Python's
+`--output` with a new dated file under `docs/learning/langchain-1.4.6/`. Run without Python's
 optimization flag: assertions are part of the checks. Installing dependencies
 requires internet access; example execution denies Python socket connections and
 DNS in the runner. This guard is not a sandbox for untrusted code.
@@ -54,6 +59,6 @@ storage remain unverified.
 - **Untested:** no execution evidence exists; do not imply runtime correctness.
 - **Credentials-required:** deliberately skipped pending provider access; not a pass.
 
-[Execution record](execution.json). These pages remain outside the approved
+[Current execution record](execution-consistency-2026-10-23.json) · [Historical execution record](execution.json). These pages remain outside the approved
 website publication manifest until their final content is reviewed. The report
 hashes identify what was executed; later edits require rerunning the checks.

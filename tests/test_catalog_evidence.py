@@ -1,3 +1,8 @@
+# File: tests/test_catalog_evidence.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog evidence."""
+
 from catalog.evidence import map_topic_evidence
 from catalog.normalization import NormalizedTopic
 from indexing.vectorstore import SearchHit
@@ -6,6 +11,15 @@ from models.topic import TopicKind
 
 
 def chunk(chunk_id: str, content: str = "Evidence content") -> Chunk:
+    """Prepare the chunk test fixture without shared production state.
+
+    Args:
+        chunk_id: Test fixture or parameter controlling the chunk id scenario.
+        content: Source text or Markdown content to process.
+
+    Returns:
+        Chunk: Prepare the chunk test fixture without shared production state.
+    """
     return Chunk(
         id=chunk_id,
         content=content,
@@ -23,6 +37,16 @@ def chunk(chunk_id: str, content: str = "Evidence content") -> Chunk:
 def topic(
     *structural_ids: str, kind: TopicKind = TopicKind.FUNCTION
 ) -> NormalizedTopic:
+    """Prepare the topic test fixture without shared production state.
+
+    Args:
+        kind: Test fixture or parameter controlling the kind scenario.
+        *structural_ids: Test fixture or parameter controlling the structural ids
+            scenario.
+
+    Returns:
+        NormalizedTopic: Prepare the topic test fixture without shared production state.
+    """
     return NormalizedTopic(
         kind=kind,
         qualified_name="langchain.agents.create_agent",
@@ -37,6 +61,15 @@ def topic(
 
 
 def hit(chunk_id: str, score: float) -> SearchHit:
+    """Prepare the hit test fixture without shared production state.
+
+    Args:
+        chunk_id: Test fixture or parameter controlling the chunk id scenario.
+        score: Test fixture or parameter controlling the score scenario.
+
+    Returns:
+        SearchHit: Prepare the hit test fixture without shared production state.
+    """
     return SearchHit(
         chunk_id=chunk_id,
         content="Semantic evidence",
@@ -48,6 +81,7 @@ def hit(chunk_id: str, score: float) -> SearchHit:
 
 
 def test_structural_evidence_is_primary_and_semantic_hits_supplement_it():
+    """Verify structural evidence is primary and semantic hits supplement it."""
     chunks = [chunk("structural"), chunk("semantic")]
 
     mapped, issues = map_topic_evidence(
@@ -68,6 +102,7 @@ def test_structural_evidence_is_primary_and_semantic_hits_supplement_it():
 
 
 def test_evidence_mapping_rejects_hits_outside_input_snapshot_and_duplicates():
+    """Verify evidence mapping rejects hits outside input snapshot and duplicates."""
     chunks = [chunk("structural"), chunk("allowed")]
 
     mapped, _ = map_topic_evidence(
@@ -88,6 +123,7 @@ def test_evidence_mapping_rejects_hits_outside_input_snapshot_and_duplicates():
 
 
 def test_evidence_mapping_rejects_high_scoring_adjacent_product_chunk():
+    """Verify evidence mapping rejects high scoring adjacent product chunk."""
     structural = chunk("structural")
     adjacent = chunk("langsmith")
     adjacent.source_url = "https://reference.langchain.com/python/langsmith"
@@ -103,17 +139,18 @@ def test_evidence_mapping_rejects_high_scoring_adjacent_product_chunk():
 
 
 def test_evidence_limits_api_topics_to_eight_and_guides_to_twelve():
+    """Verify evidence limits api topics to eight and guides to twelve."""
     chunks = [chunk(f"chunk-{index}") for index in range(15)]
     hits = [hit(item.id, 0.9 - index / 100) for index, item in enumerate(chunks)]
 
     api, _ = map_topic_evidence(
-        [topic("chunk-0")], chunks, "langchain", lambda q, l: hits
+        [topic("chunk-0")], chunks, "langchain", lambda _query, _limit: hits
     )
     guide, _ = map_topic_evidence(
         [topic("chunk-0", kind=TopicKind.GUIDE)],
         chunks,
         "langchain",
-        lambda q, l: hits,
+        lambda _query, _limit: hits,
     )
 
     assert len(api[0].evidence) == 8
@@ -121,6 +158,7 @@ def test_evidence_limits_api_topics_to_eight_and_guides_to_twelve():
 
 
 def test_missing_primary_is_blocking_and_single_short_chunk_is_warning():
+    """Verify missing primary is blocking and single short chunk is warning."""
     missing, missing_issues = map_topic_evidence(
         [topic("missing")], [], "langchain", None
     )

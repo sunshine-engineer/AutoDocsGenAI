@@ -1,7 +1,13 @@
+# File: tests/test_config.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for config."""
+
 from utils.config_loader import load_config
 
 
 def test_load_config():
+    """Verify load config."""
     config = load_config()
 
     assert config.project.name == "Documentation Knowledge Pipeline"

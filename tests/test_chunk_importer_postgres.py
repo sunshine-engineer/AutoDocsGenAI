@@ -1,3 +1,8 @@
+# File: tests/test_chunk_importer_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for chunk importer postgres."""
+
 import os
 from uuid import uuid4
 
@@ -16,6 +21,16 @@ pytestmark = pytest.mark.db_integration
 
 
 def build_state(content: str, package: str) -> PipelineState:
+    """Prepare the build state test fixture without shared production state.
+
+    Args:
+        content: Source text or Markdown content to process.
+        package: Distribution name used to scope lineage and results.
+
+    Returns:
+        PipelineState: Prepare the build state test fixture without shared production
+            state.
+    """
     chunk = Chunk(
         id=f"chunk-{package}-{content.lower()}",
         content=content,
@@ -43,6 +58,7 @@ def build_state(content: str, package: str) -> PipelineState:
 
 
 def test_idempotent_import_and_document_revision():
+    """Verify idempotent import and document revision."""
     assert DATABASE_URL is not None
     package = f"importer-demo-{uuid4().hex}"
     engine = create_database_engine(DATABASE_URL)

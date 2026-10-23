@@ -1,3 +1,10 @@
+# File: generation/ollama.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Grounded drafts, durable job state, human review and approval-gated export. Module:
+ollama.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -41,6 +48,11 @@ PAGE_REQUIREMENTS = {
 
 
 def writer_contract_hash() -> str:
+    """Hash the exact prompt, JSON wire schema and fixed generation options.
+
+    Returns:
+        SHA-256 digest of the prompt/schema/options contract.
+    """
     return sha256_identity(
         {
             "system_prompt": SYSTEM_PROMPT,
@@ -56,6 +68,20 @@ def writer_contract_hash() -> str:
 
 @dataclass(frozen=True)
 class WritingResult:
+    """Writer output plus exact model, request, timing and citation-check evidence.
+
+    Attributes:
+        draft (PageDraft): Structured generated or editorial page revision.
+        model (str): Installed model name whose exact digest is recorded.
+        model_digest (str): Exact installed model digest used to identify the writer.
+        prompt_version (str): Prompt version.
+        request_hash (str): Request hash.
+        elapsed_seconds (float): Elapsed seconds.
+        prompt_tokens (int): Prompt tokens.
+        output_tokens (int): Output tokens.
+        citation_issues (tuple[str, ...]): Citation issues.
+    """
+
     draft: PageDraft
     model: str
     model_digest: str
@@ -78,7 +104,30 @@ def write_page(
     evidence: list[EvidenceChunk],
     revision_feedback: str | None = None,
 ) -> WritingResult:
-    """One bounded local request; callers own approval, persistence, and retries."""
+    """One bounded local request; callers own approval, persistence, and retries.
+
+    Args:
+        client: Caller-owned HTTP client with bounded request settings.
+        base_url: Ollama service URL; no provider credentials are inferred.
+        model: Installed model name whose exact digest is recorded.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        title: Requested page title or source label.
+        evidence: Unique, same-package/version source chunks available to support
+            claims.
+        revision_feedback: Optional feedback for a subsequent bounded writing request.
+
+    Returns:
+        Draft, model/request identities, timing and citation-check results.
+
+    Raises:
+        ValueError: writing requires nonempty, uniquely identified evidence; writing
+            evidence must match the selected package and version; writing evidence
+            exceeds the pilot context budget; the selected model must be installed with
+            a recorded digest; model did not complete a page within the output budget.
+        httpx.HTTPError: Model discovery or generation fails at the transport/status
+            layer.
+    """
     if not evidence or len({chunk.chunk_id for chunk in evidence}) != len(evidence):
         raise ValueError("writing requires nonempty, uniquely identified evidence")
     if any(chunk.package != package or chunk.version != version for chunk in evidence):

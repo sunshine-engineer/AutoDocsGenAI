@@ -1,3 +1,8 @@
+# File: tests/test_grounded_writer.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for grounded writer."""
+
 from __future__ import annotations
 
 import json
@@ -10,6 +15,14 @@ from generation.ollama import write_page
 
 
 def evidence(**updates):
+    """Prepare the evidence test fixture without shared production state.
+
+    Args:
+        **updates: Test fixture or parameter controlling the updates scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return EvidenceChunk.model_validate(
         {
             "chunk_id": "fixture-1",
@@ -23,6 +36,14 @@ def evidence(**updates):
 
 
 def draft(**updates):
+    """Prepare the draft test fixture without shared production state.
+
+    Args:
+        **updates: Test fixture or parameter controlling the updates scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return PageDraft.model_validate(
         {
             "title": "Widget",
@@ -50,6 +71,7 @@ def draft(**updates):
 
 
 def test_citation_integrity_and_abstention():
+    """Verify citation integrity and abstention."""
     assert validate_citations(draft(), [evidence()], "fixture", "1.0") == []
     abstained = draft(
         abstained=True, reason="Insufficient source evidence", sections=[]
@@ -61,6 +83,11 @@ def test_citation_integrity_and_abstention():
 
 @pytest.mark.parametrize("change", ["unknown", "wrong_quote", "wrong_version"])
 def test_citations_reject_unknown_unmatched_and_wrong_version(change):
+    """Verify citations reject unknown unmatched and wrong version.
+
+    Args:
+        change: Test fixture or parameter controlling the change scenario.
+    """
     page = draft().model_dump()
     chunks = [evidence()]
     if change == "unknown":
@@ -75,6 +102,7 @@ def test_citations_reject_unknown_unmatched_and_wrong_version(change):
 
 
 def test_claims_without_citations_fail_schema_validation():
+    """Verify claims without citations fail schema validation."""
     payload = draft().model_dump()
     payload["sections"][0]["claims"][0]["citations"] = []
     with pytest.raises(ValueError):
@@ -83,9 +111,22 @@ def test_claims_without_citations_fail_schema_validation():
 
 @pytest.mark.parametrize("label", ["e1", "e999"])
 def test_ollama_request_is_bounded_structured_and_records_digest(label):
+    """Verify ollama request is bounded structured and records digest.
+
+    Args:
+        label: Test fixture or parameter controlling the label scenario.
+    """
     seen = []
 
     def handle(request):
+        """Prepare the handle test fixture without shared production state.
+
+        Args:
+            request: Mock HTTP request or pytest request context used by this fixture.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         seen.append(request)
         if request.url.path == "/api/tags":
             return httpx.Response(
@@ -133,6 +174,7 @@ def test_ollama_request_is_bounded_structured_and_records_digest(label):
 
 
 def test_writing_rejects_mixed_versions_before_network():
+    """Verify writing rejects mixed versions before network."""
     with (
         httpx.Client(
             transport=httpx.MockTransport(lambda _: pytest.fail("no request expected"))

@@ -1,3 +1,8 @@
+# File: tests/test_catalog_identity.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog identity."""
+
 from uuid import uuid4
 
 import pytest
@@ -14,6 +19,12 @@ from models.topic import TopicKind
 
 
 def embedding_config() -> EmbeddingConfig:
+    """Prepare the embedding config test fixture without shared production state.
+
+    Returns:
+        EmbeddingConfig: Prepare the embedding config test fixture without shared
+            production state.
+    """
     return EmbeddingConfig(
         provider="fastembed",
         model="BAAI/bge-small-en-v1.5",
@@ -24,6 +35,7 @@ def embedding_config() -> EmbeddingConfig:
 
 
 def test_snapshot_hash_is_stable_across_package_and_chunk_order_normalization():
+    """Verify snapshot hash is stable across package and chunk order normalization."""
     documentation_version_id = str(uuid4())
     pipeline_run_id = str(uuid4())
     chunks = [SnapshotChunk("chunk-b", "hash-b"), SnapshotChunk("chunk-a", "hash-a")]
@@ -57,6 +69,12 @@ def test_snapshot_hash_is_stable_across_package_and_chunk_order_normalization():
     ],
 )
 def test_snapshot_hash_changes_with_lineage(field: str, changed: object):
+    """Verify snapshot hash changes with lineage.
+
+    Args:
+        field: Counter name to increment.
+        changed: Test fixture or parameter controlling the changed scenario.
+    """
     values: dict[str, object] = {
         "package": "demo-package",
         "version": "1.0",
@@ -71,6 +89,7 @@ def test_snapshot_hash_changes_with_lineage(field: str, changed: object):
 
 
 def test_catalog_config_hash_is_order_stable_and_excludes_runtime_settings():
+    """Verify catalog config hash is order stable and excludes runtime settings."""
     run_id = str(uuid4())
     first_config = CatalogIdentityConfig(
         embedding=embedding_config(),
@@ -105,6 +124,7 @@ def test_catalog_config_hash_is_order_stable_and_excludes_runtime_settings():
 
 
 def test_canonical_config_snapshot_round_trips_to_its_hash():
+    """Verify canonical config snapshot round trips to its hash."""
     config = CatalogIdentityConfig(
         embedding=embedding_config(),
         namespace_allow_list=("/python/langchain",),
@@ -131,6 +151,7 @@ def test_canonical_config_snapshot_round_trips_to_its_hash():
 
 
 def test_config_snapshot_validation_rejects_changed_content():
+    """Verify config snapshot validation rejects changed content."""
     config = CatalogIdentityConfig(
         embedding=embedding_config(),
         namespace_allow_list=("/python/langchain",),
@@ -159,6 +180,7 @@ def test_config_snapshot_validation_rejects_changed_content():
 
 
 def test_catalog_config_hash_changes_with_output_affecting_settings():
+    """Verify catalog config hash changes with output affecting settings."""
     base = CatalogIdentityConfig(
         embedding=embedding_config(),
         namespace_allow_list=("/python/langchain",),
@@ -181,6 +203,7 @@ def test_catalog_config_hash_changes_with_output_affecting_settings():
 
 
 def test_identity_configuration_rejects_ambiguous_inputs():
+    """Verify identity configuration rejects ambiguous inputs."""
     with pytest.raises(ValueError, match="namespace_allow_list"):
         CatalogIdentityConfig(embedding=embedding_config(), namespace_allow_list=())
     with pytest.raises(ValueError, match="unique ignoring case"):

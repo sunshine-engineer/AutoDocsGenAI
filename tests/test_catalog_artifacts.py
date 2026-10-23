@@ -1,3 +1,8 @@
+# File: tests/test_catalog_artifacts.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog artifacts."""
+
 from __future__ import annotations
 
 import json
@@ -17,6 +22,11 @@ from scripts.catalog_cli import parser_for, run
 
 
 def sample_view():
+    """Prepare the sample view test fixture without shared production state.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return {
         "package": "example",
         "version": "1.0",
@@ -41,6 +51,11 @@ def sample_view():
 
 
 def test_artifacts_are_byte_stable_and_repair_corruption(tmp_path):
+    """Verify artifacts are byte stable and repair corruption.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     view = sample_view()
     assert render_artifacts(view) == render_artifacts(json.loads(json.dumps(view)))
     first = write_artifacts(view, tmp_path)
@@ -57,11 +72,26 @@ def test_artifacts_are_byte_stable_and_repair_corruption(tmp_path):
 
 
 def test_atomic_failure_keeps_existing_file_and_cleans_temporary(tmp_path, monkeypatch):
+    """Verify atomic failure keeps existing file and cleans temporary.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     view = sample_view()
     write_artifacts(view, tmp_path)
     original = (artifact_directory(view, tmp_path) / "catalog.json").read_bytes()
 
     def fail(*args):
+        """Prepare the fail test fixture without shared production state.
+
+        Args:
+            *args: Additional positional arguments.
+
+        Raises:
+            OSError: injected failure with secret database URL.
+        """
         raise OSError("injected failure with secret database URL")
 
     monkeypatch.setattr("catalog.artifacts.os.replace", fail)
@@ -74,17 +104,29 @@ def test_atomic_failure_keeps_existing_file_and_cleans_temporary(tmp_path, monke
 
 @pytest.mark.parametrize("version", ["..", "a/b", "a\\b", "C:bad"])
 def test_artifact_paths_reject_traversal(tmp_path, version):
+    """Verify artifact paths reject traversal.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        version: Exact package release; version families are not accepted implicitly.
+    """
     with pytest.raises(CatalogPersistenceError, match="unsafe"):
         artifact_directory({**sample_view(), "version": version}, tmp_path)
 
 
 @pytest.mark.parametrize("value", ["", " ", "x\nforged", "x\tforged", "x" * 201])
 def test_reviewer_validation(value):
+    """Verify reviewer validation.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+    """
     with pytest.raises(CatalogPersistenceError):
         review_text(value, "reviewer", 200, required=True)
 
 
 def test_review_table_has_only_explicit_transitions():
+    """Verify review table has only explicit transitions."""
     assert len(TRANSITIONS) == 4
     assert not any(
         source in {"approved", "rejected", "superseded"} for source, _ in TRANSITIONS
@@ -94,6 +136,11 @@ def test_review_table_has_only_explicit_transitions():
 
 @pytest.mark.parametrize("command", ["build", "inspect", "review"])
 def test_cli_rejects_malformed_ids_before_database_access(command):
+    """Verify cli rejects malformed ids before database access.
+
+    Args:
+        command: Explicit catalog subcommand to execute.
+    """
     argv = (
         ["example", "1.0", "--pipeline-run", "bad"] if command == "build" else ["bad"]
     )
@@ -103,7 +150,20 @@ def test_cli_rejects_malformed_ids_before_database_access(command):
 
 
 def test_cli_configuration_error_does_not_leak_credentials(monkeypatch, capsys):
+    """Verify cli configuration error does not leak credentials.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+        capsys: Pytest capture fixture for stdout and stderr assertions.
+    """
+
     def fail():
+        """Prepare the fail test fixture without shared production state.
+
+        Raises:
+            RuntimeError: postgresql://secret:password@host/db.
+        """
         raise RuntimeError("postgresql://secret:password@host/db")
 
     monkeypatch.setattr("scripts.catalog_cli.create_database_engine", fail)
@@ -114,6 +174,7 @@ def test_cli_configuration_error_does_not_leak_credentials(monkeypatch, capsys):
 
 
 def test_canonical_config_rehydration_rejects_runtime_or_secret_fields():
+    """Verify canonical config rehydration rejects runtime or secret fields."""
     from catalog.identity import (
         CatalogIdentityConfig,
         catalog_config_snapshot,
@@ -143,6 +204,7 @@ def test_canonical_config_rehydration_rejects_runtime_or_secret_fields():
 
 
 def test_artifact_rendering_ignores_database_row_order():
+    """Verify artifact rendering ignores database row order."""
     view = sample_view()
     child = {
         **view["topics"][0],

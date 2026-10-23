@@ -1,3 +1,8 @@
+# File: tests/test_workflow_progress.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for workflow progress."""
+
 from io import StringIO
 from types import SimpleNamespace
 
@@ -12,9 +17,24 @@ from utils.progress import ProgressReporter
 
 
 def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
+    """Verify workflow reports completed stages and artifacts.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     state = PipelineState(package="example", version="1.0")
 
     def discover(current):
+        """Prepare the discover test fixture without shared production state.
+
+        Args:
+            current: Test fixture or parameter controlling the current scenario.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         current.manifest = DocumentationManifest(
             package="example",
             version="1.0",
@@ -30,6 +50,14 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
         return current
 
     def plan(current):
+        """Prepare the plan test fixture without shared production state.
+
+        Args:
+            current: Test fixture or parameter controlling the current scenario.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         current.crawl_plan = CrawlPlan(
             root_url="https://example.com/docs",
             pages=[CrawlPage(title="Guide", url="https://example.com/docs/guide")],
@@ -37,6 +65,14 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
         return current
 
     def ingest(current):
+        """Prepare the ingest test fixture without shared production state.
+
+        Args:
+            current: Test fixture or parameter controlling the current scenario.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         current.raw_documents = [
             RawDocument(
                 title="Guide",
@@ -55,6 +91,14 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
         return current
 
     def chunk(current):
+        """Prepare the chunk test fixture without shared production state.
+
+        Args:
+            current: Test fixture or parameter controlling the current scenario.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         content = "# Guide\n\nContent."
         current.chunks = [
             Chunk(
@@ -72,7 +116,17 @@ def test_workflow_reports_completed_stages_and_artifacts(monkeypatch, tmp_path):
         ]
         return current
 
-    passthrough = lambda current: current
+    def passthrough(current):
+        """Return fixture state unchanged for stages outside this progress test.
+
+        Args:
+            current: Pipeline state passed through the mocked stage.
+
+        Returns:
+            The same pipeline state instance.
+        """
+        return current
+
     monkeypatch.setattr(
         "pipeline.workflow.load_config",
         lambda: SimpleNamespace(

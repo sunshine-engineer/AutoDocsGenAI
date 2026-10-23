@@ -1,3 +1,7 @@
+# File: deploy/compose.vm.yml
+# Purpose: Declare the public reader and opt-in private database, model and worker services.
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 name: autodocs-vm
 x-logging: &logging
   driver: json-file
@@ -84,6 +88,7 @@ services:
         condition: service_healthy
     secrets: [db_password]
     environment:
+      AUTODOCS_OLLAMA_URL: http://ollama:11434
       FASTEMBED_CACHE_PATH: /models/fastembed
       LANGCHAIN_TRACING_V2: "false"
       LANGSMITH_TRACING: "false"

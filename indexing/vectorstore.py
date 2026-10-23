@@ -1,3 +1,8 @@
+# File: indexing/vectorstore.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Persist versioned chunk vectors and rank filtered semantic and lexical search results."""
+
 from __future__ import annotations
 
 import re
@@ -21,6 +26,16 @@ from services.chunk_importer import normalize_package_name
 
 @dataclass
 class IndexResult:
+    """Embedding generation identity and indexing mutation counts.
+
+    Attributes:
+        embedding_version_id (str): Exact persisted embedding-model/version identity.
+        model (str): Installed model name whose exact digest is recorded.
+        dimension (int): Dimension.
+        chunks_indexed (int): Chunks indexed.
+        chunks_reused (int): Chunks reused.
+    """
+
     embedding_version_id: str
     model: str
     dimension: int
@@ -28,11 +43,29 @@ class IndexResult:
     chunks_reused: int
 
     def to_dict(self) -> dict[str, object]:
+        """Serialize this result into a plain dictionary for JSON reports.
+
+        Returns:
+            dict[str, object]: Serialize this result into a plain dictionary for JSON
+                reports.
+        """
         return asdict(self)
 
 
 @dataclass
 class SearchHit:
+    """Retrieved chunk content, lineage and semantic/lexical score metadata.
+
+    Attributes:
+        chunk_id (str): Chunk id.
+        content (str): Source text or Markdown content to process.
+        source_url (str): Official source URL retained for provenance and namespace
+            checks.
+        page_title (str): Page title.
+        header_path (list[str]): Ordered heading hierarchy locating the chunk.
+        score (float): Score.
+    """
+
     chunk_id: str
     content: str
     source_url: str
@@ -63,7 +96,14 @@ _QUERY_STOP_WORDS = {
 
 
 def _search_text(value: str) -> str:
-    """Normalize Markdown/API identifiers for lexical comparison."""
+    """Normalize Markdown/API identifiers for lexical comparison.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+
+    Returns:
+        Case-normalized searchable text with identifier separators expanded.
+    """
 
     value = value.replace("\\_", "_")
     value = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value)
@@ -71,7 +111,15 @@ def _search_text(value: str) -> str:
 
 
 def _lexical_relevance(query: str, hit: SearchHit) -> float:
-    """Score exact API-name and metadata agreement in the range 0..1."""
+    """Score exact API-name and metadata agreement in the range 0..1.
+
+    Args:
+        query: Retrieval query text.
+        hit: Candidate retrieval hit with text and similarity metadata.
+
+    Returns:
+        Keyword/identifier overlap score for this query and candidate.
+    """
 
     normalized_query = _search_text(query)
     terms = [
@@ -109,7 +157,15 @@ def _lexical_relevance(query: str, hit: SearchHit) -> float:
 
 
 def rerank_search_hits(query: str, hits: list[SearchHit]) -> list[SearchHit]:
-    """Blend semantic similarity with bounded lexical/metadata relevance."""
+    """Blend semantic similarity with bounded lexical/metadata relevance.
+
+    Args:
+        query: Retrieval query text.
+        hits: Ordered retrieval candidates.
+
+    Returns:
+        Candidates ordered by combined semantic/lexical relevance.
+    """
 
     reranked = []
     for hit in hits:
@@ -133,7 +189,17 @@ def index_persisted_chunks(
     config: EmbeddingConfig,
     engine: Engine | None = None,
 ) -> IndexResult:
-    """Embed only missing current chunks and store them in pgvector."""
+    """Embed only missing current chunks and store them in pgvector.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        config: Typed configuration controlling this operation.
+        engine: Database engine; None uses the configured database where supported.
+
+    Returns:
+        Embedding-version identity and inserted/skipped/indexed counts.
+    """
 
     owned_engine = engine is None
     database_engine = engine or create_database_engine()
@@ -230,7 +296,27 @@ def search_similar_chunks(
     allowed_chunk_ids: Collection[str] | None = None,
     embedding_version_id: UUID | str | None = None,
 ) -> list[SearchHit]:
-    """Return current chunks using cosine retrieval and metadata reranking."""
+    """Return current chunks using cosine retrieval and metadata reranking.
+
+    Args:
+        query: Retrieval query text.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        config: Typed configuration controlling this operation.
+        limit: Maximum requested records or text size, as used by this operation.
+        engine: Database engine; None uses the configured database where supported.
+        hybrid_rerank: Whether lexical relevance is combined with vector similarity.
+        candidate_multiplier: Number of vector candidates relative to the final limit.
+        embedder: Optional reusable CPU embedding adapter.
+        allowed_chunk_ids: Restrict results to these exact snapshot chunk IDs.
+        embedding_version_id: Exact persisted embedding-model/version identity.
+
+    Returns:
+        Ranked hits restricted to the requested release and optional snapshot.
+
+    Raises:
+        ValueError: limit must be positive; candidate_multiplier must be positive.
+    """
 
     if limit <= 0:
         raise ValueError("limit must be positive")

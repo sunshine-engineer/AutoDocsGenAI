@@ -1,3 +1,9 @@
+<!--
+File: docs/interview-demo.md
+Purpose: Interview demo and closure checklist.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Interview demo and closure checklist
 
 **Status: interview-ready for a bounded local portfolio demonstration.**
@@ -7,7 +13,7 @@ provenance, approval-gated export, executed offline API example, approved-state
 restore/re-export evidence, and four passing CI jobs on integration PR #36.
 This designation assesses the recorded demo evidence, not a rehearsal on the
 interview machine. Verify the local commands and saved artifacts before presenting.
-PR #36 is still open at this assessment; merging it is a release-integration task.
+Rechecked 2026-10-22: PR #36 merged on 2026-10-17; all four main CI jobs passed.
 Public deployment, commercial readiness, exhaustive API coverage, and autonomous
 explanation quality are outside this designation.
 
@@ -52,7 +58,7 @@ production documentation service.”
 
 ## Smallest honest closure scope
 
-- [ ] Merge consolidated [PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36) into `main`; all four CI checks passed at assessment.
+- [x] Consolidated [PR #36](https://github.com/sunshine-engineer/AutoDocsGenAI/pull/36) merged into `main`; all four main CI jobs passed.
 - [x] Review five real pilot pages and explicitly approve corrected revisions
       (Sunny approved the five exact editorial revisions on 2026-10-15).
 - [x] Export the approved catalog and validate its table of contents, citations,
@@ -99,8 +105,8 @@ and idempotent jobs prevent duplicate work after failures.
 
 The delivered scope is a five-page local workflow with human approval. Main
 pipeline adapters, arbitrary-package generation, and native LangGraph checkpoint
-integration remain future work. PR review/merges and an optional video recording
-can follow without adding features to this demonstration.
+integration remain future work. Release integration is complete; an optional video
+recording and VM acceptance can follow without expanding the demo.
 
 
 ## Documentation quality improvements, in priority order

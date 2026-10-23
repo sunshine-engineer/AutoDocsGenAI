@@ -1,3 +1,8 @@
+# File: models/source_selection.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Represent explicit human source confirmation and exact release boundaries."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -8,7 +13,18 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class SourceSelection(BaseModel):
-    """Explicit human attestation; HTTP reachability is a separate concern."""
+    """Explicit human attestation; HTTP reachability is a separate concern.
+
+    Attributes:
+        package (str): Distribution name used to scope lineage and results.
+        version (str): Exact package release; version families are not accepted
+            implicitly.
+        root_url (str): Confirmed documentation root URL.
+        version_evidence_url (str): Version evidence url.
+        immutable_revision (str): Immutable revision.
+        confirmed_by (str | None): Confirmed by.
+        confirmed_at (datetime | None): Confirmed at.
+    """
 
     model_config = ConfigDict(extra="forbid")
     package: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -21,6 +37,18 @@ class SourceSelection(BaseModel):
 
     @model_validator(mode="after")
     def validate_selection(self) -> Self:
+        """Enforce safe exact-source URLs and paired, timezone-aware human confirmation.
+
+        Returns:
+            The same validated source-selection instance.
+
+        Raises:
+            ValueError: source URLs must be absolute HTTPS URLs without credentials,
+                query, or fragment; immutable revision must not contain control
+                characters; source confirmation requires both reviewer and time;
+                reviewer must be nonblank and contain no control characters; source
+                confirmation time must include a timezone.
+        """
         for value in (self.root_url, self.version_evidence_url):
             parsed = urlsplit(value)
             if (
@@ -53,6 +81,19 @@ class SourceSelection(BaseModel):
         return self
 
     def require_confirmed(self, package: str, version: str) -> None:
+        """Require confirmation matching the requested normalized package and exact
+        version.
+
+        Args:
+            package: Distribution name used to scope lineage and results.
+            version: Exact package release; version families are not accepted
+                implicitly.
+
+        Raises:
+            ValueError: source selection does not match the requested package and exact
+                version; source selection requires explicit human confirmation before
+                crawling.
+        """
         from services.chunk_importer import normalize_package_name
 
         if (

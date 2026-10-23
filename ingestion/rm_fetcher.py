@@ -1,3 +1,8 @@
+# File: ingestion/rm_fetcher.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Reserved fetcher module; active fetchers live in ingestion/fetchers/."""
+
 # from models.raw_document import RawDocument
 
 # from utils.http_client import http_client

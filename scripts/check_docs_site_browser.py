@@ -1,3 +1,6 @@
+# File: scripts/check_docs_site_browser.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Verify the built reader's links and desktop/mobile browser interactions."""
 
 from __future__ import annotations
@@ -17,12 +20,21 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Links(HTMLParser):
+    """Minimal HTML parser collecting internal-link targets and fragment IDs."""
+
     def __init__(self):
+        """Initialize empty link targets and HTML fragment identifiers."""
         super().__init__()
         self.targets = []
         self.ids = set()
 
     def handle_starttag(self, tag, attrs):
+        """Collect HTML IDs and href/src targets for static-link verification.
+
+        Args:
+            tag: HTML tag name reported by the parser.
+            attrs: HTML attribute name/value pairs.
+        """
         values = dict(attrs)
         if values.get("id"):
             self.ids.add(values["id"])
@@ -32,6 +44,14 @@ class Links(HTMLParser):
 
 
 def check_static_links(site: Path) -> int:
+    """Reject missing or unsafe local rendered links and fragment targets.
+
+    Args:
+        site: Built static HTML directory.
+
+    Returns:
+        Number of validated internal resource and fragment links.
+    """
     parsed = {}
     for path in site.rglob("*.html"):
         parser = Links()
@@ -67,6 +87,12 @@ def check_static_links(site: Path) -> int:
 
 
 def check_browser(base: str, out: Path):
+    """Verify desktop/mobile reader interactions and save screenshots and browser evidence.
+
+    Args:
+        base: Base URL of the temporary reader server.
+        out: Directory receiving browser evidence.
+    """
     out.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
@@ -164,6 +190,12 @@ def check_browser(base: str, out: Path):
 
 
 def main():
+    """Parse command-line inputs and check rendered links and desktop/mobile reader
+    interactions.
+
+    Raises:
+        ValueError: Build the reader before running checks.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--url", help="Use an existing local preview instead of an ephemeral server"

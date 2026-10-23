@@ -1,9 +1,15 @@
+# File: tests/test_ecosystem_docs.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for ecosystem docs."""
+
 import json
 
 from scripts.ecosystem_docs import compare_versions, extract_api, release_versions
 
 
 def test_static_reference_preserves_signatures_methods_and_exports():
+    """Verify static reference preserves signatures methods and exports."""
     api = extract_api('''"""Module docs."""
 from .impl import Agent as PublicAgent
 __all__ = ["PublicAgent", "Worker"]
@@ -27,6 +33,7 @@ class Worker(Base):
 
 
 def test_versions_skip_prereleases_yanked_and_choose_minor_heads():
+    """Verify versions skip prereleases yanked and choose minor heads."""
     metadata = {
         "releases": {
             version: [{"yanked": yanked}]
@@ -44,6 +51,11 @@ def test_versions_skip_prereleases_yanked_and_choose_minor_heads():
 
 
 def test_api_diff_does_not_report_movement_as_confirmed_breakage(tmp_path):
+    """Verify api diff does not report movement as confirmed breakage.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     for version, source in [
         ("1.0.0", "def old(a): pass"),
         ("2.0.0", "def new(a): pass"),
@@ -60,6 +72,13 @@ def test_api_diff_does_not_report_movement_as_confirmed_breakage(tmp_path):
 
 
 def test_verified_wheel_emits_reference_and_preserves_license(tmp_path, monkeypatch):
+    """Verify verified wheel emits reference and preserves license.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     import hashlib
     import io
     import zipfile
@@ -103,6 +122,11 @@ def test_verified_wheel_emits_reference_and_preserves_license(tmp_path, monkeypa
 
 
 def test_matrix_assessment_rejects_unrelated_failures_and_missing_checks(tmp_path):
+    """Verify matrix assessment rejects unrelated failures and missing checks.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     from scripts.ecosystem_matrix import assess
 
     result = [{"label": "legacy", "install_exit": 0, "probe_exit": 0}]

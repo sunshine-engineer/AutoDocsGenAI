@@ -1,18 +1,25 @@
+<!--
+File: docs/deployment/supplied-vm.md
+Purpose: Deploy to the supplied Linux VM.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Deploy to the supplied Linux VM
 
-Prepared 2026-10-16 (Asia/Calcutta). Sunny will provide the VM; this bundle does not create GCP resources or require project, region or budget settings. Domain/hostname and certificate contact are runtime environment values. **No VM deployment has happened yet.**
+Prepared 2026-10-16 (Asia/Calcutta). Sunny will provide the VM; this bundle does not create GCP resources or require project, region or budget settings. Domain/hostname and certificate contact are runtime environment values. **No supplied-VM deployment/acceptance evidence is recorded in this repository; this review did not connect to the host.**
 
 The default service is the static website. PostgreSQL, the batch worker and Docker Ollama are opt-in. Readers never start jobs, access a database or call a model.
 
 ## First-run setup script
 
-After merging the reviewed integration PR, clone and select the reviewed release
+PR #36 merged on 2026-10-17. Last handover review: 2026-10-22. Clone and select the reviewed release
 on your supplied VM. Git and Python 3 must already be installed. On an intended
 Ubuntu 24.04 / Debian 12 x86-64 systemd host:
 
 ```bash
 git clone https://github.com/sunshine-engineer/AutoDocsGenAI.git
 cd AutoDocsGenAI
+git checkout --detach bf0aa5418a0d69a0dd097c2df1aad9f4a14f582e
 bash deploy/setup-vm.sh --plan
 sudo bash deploy/setup-vm.sh
 ```
@@ -189,3 +196,5 @@ This creates isolated disposable containers and loopback-only ports, builds both
 Measured local results are in [local-validation.json](local-validation.json). Docker builds and HTTP/database operations passed. Bash syntax and Python regression checks are also run. Public HTTPS issuance, guest initialization/systemd execution, actual VM reboot, production firewall reachability, live model inference, and real generation-batch resource sizing remain unverified.
 
 Google's old container startup agent is deprecated; this bundle uses ordinary Docker and systemd on the supplied host. See [current Google guidance](https://docs.cloud.google.com/compute/docs/deprecations/container-startup-agent-on-compute).
+
+See the [handover checklist](../handover.md) for owner/access inputs, acceptance evidence, common failures and upgrade recovery.

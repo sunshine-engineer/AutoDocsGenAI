@@ -1,3 +1,8 @@
+# File: database/base.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Define the shared SQLAlchemy declarative metadata base."""
+
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 
@@ -11,4 +16,6 @@ NAMING_CONVENTION = {
 
 
 class Base(DeclarativeBase):
+    """Shared declarative metadata registry for all application tables."""
+
     metadata = MetaData(naming_convention=NAMING_CONVENTION)

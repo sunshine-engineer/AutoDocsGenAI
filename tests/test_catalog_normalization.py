@@ -1,3 +1,8 @@
+# File: tests/test_catalog_normalization.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog normalization."""
+
 from catalog.extractors import (
     CatalogExtraction,
     ExtractedTopic,
@@ -17,6 +22,22 @@ def extracted(
     definition: str | None = "Definition",
     origin: ExtractionOrigin = ExtractionOrigin.API_REFERENCE,
 ) -> ExtractedTopic:
+    """Prepare the extracted test fixture without shared production state.
+
+    Args:
+        qualified_name: Test fixture or parameter controlling the qualified name
+            scenario.
+        kind: Test fixture or parameter controlling the kind scenario.
+        chunk_id: Test fixture or parameter controlling the chunk id scenario.
+        display_name: Human-readable topic or symbol name.
+        source_url: Official source URL retained for provenance and namespace checks.
+        definition: Test fixture or parameter controlling the definition scenario.
+        origin: Test fixture or parameter controlling the origin scenario.
+
+    Returns:
+        ExtractedTopic: Prepare the extracted test fixture without shared production
+            state.
+    """
     return ExtractedTopic(
         kind=kind,
         qualified_name=qualified_name,
@@ -30,6 +51,7 @@ def extracted(
 
 
 def test_normalization_merges_duplicate_identity_and_keeps_structural_chunks():
+    """Verify normalization merges duplicate identity and keeps structural chunks."""
     extraction = CatalogExtraction(
         topics=[
             extracted(
@@ -61,6 +83,7 @@ def test_normalization_merges_duplicate_identity_and_keeps_structural_chunks():
 
 
 def test_normalization_creates_missing_module_ancestors_and_paths():
+    """Verify normalization creates missing module ancestors and paths."""
     extraction = CatalogExtraction(
         topics=[
             extracted(
@@ -89,6 +112,7 @@ def test_normalization_creates_missing_module_ancestors_and_paths():
 
 
 def test_curated_topics_use_navigation_namespaces_without_module_collision():
+    """Verify curated topics use navigation namespaces without module collision."""
     extraction = CatalogExtraction(
         topics=[
             extracted("langchain.agents", TopicKind.MODULE, "module"),
@@ -112,6 +136,7 @@ def test_curated_topics_use_navigation_namespaces_without_module_collision():
 
 
 def test_slug_collision_gets_stable_qualified_name_hash():
+    """Verify slug collision gets stable qualified name hash."""
     extraction = CatalogExtraction(
         topics=[
             extracted("langchain.tools.Foo_Bar", TopicKind.CLASS, "first"),
@@ -134,6 +159,7 @@ def test_slug_collision_gets_stable_qualified_name_hash():
 
 
 def test_normalization_reports_kind_conflict_as_blocking():
+    """Verify normalization reports kind conflict as blocking."""
     extraction = CatalogExtraction(
         topics=[
             extracted("langchain.agents", TopicKind.MODULE, "module"),

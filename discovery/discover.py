@@ -1,3 +1,8 @@
+# File: discovery/discover.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Populate pipeline discovery state after explicit source confirmation."""
+
 from discovery.manager import DiscoveryManager
 from discovery.manifest_builder import build_manifest
 from discovery.validator import validate_source
@@ -8,7 +13,14 @@ from models.state import PipelineState
 def discover_documentation(
     state: PipelineState,
 ) -> PipelineState:
+    """Build a manifest from a supplied confirmed source or discovered PyPI metadata.
 
+    Args:
+        state: Typed pipeline or agent state consumed by this operation.
+
+    Returns:
+        Pipeline state populated with the discovered manifest.
+    """
     if state.source_selection is not None:
         selection = state.source_selection
         selection.require_confirmed(state.package, state.version)

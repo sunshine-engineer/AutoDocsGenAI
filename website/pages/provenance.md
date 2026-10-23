@@ -1,3 +1,9 @@
+<!--
+File: website/pages/provenance.md
+Purpose: Sources & review policy.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Sources & review policy
 
 ## What “Approved” means here

@@ -1,3 +1,8 @@
+# File: generation/export.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Export only exact approved revisions with provenance and approval manifests."""
+
 from __future__ import annotations
 
 import json
@@ -26,6 +31,22 @@ from models.topic import TopicCandidate, TopicKind
 
 
 def approved_export_pages(session: Session, catalog_id: str) -> list[dict[str, Any]]:
+    """Load only final-approved revisions belonging to an approved catalog.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        catalog_id: Persisted catalog UUID or its string representation.
+
+    Returns:
+        Ordered final-approved page revisions with source and review metadata.
+
+    Raises:
+        GenerationError: export requires an active approved catalog; catalog topic is no
+            longer approved; every catalog topic must have an approved validated page
+            before export; stored page or job identity is corrupt; page provenance
+            differs from the selected catalog; stored page fails current citation
+            validation; empty catalogs cannot be exported.
+    """
     catalog = lock_catalog(session, catalog_id)
     if catalog.status != "approved":
         raise GenerationError("export requires an active approved catalog")
@@ -119,6 +140,17 @@ def approved_export_pages(session: Session, catalog_id: str) -> list[dict[str, A
 def render_page(
     page: dict[str, Any], package: str, version: str, index_link: str
 ) -> str:
+    """Render an approved article with review metadata, citations and relative navigation.
+
+    Args:
+        page: Approved revision content with source and final review metadata.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        index_link: Relative path back to the export index.
+
+    Returns:
+        Markdown article with citations, provenance and relative navigation.
+    """
     draft: PageDraft = page["draft"]
     chunks = {chunk.chunk_id: chunk for chunk in page["evidence"]}
     lines = [
@@ -147,6 +179,15 @@ def render_page(
 
 
 def child_navigation(path: str, pages: list[dict[str, Any]]) -> str:
+    """Render direct child links relative to a page output path.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+        pages: Ordered page or crawl records used by this operation.
+
+    Returns:
+        Markdown links to the page's immediate children, or an empty string.
+    """
     parent = Path(path).parent
     if Path(path).name != "README.md":
         return ""
@@ -162,7 +203,22 @@ def child_navigation(path: str, pages: list[dict[str, Any]]) -> str:
 def export_catalog(
     factory: sessionmaker[Session], catalog_id: str, output: Path
 ) -> Path:
-    """Publish a complete approved tree via one sibling-directory rename."""
+    """Publish a complete approved tree via one sibling-directory rename.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        catalog_id: Persisted catalog UUID or its string representation.
+        output: Destination for newly generated artifacts or reports.
+
+    Returns:
+        Output directory containing the export and approval/build manifests.
+
+    Raises:
+        GenerationError: export destination already exists; select a new build
+            directory; catalog paths collide with the master index or each other; export
+            navigation points to a missing page; export destination appeared during
+            rendering.
+    """
     if output.exists():
         raise GenerationError(
             "export destination already exists; select a new build directory"

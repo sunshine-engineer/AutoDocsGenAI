@@ -1,3 +1,6 @@
+# File: deploy/worker_entrypoint.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Build the private database URL from a mounted secret, then exec one job."""
 
 from __future__ import annotations
@@ -9,6 +12,17 @@ from urllib.parse import quote
 
 
 def database_url(password: str) -> str:
+    """Construct the private worker database URL from a validated mounted password.
+
+    Args:
+        password: Mounted database password; never log it.
+
+    Returns:
+        URL-encoded private SQLAlchemy database connection string.
+
+    Raises:
+        ValueError: Database secret must be a nonempty single line.
+    """
     if not password or "\n" in password or "\r" in password:
         raise ValueError("Database secret must be a nonempty single line")
     return (
@@ -19,6 +33,7 @@ def database_url(password: str) -> str:
 
 
 def main():
+    """Load the mounted secret and replace this process with the explicit worker command."""
     if len(sys.argv) < 2:
         raise SystemExit("Supply an explicit worker command")
     secret = Path("/run/secrets/db_password").read_text(encoding="utf-8").rstrip("\n")

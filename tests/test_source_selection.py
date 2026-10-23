@@ -1,3 +1,8 @@
+# File: tests/test_source_selection.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for source selection."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -13,6 +18,14 @@ from planner.planner import build_crawl_plan
 
 
 def selection(**updates):
+    """Prepare the selection test fixture without shared production state.
+
+    Args:
+        **updates: Test fixture or parameter controlling the updates scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return SourceSelection.model_validate(
         {
             "package": "example",
@@ -28,9 +41,23 @@ def selection(**updates):
 
 
 def test_release_specific_pypi_request(monkeypatch):
+    """Verify release specific pypi request.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     seen = []
 
     def get(url):
+        """Return a controlled get response without contacting external services.
+
+        Args:
+            url: Absolute source or service URL.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         seen.append(url)
         return httpx.Response(
             200, json={"info": {"version": "1.2.3"}}, request=httpx.Request("GET", url)
@@ -55,10 +82,16 @@ def test_release_specific_pypi_request(monkeypatch):
     ],
 )
 def test_crawl_rejects_wrong_version_namespace_and_encoded_escape(url):
+    """Verify crawl rejects wrong version namespace and encoded escape.
+
+    Args:
+        url: Absolute source or service URL.
+    """
     assert not source_contains(selection().root_url, url)
 
 
 def test_scope_and_canonicalization():
+    """Verify scope and canonicalization."""
     assert source_contains(selection().root_url, "https://docs.example.com/v1.2.3/api")
     assert (
         canonical_crawl_url("https://docs.example.com/v1.2.3/api/?tracking=1#section")
@@ -67,6 +100,12 @@ def test_scope_and_canonicalization():
 
 
 def test_unconfirmed_source_blocks_before_network(monkeypatch):
+    """Verify unconfirmed source blocks before network.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     monkeypatch.setattr(
         "planner.planner.discover_links", lambda *_: pytest.fail("must not crawl")
     )
@@ -80,6 +119,12 @@ def test_unconfirmed_source_blocks_before_network(monkeypatch):
 
 
 def test_planner_deduplicates_and_stays_in_confirmed_scope(monkeypatch):
+    """Verify planner deduplicates and stays in confirmed scope.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     from models.manifest import DocumentationManifest, DocumentationSource
 
     selected = selection()
@@ -128,11 +173,22 @@ def test_planner_deduplicates_and_stays_in_confirmed_scope(monkeypatch):
     ],
 )
 def test_source_confirmation_rejects_invalid_review_metadata(overrides):
+    """Verify source confirmation rejects invalid review metadata.
+
+    Args:
+        overrides: Test fixture or parameter controlling the overrides scenario.
+    """
     with pytest.raises(ValueError):
         selection(**overrides)
 
 
 def test_http_fetch_metadata_records_actual_http_method(monkeypatch):
+    """Verify http fetch metadata records actual http method.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     from ingestion.fetchers.http_fetcher import HTTPFetcher
 
     request = httpx.Request("GET", "https://docs.example.com/v1.2.3/api")
@@ -146,6 +202,13 @@ def test_http_fetch_metadata_records_actual_http_method(monkeypatch):
 
 
 def test_ingestion_honors_crawl_budget_and_records_confirmation(monkeypatch, tmp_path):
+    """Verify ingestion honors crawl budget and records confirmation.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     from types import SimpleNamespace
 
     from config.settings import CrawlConfig
@@ -169,6 +232,15 @@ def test_ingestion_honors_crawl_budget_and_records_confirmation(monkeypatch, tmp
     seen = []
 
     def fetch(title, url):
+        """Prepare the fetch test fixture without shared production state.
+
+        Args:
+            title: Requested page title or source label.
+            url: Absolute source or service URL.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         seen.append(url)
         return RawDocument(
             title=title,
@@ -196,6 +268,12 @@ def test_ingestion_honors_crawl_budget_and_records_confirmation(monkeypatch, tmp
 
 
 def test_ingestion_rejects_out_of_scope_plan_before_fetch(monkeypatch):
+    """Verify ingestion rejects out of scope plan before fetch.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     from ingestion.ingest import ingest_documents
     from models.crawl import CrawlPage, CrawlPlan
 

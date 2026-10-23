@@ -1,3 +1,6 @@
+# File: scripts/check_learning_examples.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Execute the authored learning examples; validate snippets and record evidence."""
 
 from __future__ import annotations
@@ -38,10 +41,23 @@ CASES = (
 
 
 def digest(path: Path) -> str:
+    """Return the hexadecimal SHA-256 digest of a file.
+
+    Args:
+        path: Input or output filesystem path for this operation.
+
+    Returns:
+        Hexadecimal SHA-256 digest of the file bytes.
+    """
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def main():
+    """Parse command-line inputs and run the check learning examples operator command.
+
+    Raises:
+        ValueError: Run these examples with Python 3.12.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output", type=Path, default=ROOT / ".site-work/learning-results.json"

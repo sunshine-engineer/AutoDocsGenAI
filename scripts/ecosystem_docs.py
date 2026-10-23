@@ -1,3 +1,6 @@
+# File: scripts/ecosystem_docs.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
 """Build version-pinned API references from hash-verified PyPI wheels.
 
 This is static source documentation, not model output or human-approved prose.
@@ -58,6 +61,18 @@ PINNED = {
 
 
 def fetch(url: str, limit: int = 60_000_000) -> bytes:
+    """Fetch bounded source bytes with the release-download user agent.
+
+    Args:
+        url: Absolute source or service URL.
+        limit: Maximum requested records or text size, as used by this operation.
+
+    Returns:
+        bytes: Fetch bounded source bytes with the release-download user agent.
+
+    Raises:
+        ValueError: download exceeds size budget.
+    """
     with urllib.request.urlopen(url, timeout=90) as response:
         payload = response.read(limit + 1)
     if len(payload) > limit:
@@ -66,7 +81,14 @@ def fetch(url: str, limit: int = 60_000_000) -> bytes:
 
 
 def release_versions(metadata: dict) -> list[str]:
-    """Latest stable release in three most recent major/minor lines."""
+    """Latest stable release in three most recent major/minor lines.
+
+    Args:
+        metadata: Source metadata or safe progress attributes.
+
+    Returns:
+        Selected release versions in the inventory's intended order.
+    """
     found: dict[tuple[int, int], tuple[int, int, int]] = {}
     for value, artifacts in metadata["releases"].items():
         if not re.fullmatch(r"\d+\.\d+\.\d+", value):
@@ -82,6 +104,14 @@ def release_versions(metadata: dict) -> list[str]:
 
 
 def extract_api(source: str) -> dict:
+    """Extract static module, class, function and method declarations from Python source.
+
+    Args:
+        source: Python module source text to inspect statically, without executing it.
+
+    Returns:
+        Static module and declaration inventory without executing source code.
+    """
     tree = ast.parse(source)
     symbols: list[dict] = []
     exports: list[dict] = []
@@ -162,6 +192,21 @@ def extract_api(source: str) -> dict:
 
 
 def build_release(package: str, version: str, output: Path) -> dict:
+    """Fetch and hash-verify a portable wheel, then write its static reference inventory.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        output: Destination for newly generated artifacts or reports.
+
+    Returns:
+        Hash-verified static reference inventory for the exact wheel release.
+
+    Raises:
+        ValueError: release version mismatch; no portable wheel available; unexpected
+            artifact host; wheel hash mismatch; uncompressed archive exceeds budget;
+            unsafe wheel member.
+    """
     metadata = json.loads(fetch(f"https://pypi.org/pypi/{package}/{version}/json"))
     if metadata["info"]["version"] != version:
         raise ValueError("release version mismatch")
@@ -287,10 +332,29 @@ def build_release(package: str, version: str, output: Path) -> dict:
 
 
 def compare_versions(output: Path, package: str, versions: list[str]) -> list[dict]:
+    """Compare extracted API signatures across recorded exact releases.
+
+    Args:
+        output: Destination for newly generated artifacts or reports.
+        package: Distribution name used to scope lineage and results.
+        versions: Exact release versions to compare.
+
+    Returns:
+        Added, removed and signature-changed declarations between releases.
+    """
     comparisons = []
     for newer, older in pairwise(versions):
 
         def signatures(version):
+            """Load qualified static API signatures for one recorded release.
+
+            Args:
+                version: Exact package release; version families are not accepted
+                    implicitly.
+
+            Returns:
+                Qualified declaration names mapped to static signatures.
+            """
             manifest = json.loads(
                 (output / package / version / "manifest.json").read_text()
             )
@@ -320,6 +384,7 @@ def compare_versions(output: Path, package: str, versions: list[str]) -> list[di
 
 
 def main():
+    """Parse command-line inputs and run the ecosystem docs operator command."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--packages", nargs="+", default=list(PACKAGES))
@@ -358,6 +423,14 @@ def main():
     results, errors, versions = [], [], {}
 
     def package_job(package):
+        """Build selected releases of one package and return their inventory records.
+
+        Args:
+            package: Distribution name used to scope lineage and results.
+
+        Returns:
+            Release inventory records generated for this package.
+        """
         metadata = json.loads(fetch(f"https://pypi.org/pypi/{package}/json"))
         selected = (
             plan.get(package) or PINNED.get(package) or release_versions(metadata)

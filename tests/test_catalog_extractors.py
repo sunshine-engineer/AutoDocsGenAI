@@ -1,3 +1,8 @@
+# File: tests/test_catalog_extractors.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog extractors."""
+
 import json
 from pathlib import Path
 
@@ -12,6 +17,12 @@ FIXTURE = Path(__file__).parent / "fixtures" / "catalog" / "reference_chunks.jso
 
 
 def load_chunks() -> list[Chunk]:
+    """Prepare the load chunks test fixture without shared production state.
+
+    Returns:
+        list[Chunk]: Prepare the load chunks test fixture without shared production
+            state.
+    """
     records = json.loads(FIXTURE.read_text(encoding="utf-8"))
     for record in records:
         record["character_count"] = len(record["content"])
@@ -19,6 +30,7 @@ def load_chunks() -> list[Chunk]:
 
 
 def test_reference_extractor_keeps_raw_duplicate_evidence_for_b2_merging():
+    """Verify reference extractor keeps raw duplicate evidence for b2 merging."""
     result = extract_catalog_candidates(load_chunks(), "LangChain")
     create_agent = [
         topic
@@ -36,6 +48,7 @@ def test_reference_extractor_keeps_raw_duplicate_evidence_for_b2_merging():
 
 
 def test_reference_extractor_parses_class_definition_and_canonical_identity():
+    """Verify reference extractor parses class definition and canonical identity."""
     result = extract_catalog_candidates(load_chunks(), "langchain")
     middleware = next(
         topic for topic in result.topics if topic.source_chunk_id == "agent-middleware"
@@ -49,6 +62,7 @@ def test_reference_extractor_parses_class_definition_and_canonical_identity():
 
 
 def test_reference_extractor_preserves_python_identifier_underscores():
+    """Verify reference extractor preserves python identifier underscores."""
     result = extract_catalog_candidates(load_chunks(), "langchain")
 
     assert any(
@@ -58,6 +72,7 @@ def test_reference_extractor_preserves_python_identifier_underscores():
 
 
 def test_reference_extractor_defers_types_to_their_owner():
+    """Verify reference extractor defers types to their owner."""
     result = extract_catalog_candidates(load_chunks(), "langchain")
 
     assert len(result.deferred_symbols) == 1
@@ -68,6 +83,7 @@ def test_reference_extractor_defers_types_to_their_owner():
 
 
 def test_reference_extractor_reports_cross_namespace_and_malformed_markers():
+    """Verify reference extractor reports cross namespace and malformed markers."""
     result = extract_catalog_candidates(load_chunks(), "langchain")
 
     reasons = {exclusion.reason for exclusion in result.exclusions}
@@ -84,6 +100,7 @@ def test_reference_extractor_reports_cross_namespace_and_malformed_markers():
 
 
 def test_curated_extractor_emits_only_allowlisted_guides_and_concepts():
+    """Verify curated extractor emits only allowlisted guides and concepts."""
     result = extract_catalog_candidates(load_chunks(), "langchain")
     curated = [
         topic
@@ -108,6 +125,7 @@ def test_curated_extractor_emits_only_allowlisted_guides_and_concepts():
 
 
 def test_extraction_order_is_stable_when_input_order_changes():
+    """Verify extraction order is stable when input order changes."""
     chunks = load_chunks()
 
     forward = extract_catalog_candidates(chunks, "langchain")

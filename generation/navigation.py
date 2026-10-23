@@ -1,3 +1,8 @@
+# File: generation/navigation.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Validate safe relative navigation outside fenced Markdown examples."""
+
 from __future__ import annotations
 
 import re
@@ -10,6 +15,17 @@ LINK = re.compile(r"(?<!!)(?<!\\)\[[^\]]*\]\(([^\s)]+)\)")
 
 
 def _plain_lines(markdown: str) -> list[str]:
+    """Strip fenced examples before checking generated Markdown navigation.
+
+    Args:
+        markdown: Markdown text to normalize, split or inspect.
+
+    Returns:
+        Markdown lines outside fenced code blocks.
+
+    Raises:
+        GenerationError: export contains an unbalanced code fence.
+    """
     lines = []
     fence = None
     for line in markdown.splitlines():
@@ -29,7 +45,16 @@ def _plain_lines(markdown: str) -> list[str]:
 
 
 def validate_navigation(root: Path) -> None:
-    """Validate local file/heading links; external HTTP reachability is separate."""
+    """Validate local file/heading links; external HTTP reachability is separate.
+
+    Args:
+        root: Root directory delimiting artifact or publication access.
+
+    Raises:
+        GenerationError: export contains an unsupported or absolute local link; export
+            contains a broken or escaping local link; export contains a broken local
+            heading anchor.
+    """
     documents = {
         path.resolve(): _plain_lines(path.read_text(encoding="utf-8"))
         for path in root.rglob("*.md")

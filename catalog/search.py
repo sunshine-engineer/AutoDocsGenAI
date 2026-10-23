@@ -1,3 +1,8 @@
+# File: catalog/search.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Reuse a single local embedding model for snapshot-filtered catalog evidence queries."""
+
 from __future__ import annotations
 
 from collections.abc import Collection
@@ -23,6 +28,17 @@ class CatalogEvidenceSearch:
         allowed_chunk_ids: Collection[str],
         embedding_version_id: UUID | str,
     ) -> None:
+        """Freeze search scope and load one reusable embedding model.
+
+        Args:
+            package: Distribution name used to scope lineage and results.
+            version: Exact package release; version families are not accepted
+                implicitly.
+            config: Typed configuration controlling this operation.
+            engine: Database engine; None uses the configured database where supported.
+            allowed_chunk_ids: Restrict results to these exact snapshot chunk IDs.
+            embedding_version_id: Exact persisted embedding-model/version identity.
+        """
         self.package = package
         self.version = version
         self.config = config
@@ -32,6 +48,17 @@ class CatalogEvidenceSearch:
         self.embedder = LocalEmbedder(config.model, config.cache_directory)
 
     def __call__(self, query: str, limit: int) -> list[SearchHit]:
+        """Retrieve evidence hits restricted to this catalog snapshot and embedding
+        version.
+
+        Args:
+            query: Retrieval query text.
+            limit: Maximum requested records or text size, as used by this operation.
+
+        Returns:
+            list[SearchHit]: Retrieve evidence hits restricted to this catalog snapshot
+                and embedding version.
+        """
         return search_similar_chunks(
             query=query,
             package=self.package,

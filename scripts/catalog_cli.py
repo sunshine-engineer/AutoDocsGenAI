@@ -1,3 +1,10 @@
+# File: scripts/catalog_cli.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Explicit operator commands, compatibility probes and static-reader validation. Module:
+catalog_cli.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -24,6 +31,17 @@ from utils.config_loader import load_config
 
 
 def uuid_argument(value: str) -> UUID:
+    """Parse a UUID and translate invalid CLI input into an argparse error.
+
+    Args:
+        value: Value to normalize or validate under this function contract.
+
+    Returns:
+        Parsed UUID value.
+
+    Raises:
+        argparse.ArgumentTypeError: expected a UUID.
+    """
     try:
         return UUID(value)
     except ValueError:
@@ -31,6 +49,14 @@ def uuid_argument(value: str) -> UUID:
 
 
 def parser_for(command: str) -> argparse.ArgumentParser:
+    """Build the catalog command parser with shared configuration and review arguments.
+
+    Args:
+        command: Explicit catalog subcommand to execute.
+
+    Returns:
+        Argument parser configured for the requested catalog subcommand.
+    """
     parser = argparse.ArgumentParser(
         description=f"{command.capitalize()} an evidence-backed topic catalog"
     )
@@ -57,6 +83,15 @@ def parser_for(command: str) -> argparse.ArgumentParser:
 
 
 def run(command: str, argv: list[str] | None = None) -> int:
+    """Execute one explicit catalog command and return its process exit status.
+
+    Args:
+        command: Explicit catalog subcommand to execute.
+        argv: Command arguments; None uses the process command line.
+
+    Returns:
+        int: Execute one explicit catalog command and return its process exit status.
+    """
     args = parser_for(command).parse_args(argv)
     engine = None
     try:

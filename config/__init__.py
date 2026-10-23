@@ -1,0 +1,4 @@
+# File: config/__init__.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Application settings and configuration compatibility exports."""

@@ -1,3 +1,8 @@
+# File: catalog/snapshot.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Resolve complete database snapshots and verify their chunk lineage hashes."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -28,12 +33,33 @@ class CatalogSnapshotError(ValueError):
 
 @dataclass(frozen=True, order=True)
 class SnapshotChunk:
+    """Immutable chunk ID and content digest participating in snapshot identity.
+
+    Attributes:
+        id (str): Id.
+        content_hash (str): Recorded digest of normalized content.
+    """
+
     id: str
     content_hash: str
 
 
 @dataclass(frozen=True)
 class CatalogSnapshot:
+    """Frozen source-run and embedding lineage for catalog construction.
+
+    Attributes:
+        package (str): Distribution name used to scope lineage and results.
+        package_version (str): Package version.
+        documentation_version_id (str): Persisted documentation-version identity.
+        source_pipeline_run_id (str): Exact persisted ingestion-run identity.
+        embedding_version_id (str): Exact persisted embedding-model/version identity.
+        chunks (tuple[SnapshotChunk, ...]): Validated documentation chunks for the
+            selected source scope.
+        input_snapshot_hash (str): Expected hash of the frozen input source/chunk
+            snapshot.
+    """
+
     package: str
     package_version: str
     documentation_version_id: str
@@ -44,15 +70,33 @@ class CatalogSnapshot:
 
     @property
     def chunk_count(self) -> int:
+        """Return the number of chunks frozen in the snapshot.
+
+        Returns:
+            Number of chunks frozen in this snapshot.
+        """
         return len(self.chunks)
 
     @property
     def chunk_ids(self) -> tuple[str, ...]:
+        """Return ordered IDs for the chunks frozen in the snapshot.
+
+        Returns:
+            Ordered chunk IDs frozen in this snapshot.
+        """
         return tuple(chunk.id for chunk in self.chunks)
 
 
 def load_snapshot_chunks(session: Session, snapshot: CatalogSnapshot) -> list[Chunk]:
-    """Load and revalidate the exact persisted chunks captured by a snapshot."""
+    """Load and revalidate the exact persisted chunks captured by a snapshot.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        snapshot: Verified source snapshot used to scope this operation.
+
+    Returns:
+        Validated chunks ordered consistently with the frozen snapshot.
+    """
 
     expected_hashes = {chunk.id: chunk.content_hash for chunk in snapshot.chunks}
     records = list(
@@ -112,7 +156,18 @@ def input_snapshot_hash(
     source_pipeline_run_id: str,
     chunks: tuple[SnapshotChunk, ...] | list[SnapshotChunk],
 ) -> str:
-    """Hash exact catalog evidence lineage independent of query row order."""
+    """Hash exact catalog evidence lineage independent of query row order.
+
+    Args:
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        documentation_version_id: Persisted documentation-version identity.
+        source_pipeline_run_id: Exact persisted ingestion-run identity.
+        chunks: Validated documentation chunks for the selected source scope.
+
+    Returns:
+        SHA-256 digest of source lineage and ordered chunk identities.
+    """
 
     ordered_chunks = sorted(chunks, key=lambda chunk: (chunk.id, chunk.content_hash))
     return sha256_identity(
@@ -134,7 +189,25 @@ def resolve_catalog_snapshot(
     pipeline_run_id: UUID | str,
     embedding: EmbeddingConfig,
 ) -> CatalogSnapshot:
-    """Resolve one completed, current, fully embedded package snapshot."""
+    """Resolve one completed, current, fully embedded package snapshot.
+
+    Args:
+        session: Caller-owned SQLAlchemy session; the caller controls commit/rollback.
+        package: Distribution name used to scope lineage and results.
+        version: Exact package release; version families are not accepted implicitly.
+        pipeline_run_id: Exact persisted ingestion-run identity.
+        embedding: Typed embedding model, dimension and cache settings.
+
+    Returns:
+        Complete current source/embedding snapshot for this exact release.
+
+    Raises:
+        CatalogSnapshotError: pipeline_run_id must be a UUID; pipeline run does not
+            belong to the requested package and version; documentation version must be
+            completed; pipeline run must be completed; pipeline run has no source
+            documents; pipeline run has no chunks; configured embedding identity does
+            not exist.
+    """
 
     normalized_package = normalize_package_name(package)
     try:

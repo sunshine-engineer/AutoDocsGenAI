@@ -1,3 +1,8 @@
+# File: tests/test_stage4a_foundation.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for stage4a foundation."""
+
 import json
 import os
 import shutil
@@ -12,6 +17,7 @@ SETUP_SCRIPT = PROJECT_ROOT / ".devcontainer" / "setup.sh"
 
 
 def test_compose_uses_pinned_healthy_pgvector_service():
+    """Verify compose uses pinned healthy pgvector service."""
     compose = yaml.safe_load(
         (PROJECT_ROOT / "compose.yaml").read_text(encoding="utf-8")
     )
@@ -28,6 +34,7 @@ def test_compose_uses_pinned_healthy_pgvector_service():
 
 
 def test_devcontainer_uses_compose_app_service():
+    """Verify devcontainer uses compose app service."""
     devcontainer = json.loads(
         (PROJECT_ROOT / ".devcontainer" / "devcontainer.json").read_text(
             encoding="utf-8"
@@ -41,6 +48,7 @@ def test_devcontainer_uses_compose_app_service():
 
 
 def test_example_environment_documents_database_contract():
+    """Verify example environment documents database contract."""
     keys = {
         line.split("=", maxsplit=1)[0]
         for line in (PROJECT_ROOT / ".env.example")
@@ -62,6 +70,7 @@ def test_example_environment_documents_database_contract():
 
 
 def test_setup_script_has_safe_migration_default():
+    """Verify setup script has safe migration default."""
     script = SETUP_SCRIPT.read_text(encoding="utf-8")
 
     assert 'AUTO_APPLY_MIGRATIONS="${AUTO_APPLY_MIGRATIONS-false}"' in script
@@ -73,6 +82,14 @@ def test_setup_script_has_safe_migration_default():
 
 @pytest.fixture
 def fake_setup_project(tmp_path):
+    """Prepare the fake setup project test fixture without shared production state.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     project = tmp_path / "project"
     (project / ".devcontainer").mkdir(parents=True)
     (project / "data").mkdir()
@@ -156,6 +173,17 @@ def fake_setup_project(tmp_path):
 
 
 def run_setup(project, fake_bin, log_file, **extra_env):
+    """Prepare the run setup test fixture without shared production state.
+
+    Args:
+        project: Test fixture or parameter controlling the project scenario.
+        fake_bin: Test fixture or parameter controlling the fake bin scenario.
+        log_file: Test fixture or parameter controlling the log file scenario.
+        **extra_env: Test fixture or parameter controlling the extra env scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     env = os.environ.copy()
     env.update(
         {
@@ -182,10 +210,24 @@ def run_setup(project, fake_bin, log_file, **extra_env):
 
 
 def commands(log_file):
+    """Prepare the commands test fixture without shared production state.
+
+    Args:
+        log_file: Test fixture or parameter controlling the log file scenario.
+
+    Returns:
+        The controlled fixture result used by this test.
+    """
     return log_file.read_text(encoding="utf-8").splitlines()
 
 
 def test_setup_skips_migrations_by_default(fake_setup_project):
+    """Verify setup skips migrations by default.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(project, fake_bin, log_file)
@@ -201,6 +243,12 @@ def test_setup_skips_migrations_by_default(fake_setup_project):
 
 
 def test_setup_applies_migrations_when_explicitly_enabled(fake_setup_project):
+    """Verify setup applies migrations when explicitly enabled.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(
@@ -219,6 +267,12 @@ def test_setup_applies_migrations_when_explicitly_enabled(fake_setup_project):
 
 
 def test_setup_skips_migrations_when_explicitly_false(fake_setup_project):
+    """Verify setup skips migrations when explicitly false.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(
@@ -236,6 +290,13 @@ def test_setup_skips_migrations_when_explicitly_false(fake_setup_project):
 
 @pytest.mark.parametrize("invalid_value", ["yes", "1", "TRUE", ""])
 def test_setup_rejects_invalid_migration_flag(fake_setup_project, invalid_value):
+    """Verify setup rejects invalid migration flag.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+        invalid_value: Test fixture or parameter controlling the invalid value scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(
@@ -254,6 +315,12 @@ def test_setup_rejects_invalid_migration_flag(fake_setup_project, invalid_value)
 
 
 def test_setup_fails_when_upgrade_fails(fake_setup_project):
+    """Verify setup fails when upgrade fails.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(
@@ -269,6 +336,12 @@ def test_setup_fails_when_upgrade_fails(fake_setup_project):
 
 
 def test_setup_does_not_print_database_credentials(fake_setup_project):
+    """Verify setup does not print database credentials.
+
+    Args:
+        fake_setup_project: Test fixture or parameter controlling the fake setup project
+            scenario.
+    """
     project, fake_bin, log_file = fake_setup_project
 
     result = run_setup(project, fake_bin, log_file)

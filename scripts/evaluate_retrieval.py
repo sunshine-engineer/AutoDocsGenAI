@@ -1,3 +1,8 @@
+# File: scripts/evaluate_retrieval.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Parse command-line inputs and run the evaluate retrieval operator command."""
+
 from __future__ import annotations
 
 import argparse
@@ -10,6 +15,11 @@ DEFAULT_CASES = Path("retrieval/evaluation_cases/langchain-0.3.json")
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse the command-line options for this operator command.
+
+    Returns:
+        Parsed command arguments with their documented defaults.
+    """
     parser = argparse.ArgumentParser(
         description="Compare semantic and hybrid retrieval on a checked-in query set"
     )
@@ -21,6 +31,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Parse command-line inputs and run the evaluate retrieval operator command."""
     args = parse_args()
     config = load_config()
     cases = load_evaluation_cases(args.cases)

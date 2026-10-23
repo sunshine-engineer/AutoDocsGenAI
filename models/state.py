@@ -1,3 +1,8 @@
+# File: models/state.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Carry typed artifacts and stage results through pipeline orchestration."""
+
 from pydantic import BaseModel, Field
 
 from models.chunk import Chunk
@@ -10,8 +15,23 @@ from models.source_selection import SourceSelection
 
 
 class PipelineState(BaseModel):
-    """
-    Shared state passed through the pipeline.
+    """Shared state passed through the pipeline.
+
+    Attributes:
+        package (str): Distribution name used to scope lineage and results.
+        version (str): Exact package release; version families are not accepted
+            implicitly.
+        source_selection (SourceSelection | None): Source selection.
+        manifest (DocumentationManifest | None): Manifest.
+        raw_documents (list[RawDocument]): Raw documents.
+        cleaned_documents (list[CleanDocument]): Cleaned documents.
+        chunks (list[Chunk]): Validated documentation chunks for the selected source
+            scope.
+        retrieval_results (list[RetrievalResult]): Retrieval results.
+        generated_sections (list[GeneratedSection]): Generated sections.
+        validation_reports (list[ValidationReport]): Validation reports.
+        errors (list[str]): Errors.
+        crawl_plan (CrawlPlan | None): Crawl plan.
     """
 
     package: str

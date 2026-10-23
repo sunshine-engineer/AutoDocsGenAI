@@ -1,3 +1,8 @@
+# File: tests/test_catalog_workflow_postgres.py
+# Maintainer: sunshine-engineer
+# Modified: 2026-10-23
+"""Behavioral tests for catalog workflow postgres."""
+
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
@@ -23,6 +28,13 @@ pytestmark = pytest.mark.db_integration
 
 
 def add_stale_tree(factory, catalog_id, build):
+    """Prepare the add stale tree test fixture without shared production state.
+
+    Args:
+        factory: SQLAlchemy session factory used for transactional work.
+        catalog_id: Persisted catalog UUID or its string representation.
+        build: Validated snapshot-bound catalog proposal.
+    """
     with factory.begin() as session:
         parent = TopicRecord(
             catalog_id=catalog_id,
@@ -60,6 +72,7 @@ def add_stale_tree(factory, catalog_id, build):
 
 
 def test_reconcile_is_exact_child_first_and_idempotent():
+    """Verify reconcile is exact child first and idempotent."""
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
@@ -96,6 +109,12 @@ def test_reconcile_is_exact_child_first_and_idempotent():
 
 
 def test_reconcile_rollback_restores_deleted_evidence_and_topics(monkeypatch):
+    """Verify reconcile rollback restores deleted evidence and topics.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
@@ -104,6 +123,15 @@ def test_reconcile_rollback_restores_deleted_evidence_and_topics(monkeypatch):
             before = load_catalog_view(session, first.catalog_id)
 
         def fail(*args, **kwargs):
+            """Prepare the fail test fixture without shared production state.
+
+            Args:
+                *args: Additional positional arguments.
+                **kwargs: Keyword overrides forwarded to the wrapped API.
+
+            Raises:
+                RuntimeError: injected after stale deletion.
+            """
             raise RuntimeError("injected after stale deletion")
 
         monkeypatch.setattr("catalog.repository._persist_evidence", fail)
@@ -116,10 +144,16 @@ def test_reconcile_rollback_restores_deleted_evidence_and_topics(monkeypatch):
 
 
 def test_concurrent_identical_builds_resolve_to_one_catalog():
+    """Verify concurrent identical builds resolve to one catalog."""
     engine, factory, build = prepare_build()
     barrier = Barrier(2)
 
     def create():
+        """Prepare the create test fixture without shared production state.
+
+        Returns:
+            The controlled fixture result used by this test.
+        """
         barrier.wait(timeout=10)
         return persist_snapshot_catalog_proposal(factory, build)
 
@@ -135,6 +169,11 @@ def test_concurrent_identical_builds_resolve_to_one_catalog():
 
 
 def test_review_workflow_repairs_artifacts_and_preserves_historical_snapshot(tmp_path):
+    """Verify review workflow repairs artifacts and preserves historical snapshot.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build = prepare_build()
     try:
         result = persist_snapshot_catalog_proposal(factory, build)
@@ -191,6 +230,11 @@ def test_review_workflow_repairs_artifacts_and_preserves_historical_snapshot(tmp
 
 
 def test_rejection_is_atomic_and_matching_retry_is_idempotent(tmp_path):
+    """Verify rejection is atomic and matching retry is idempotent.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
@@ -227,11 +271,26 @@ def test_rejection_is_atomic_and_matching_retry_is_idempotent(tmp_path):
 
 
 def test_artifact_failure_reports_committed_review(tmp_path, monkeypatch):
+    """Verify artifact failure reports committed review.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
 
         def fail(*args):
+            """Prepare the fail test fixture without shared production state.
+
+            Args:
+                *args: Additional positional arguments.
+
+            Raises:
+                OSError: disk full.
+            """
             raise OSError("disk full")
 
         monkeypatch.setattr("catalog.artifacts.os.replace", fail)
@@ -252,6 +311,11 @@ def test_artifact_failure_reports_committed_review(tmp_path, monkeypatch):
 
 
 def test_concurrent_conflicting_reviews_cannot_both_succeed(tmp_path):
+    """Verify concurrent conflicting reviews cannot both succeed.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
@@ -260,6 +324,14 @@ def test_concurrent_conflicting_reviews_cannot_both_succeed(tmp_path):
         barrier = Barrier(2)
 
         def decide(decision):
+            """Prepare the decide test fixture without shared production state.
+
+            Args:
+                decision: Explicit review transition, restricted by the workflow.
+
+            Returns:
+                The controlled fixture result used by this test.
+            """
             barrier.wait(timeout=10)
             try:
                 return review_catalog(
@@ -281,6 +353,7 @@ def test_concurrent_conflicting_reviews_cannot_both_succeed(tmp_path):
 
 
 def test_reconcile_reparents_retained_child_before_removing_old_parent():
+    """Verify reconcile reparents retained child before removing old parent."""
     engine, factory, build = prepare_build()
     try:
         first = persist_snapshot_catalog_proposal(factory, build)
@@ -306,12 +379,29 @@ def test_reconcile_reparents_retained_child_before_removing_old_parent():
 
 
 def test_review_mid_flush_failure_rolls_back_all_states(tmp_path):
+    """Verify review mid flush failure rolls back all states.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     from sqlalchemy import event
     from sqlalchemy.orm import Session
 
     engine, factory, build = prepare_build()
 
     def fail(session, flush_context, instances):
+        """Prepare the fail test fixture without shared production state.
+
+        Args:
+            session: Caller-owned SQLAlchemy session; the caller controls
+                commit/rollback.
+            flush_context: Test fixture or parameter controlling the flush context
+                scenario.
+            instances: Test fixture or parameter controlling the instances scenario.
+
+        Raises:
+            RuntimeError: injected review failure.
+        """
         if any(
             isinstance(item, TopicCatalogRecord) and item.status == "rejected"
             for item in session.dirty
@@ -347,6 +437,14 @@ def test_review_mid_flush_failure_rolls_back_all_states(tmp_path):
 def test_cli_commands_delegate_and_emit_inspectable_results(
     tmp_path, monkeypatch, capsys
 ):
+    """Verify cli commands delegate and emit inspectable results.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+        capsys: Pytest capture fixture for stdout and stderr assertions.
+    """
     import json
 
     from scripts.catalog_cli import run
@@ -403,6 +501,11 @@ def test_cli_commands_delegate_and_emit_inspectable_results(
 
 
 def test_exact_snapshot_extraction_through_approved_artifacts(tmp_path):
+    """Verify exact snapshot extraction through approved artifacts.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     import os
     from uuid import uuid4
 
@@ -487,6 +590,12 @@ def test_exact_snapshot_extraction_through_approved_artifacts(tmp_path):
 
 
 def test_catalog_identity_retry_is_bounded(monkeypatch):
+    """Verify catalog identity retry is bounded.
+
+    Args:
+        monkeypatch: Pytest fixture restoring environment and dependency overrides after
+            the test.
+    """
     from types import SimpleNamespace
 
     from sqlalchemy.exc import IntegrityError
@@ -496,6 +605,8 @@ def test_catalog_identity_retry_is_bounded(monkeypatch):
     engine, factory, build = prepare_build()
 
     class IdentityRace(Exception):
+        """Controlled identity race fixture for isolated behavioral tests."""
+
         sqlstate = "23505"
         diag = SimpleNamespace(
             constraint_name="uq_topic_catalogs_documentation_version_config_hash"
@@ -504,6 +615,17 @@ def test_catalog_identity_retry_is_bounded(monkeypatch):
     calls = 0
 
     def race_once(*args):
+        """Prepare the race once test fixture without shared production state.
+
+        Args:
+            *args: Additional positional arguments.
+
+        Returns:
+            The controlled fixture result used by this test.
+
+        Raises:
+            IntegrityError: insert.
+        """
         nonlocal calls
         calls += 1
         if calls == 1:
@@ -517,6 +639,14 @@ def test_catalog_identity_retry_is_bounded(monkeypatch):
         calls = 0
 
         def always_race(*args):
+            """Prepare the always race test fixture without shared production state.
+
+            Args:
+                *args: Additional positional arguments.
+
+            Raises:
+                IntegrityError: insert.
+            """
             nonlocal calls
             calls += 1
             raise IntegrityError("insert", {}, IdentityRace())
@@ -530,6 +660,11 @@ def test_catalog_identity_retry_is_bounded(monkeypatch):
 
 
 def test_submission_rejects_missing_primary_evidence(tmp_path):
+    """Verify submission rejects missing primary evidence.
+
+    Args:
+        tmp_path: Pytest-provided temporary directory for isolated artifacts.
+    """
     from sqlalchemy import delete
 
     engine, factory, build = prepare_build()

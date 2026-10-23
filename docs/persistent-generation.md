@@ -1,3 +1,9 @@
+<!--
+File: docs/persistent-generation.md
+Purpose: Persistent generation workflow.
+Maintainer: sunshine-engineer
+Modified: 2026-10-23
+-->
 # Persistent generation workflow
 
 ## Scope

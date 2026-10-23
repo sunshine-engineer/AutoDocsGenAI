@@ -4,9 +4,9 @@ Status: frozen on 2026-08-13. This document is the authoritative delivery
 roadmap. Changes to its product boundaries or approved architecture decisions
 require an explicit decision and a documented revision.
 
-## Current delivery addendum — 2026-10-16
+## Current delivery addendum — reviewed 2026-10-22
 
-Sunny requested a central documentation website and GCP VM deployment. The
+PR #36 merged on 2026-10-17; main CI passed. See the [handover checklist](handover.md) for current acceptance gaps. Sunny requested a central documentation website and GCP VM deployment. The
 [current findings and closure tracker](closure-tracker.md) records this delivery
 surface, verified compatibility findings, pending work and acceptance criteria.
 This extends how approved artifacts are served; it does not remove source or
